@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../app/generated/prisma"
 }
 
@@ -13,12 +13,12 @@ datasource db {
   provider = "postgresql"
 }
 
-/*
-  Models for CRM Office
-  - CNPJ stored as varchar(14) (normalized, only digits)
-  - timestamps use DateTime
-  - raw payloads use Json where appropriate 
-*/
+/**
+ * Models for CRM Office
+ * - CNPJ stored as varchar(14) (normalized, only digits)
+ * - timestamps use DateTime
+ * - raw payloads use Json where appropriate
+ */
 
 enum Role {
   ADMIN
@@ -43,26 +43,33 @@ enum ActivityKind {
   SECONDARY
 }
 
-/*** USERS ***/
+/**
+ * * USERS **
+ */
 model User {
-  id          Int      @id @default(autoincrement())
-  username    String   @unique
-  password    String
-  role        Role     @default(USER)
-  active      Boolean  @default(true)
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  password String
+  role     Role    @default(USER)
+  active   Boolean @default(true)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  companySectors    CompanySector[]
-  notes             Note[]
-  attachments       Attachment[] @relation("AttachmentUploader")
-  certificates      Certificate[] @relation("CertificateUploader")
-  auditLogs         AuditLog[]
+  companySectors CompanySector[]
+  notes          Note[]
+  attachments    Attachment[]    @relation("AttachmentUploader")
+  certificates   Certificate[]   @relation("CertificateUploader")
+  auditLogs      AuditLog[]
+
+  // NEW: forms created by this user
+  forms Form[]
 }
 
-/*** FORMS (histórico dos formulários internos) ***/
+/**
+ * * FORMS (histórico dos formulários internos) **
+ */
 model Form {
   id            Int      @id @default(autoincrement())
   cnpj          String?  @db.VarChar(14)
@@ -72,91 +79,102 @@ model Form {
   sector        String?
   certificate   Boolean?
 
-  companyCnpj   String?  @db.VarChar(14)  // FK to Company if a company was created from this form
+  companyCnpj String? @db.VarChar(14) // FK to Company if a company was created from this form
 
-  createdById   Int?
-  createdBy     User?    @relation(fields: [createdById], references: [id])
+  // NEW: relation back to Company
+  createdCompany Company? @relation("FormCompany")
 
-  createdAt     DateTime @default(now())
+  createdById Int?
+  createdBy   User? @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
 }
 
-/*** COMPANIES (dados principais + Receita) ***/
+/**
+ * * COMPANIES (dados principais + Receita) **
+ */
 model Company {
-  cnpj         String   @id @db.VarChar(14)
-  name         String?
-  fantasy      String?
-  status       String?
-  type         String?
-  size         String?
-  legalNature  String?
+  cnpj        String  @id @db.VarChar(14)
+  name        String?
+  fantasy     String?
+  status      String?
+  type        String?
+  size        String?
+  legalNature String?
 
-  publicSpace  String?
-  number       String?
-  district     String?
-  city         String?
-  state        String?
-  zipCode      String?  // varchar to preserve leading zeros
-  email        String?
-  telephone    String?
+  publicSpace String?
+  number      String?
+  district    String?
+  city        String?
+  state       String?
+  zipCode     String? // varchar to preserve leading zeros
+  email       String?
+  telephone   String?
 
-  opening      DateTime? 
-  lastUpdate   DateTime? 
+  opening    DateTime?
+  lastUpdate DateTime?
 
-  sourceFormId Int?      // optional link to forms.id
-  sourceForm   Form?     @relation(fields: [sourceFormId], references: [id])
+  sourceFormId Int?  @unique
+  sourceForm   Form? @relation("FormCompany", fields: [sourceFormId], references: [id])
 
-  rawData      Json?     // optional: store full API payload if desired
+  rawData Json? // optional: store full API payload if desired
 
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  deletedAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   // relations
-  qsas             CompanyQsa[]
-  activities       CompanyActivity[]
-  companySectors   CompanySector[]
-  companySystems   CompanySystem[]
-  contacts         Contact[]
-  attachments      Attachment[]
-  certificates     Certificate[]
-  notes            Note[]
+  qsas           CompanyQsa[]
+  activities     CompanyActivity[]
+  companySectors CompanySector[]
+  companySystems CompanySystem[]
+  contacts       Contact[]
+  attachments    Attachment[]
+  certificates   Certificate[]
+  notes          Note[]
 }
 
-/*** QSA (sócios) ***/
+/**
+ * * QSA (sócios) **
+ */
 model CompanyQsa {
-  id          Int      @id @default(autoincrement())
-  companyCnpj String   @db.VarChar(14)
-  nome        String
+  id           Int    @id @default(autoincrement())
+  companyCnpj  String @db.VarChar(14)
+  nome         String
   qualificacao String
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  company     Company  @relation(fields: [companyCnpj], references: [cnpj])
+  company Company @relation(fields: [companyCnpj], references: [cnpj])
 
   @@index([companyCnpj])
 }
 
-/*** CNAE / atividades ***/
+/**
+ * * CNAE / atividades **
+ */
 model CompanyActivity {
-  id          Int      @id @default(autoincrement())
-  companyCnpj String   @db.VarChar(14)
+  id          Int          @id @default(autoincrement())
+  companyCnpj String       @db.VarChar(14)
   cnaeCode    String
   description String?
   kind        ActivityKind
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  company     Company  @relation(fields: [companyCnpj], references: [cnpj])
+  company Company @relation(fields: [companyCnpj], references: [cnpj])
 
   @@index([companyCnpj])
-  @@index([cnaeCode])  
+  @@index([cnaeCode])
 }
 
-/*** SETORES (catálogo internos) ***/
+/**
+ * * SETORES (catálogo internos) **
+ */
 model Sector {
   id          Int      @id @default(autoincrement())
   key         String   @unique
@@ -165,33 +183,37 @@ model Sector {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  companySectors CompanySector[]  
+  companySectors CompanySector[]
 }
 
-/*** COMPANY_SECTORES (status por setor + responsável) ***/
+/**
+ * * COMPANY_SECTORES (status por setor + responsável) **
+ */
 model CompanySector {
-  id          Int                     @id @default(autoincrement())
-  companyCnpj String                  @db.VarChar(14)
+  id          Int                 @id @default(autoincrement())
+  companyCnpj String              @db.VarChar(14)
   sectorId    Int
-  status      CompanySectorStatus    @default(NOT_REGISTERED)
+  status      CompanySectorStatus @default(NOT_REGISTERED)
   ownerId     Int?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  company     Company  @relation(fields: [companyCnpj], references: [cnpj])
-  sector      Sector   @relation(fields: [sectorId], references: [id])
-  owner       User?    @relation(fields: [ownerId], references: [id])
+  company Company @relation(fields: [companyCnpj], references: [cnpj])
+  sector  Sector  @relation(fields: [sectorId], references: [id])
+  owner   User?   @relation(fields: [ownerId], references: [id])
 
-  notes       Note[]
+  notes Note[]
 
+  @@unique([companyCnpj, sectorId])
   @@index([companyCnpj])
   @@index([sectorId])
-  @@unique([companyCnpj, sectorId])  
 }
 
-/*** SYSTEMS (catálogo de sistemas internos) ***/
+/**
+ * * SYSTEMS (catálogo de sistemas internos) **
+ */
 model System {
   id        Int      @id @default(autoincrement())
   key       String   @unique
@@ -202,110 +224,122 @@ model System {
   companySystems CompanySystem[]
 }
 
-/*** COMPANY_SYSTEMS (status de cadastro em sistemas) ***/
+/**
+ * * COMPANY_SYSTEMS (status de cadastro em sistemas) **
+ */
 model CompanySystem {
-  id          Int      @id @default(autoincrement())
-  companyCnpj String   @db.VarChar(14)
-  systemId    Int
-  registered  Boolean  @default(false)
-  details     String?
+  id           Int       @id @default(autoincrement())
+  companyCnpj  String    @db.VarChar(14)
+  systemId     Int
+  registered   Boolean   @default(false)
+  details      String?
   registeredAt DateTime?
 
-  company     Company  @relation(fields: [companyCnpj], references: [cnpj])
-  system      System   @relation(fields: [systemId], references: [id])
+  company Company @relation(fields: [companyCnpj], references: [cnpj])
+  system  System  @relation(fields: [systemId], references: [id])
 
+  @@unique([companyCnpj, systemId])
   @@index([companyCnpj])
   @@index([systemId])
-  @@unique([companyCnpj, systemId])
 }
 
-/*** CONTACTS ***/
+/**
+ * * CONTACTS **
+ */
 model Contact {
-  id          Int      @id @default(autoincrement())
-  firstName   String
-  lastName    String?
-  email       String?
-  phone       String?
-  title       String?
+  id        Int     @id @default(autoincrement())
+  firstName String
+  lastName  String?
+  email     String?
+  phone     String?
+  title     String?
 
-  companyCnpj String   @db.VarChar(14)
+  companyCnpj String @db.VarChar(14)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  company     Company  @relation(fields: [companyCnpj], references: [cnpj])
+  company Company @relation(fields: [companyCnpj], references: [cnpj])
 
   @@index([companyCnpj])
   @@index([email])
 }
 
-/*** NOTES ***/
+/**
+ * * NOTES **
+ */
 model Note {
-  id               Int      @id @default(autoincrement())
-  content          String
-  authorId         Int?
-  companyCnpj      String?  @db.VarChar(14)
-  companySectorId  Int?
+  id              Int     @id @default(autoincrement())
+  content         String
+  authorId        Int?
+  companyCnpj     String? @db.VarChar(14)
+  companySectorId Int?
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  author           User?    @relation(fields: [authorId], references: [id])
-  company          Company? @relation(fields: [companyCnpj], references: [cnpj])
-  companySector    CompanySector? @relation(fields: [companySectorId], references: [id])
+  author        User?          @relation(fields: [authorId], references: [id])
+  company       Company?       @relation(fields: [companyCnpj], references: [cnpj])
+  companySector CompanySector? @relation(fields: [companySectorId], references: [id])
 }
 
-/*** ATTACHMENTS (arquivos vinculados - Google Drive IDs ou S3 keys) ***/
+/**
+ * * ATTACHMENTS (arquivos vinculados - Google Drive IDs ou S3 keys) **
+ */
 model Attachment {
-  id          Int      @id @default(autoincrement())
-  companyCnpj String   @db.VarChar(14)
-  driveFileId String?  @unique
+  id          Int     @id @default(autoincrement())
+  companyCnpj String  @db.VarChar(14)
+  driveFileId String? @unique
   url         String?
   filename    String?
   mimetype    String?
   size        Int?
 
-  uploadedBy  Int?
-  createdAt   DateTime @default(now())
+  uploadedBy Int?
+  createdAt  DateTime @default(now())
 
-  uploader    User?    @relation("AttachmentUploader", fields: [uploadedBy], references: [id])
-  company     Company  @relation(fields: [companyCnpj], references: [cnpj])
+  uploader User?   @relation("AttachmentUploader", fields: [uploadedBy], references: [id])
+  company  Company @relation(fields: [companyCnpj], references: [cnpj])
 
   @@index([companyCnpj])
 }
 
-/*** CERTIFICATES (certificados digitais vinculados ao Drive) ***/
+/**
+ * * CERTIFICATES (certificados digitais vinculados ao Drive) **
+ */
 model Certificate {
-  id           Int      @id @default(autoincrement())
-  companyCnpj  String   @db.VarChar(14)
-  driveFileId  String   @unique
-  filename     String?
-  mimetype     String?
-  size         Int?
-  uploadedBy   Int?
-  uploadedAt   DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  companyCnpj String   @db.VarChar(14)
+  driveFileId String   @unique
+  filename    String?
+  mimetype    String?
+  size        Int?
+  uploadedBy  Int?
+  uploadedAt  DateTime @default(now())
 
-  subject      String?
-  issuer       String?
-  serialNumber String?
-  validFrom    DateTime?
-  validTo      DateTime?
-  status       CertificateStatus @default(UNKNOWN)
+  subject       String?
+  issuer        String?
+  serialNumber  String?
+  validFrom     DateTime?
+  validTo       DateTime?
+  status        CertificateStatus @default(UNKNOWN)
   lastCheckedAt DateTime?
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  deletedAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  uploader     User?    @relation("CertificateUploader", fields: [uploadedBy], references: [id])
-  company      Company  @relation(fields: [companyCnpj], references: [cnpj])
+  uploader User?   @relation("CertificateUploader", fields: [uploadedBy], references: [id])
+  company  Company @relation(fields: [companyCnpj], references: [cnpj])
 
   @@index([companyCnpj])
   @@index([validTo])
 }
 
-/*** AUDIT LOGS ***/
+/**
+ * * AUDIT LOGS **
+ */
 model AuditLog {
   id        Int      @id @default(autoincrement())
   entity    String
@@ -315,5 +349,5 @@ model AuditLog {
   userId    Int?
   createdAt DateTime @default(now())
 
-  user      User?    @relation(fields: [userId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
 }
