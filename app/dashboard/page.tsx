@@ -7,6 +7,8 @@ import { ChartBarMixed } from "./components/chartBar";
 import { ChartAreaInteractive } from "./components/chartArea";
 
 export default function Dashboard() {
+
+    // Dados fictícios para os gráficos
     const chartDataRegimeTributario = [
         { category: "simples", value: 27, fill: "var(--color-simples)" },
         { category: "presumido", value: 20, fill: "var(--color-presumido)" },
@@ -33,6 +35,7 @@ export default function Dashboard() {
         { category: "pedroArthur", value: 10, fill: "var(--color-pedroArthur)" },
     ]
 
+    // Configurações dos gráficos
     const chartConfigRegimeTributario = {
         value: {
             label: "Empresas",
@@ -116,8 +119,8 @@ export default function Dashboard() {
     return (
         <div>
             <Header/>
-            <h1 className="text-3xl m-2 mt-4 font-medium">Dashboard</h1>
-            <div className="grid grid-cols-2 gap-4 m-2 mt-7">
+            <h1 className=" text-xl md:text-3xl m-2 mt-4 font-medium px-8">Dashboard</h1>
+            <div className="md:grid grid-cols-2 gap-8 m-2 mt-2 p-8 w-auto h-auto">
                 {/* Primeira Coluna */}
                 <ChartBarMixed
                     nome="Regime Tributário"

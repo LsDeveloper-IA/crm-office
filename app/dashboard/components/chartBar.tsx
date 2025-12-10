@@ -39,7 +39,7 @@ export function ChartBarMixed(info: {nome: string, descricao: string, config: Ch
               dataKey="category"
               type="category"
               tickLine={false}
-              tickMargin={10}
+              tickMargin={5}
               axisLine={false}
               tickFormatter={(value) =>
                 info.config[value as keyof typeof info.config]?.label
