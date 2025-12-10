@@ -62,10 +62,10 @@ export function ChartBarMixed(info: any) {
         <CardDescription>{info.descricao}</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={info.chartConfig}>
+        <ChartContainer config={chartConfig}>
           <BarChart
             accessibilityLayer
-            data={info.chartData}
+            data={chartData}
             layout="vertical"
             margin={{
               left: 0,

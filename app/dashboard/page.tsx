@@ -67,14 +67,23 @@ export default function Dashboard() {
                 <ChartBarMixed
                     nome="Regime Tributário"
                     descricao="Empresas por regime tributário"
-                    chartConfig={chartConfig}
-                    chartData={dados}
                 />
-                <ChartBarMixed/>
+
+                <ChartBarMixed
+                    nome="Atividades Principais"
+                    descricao="Empresas por atividade principal"
+                />
 
                 {/* Segunda Coluna */}
-                <ChartBarMixed/>
-                <ChartBarMixed/>
+                <ChartBarMixed
+                    nome="Empresas Ativas"
+                    descricao="Quantidade de empresas ativas por setor"
+                />
+
+                <ChartBarMixed
+                    nome="Responsáveis"
+                    descricao="Quantidade de empresas por responsável"
+                />
 
             </div>
         </div>
