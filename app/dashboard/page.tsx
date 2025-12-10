@@ -7,82 +7,145 @@ import { ChartBarMixed } from "./components/chartBar";
 import { ChartAreaInteractive } from "./components/chartArea";
 
 export default function Dashboard() {
-    const chartConfig = {
-        value: {
-            label: "Vendas Mensais",
-            color: "blue",
-            axis: "y",
-        },
+    const chartDataRegimeTributario = [
+        { category: "simples", value: 27, fill: "var(--color-simples)" },
+        { category: "presumido", value: 20, fill: "var(--color-presumido)" },
+        { category: "real", value: 18, fill: "var(--color-real)" },
+        { category: "mei", value: 17, fill: "var(--color-mei)" },
+    ]
 
-        mes: {
-            label: "mês"
-        }
+    const chartDataAtividadesPrincipais = [
+        { category: "servico", value: 85, fill: "var(--color-servico)" },
+        { category: "industria", value: 115, fill: "var(--color-industria)" },
+        { category: "comercio", value: 100, fill: "var(--color-comercio)" },
+    ]
+
+    const chartDataEmpresasAtivasPorSetor = [
+        { category: "fiscal", value: 60, fill: "var(--color-fiscal)" },
+        { category: "contabil", value: 100, fill: "var(--color-contabil)" },
+        { category: "pessoal", value: 45, fill: "var(--color-pessoal)" },
+    ]
+
+    const chartDataResponsaveis = [
+        { category: "thais", value: 25, fill: "var(--color-thais)" },
+        { category: "carla", value: 25, fill: "var(--color-carla)" },
+        { category: "fernando", value: 15, fill: "var(--color-fernando)" },
+        { category: "pedroArthur", value: 10, fill: "var(--color-pedroArthur)" },
+    ]
+
+    const chartConfigRegimeTributario = {
+        value: {
+            label: "Empresas",
+        },
+        simples: {
+            label: "Simples",
+            color: "var(--color-neutral-200)",
+        },
+        presumido: {
+            label: "Presumido",
+            color: "var(--color-neutral-400)",
+        },
+        real: {
+            label: "Real",
+            color: "var(--color-neutral-600)",
+        },
+        mei: {
+            label: "MEI",
+            color: "var(--color-neutral-800)",
+        },
     }
 
-    const dados = [
-        { month: "Jan", value: 5},
-        { month: "Fev", value: 10},
-        { month: "Mar", value: 15},
-        { month: "Abr", value: 30},
-        { month: "Mai", value: 25},
-        { month: "Jun", value: 5},
-        { month: "Jul", value: 15},
-        { month: "Ago", value: 25},
-        { month: "Set", value: 35},
-        { month: "Out", value: 20},
-        { month: "Nov", value: 2},
-        { month: "Dez", value: 30},
-    ]
+    const chartConfigAtividadesPrincipais = {
+        value: {
+            label: "Empresas",
+        },
+        servico: {
+            label: "Serviço",
+            color: "var(--color-neutral-200)",
+        },
+        industria: {
+            label: "Indústria",
+            color: "var(--color-neutral-400)",
+        },
+        comercio: {
+            label: "Comércio",
+            color: "var(--color-neutral-600)",
+        },
+    }
+
+    const chartConfigEmpresasAtivasPorSetor = {
+        value: {
+            label: "Empresas",
+        },
+        fiscal: {
+            label: "Fiscal",
+            color: "var(--color-neutral-200)",
+        },
+        contabil: {
+            label: "Contábil",
+            color: "var(--color-neutral-400)",
+        },
+        pessoal: {
+            label: "Pessoal",
+            color: "var(--color-neutral-600)",
+        },
+    }
+
+    const chartConfigResponsaveis = {
+        value: {
+            label: "Empresas",
+        },
+        thais: {
+            label: "Thais",
+            color: "var(--color-neutral-200)",
+        },
+        carla: {
+            label: "Carla",
+            color: "var(--color-neutral-400)",
+        },
+        fernando: {
+            label: "Fernando",
+            color: "var(--color-neutral-600)",
+        },
+        pedroArthur: {
+            label: "Pedro Arthur",
+            color: "var(--color-neutral-800)",
+        },
+    }
 
     return (
         <div>
             <Header/>
             <h1 className="text-3xl m-2 mt-4 font-medium">Dashboard</h1>
             <div className="grid grid-cols-2 gap-4 m-2 mt-7">
-                {/* <div className="p-4 rounded-lg shadow-md border-1 border-gray-200">
-                    <h1 className="mx-10 mb-5 text-xl font-medium">Renda Mensal</h1>
-                    <ChartContainer config={chartConfig} className="mt-2 w-150 h-100">
-                        <BarChart data={dados}>
-                            <XAxis dataKey="month"  tickLine={false} axisLine={false}/>
-                            <YAxis tickLine={false} axisLine={false}/>
-                            <Bar dataKey={"value"} fill="gray" radius={1}/>
-                            <ChartTooltip content={<ChartTooltipContent />} />
-                        </BarChart>
-                    </ChartContainer>
-                    
-                </div>
-                <div className="p-4 rounded-lg shadow-md border-1 border-gray-200">
-                    <h1 className="mx-10 mb-5 text-xl font-medium">Despesas</h1>
-                    <ChartContainer config={chartConfig} className="mt-2 w-150 h-100">
-                        <BarChart data={dados}>
-                            <XAxis dataKey="month"  tickLine={false} axisLine={false}/>
-                            <YAxis tickLine={false} axisLine={false}/>
-                            <Bar dataKey={"value"} fill="gray" radius={1}/>
-                            <ChartTooltip content={<ChartTooltipContent />} />
-                        </BarChart>
-                    </ChartContainer>
-                </div> */}
-
                 {/* Primeira Coluna */}
                 <ChartBarMixed
                     nome="Regime Tributário"
                     descricao="Empresas por regime tributário"
+                    config={chartConfigRegimeTributario}
+                    data={chartDataRegimeTributario}
                 />
 
                 <ChartBarMixed
                     nome="Atividades Principais"
                     descricao="Empresas por atividade principal"
+                    config={chartConfigAtividadesPrincipais}
+                    data={chartDataAtividadesPrincipais}
                 />
 
                 {/* Segunda Coluna */}
                 <ChartBarMixed
                     nome="Empresas Ativas"
                     descricao="Quantidade de empresas ativas por setor"
+                    config={chartConfigEmpresasAtivasPorSetor}
+                    data={chartDataEmpresasAtivasPorSetor}
                 />
 
                 <ChartBarMixed
                     nome="Responsáveis"
                     descricao="Quantidade de empresas por responsável"
+                    config={chartConfigResponsaveis}
+                    data={chartDataResponsaveis}
                 />
 
             </div>
