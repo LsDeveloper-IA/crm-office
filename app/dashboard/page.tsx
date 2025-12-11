@@ -1,12 +1,27 @@
-"use client";
-
 import { Header } from "../../components/layout/header";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltipContent, ChartTooltip} from "@/components/ui/chart";
 import { ChartBarMixed } from "./components/chartBar";
 import { ChartAreaInteractive } from "./components/chartArea";
+import { redirect } from "next/navigation";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+    // Se você está em produção e usa um domínio, defina NEXT_PUBLIC_BASE_URL para evitar problemas de fetch.
+    const base = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+
+    // Fetch server-side: em server components o fetch para o mesmo host encaminha cookies (Next faz forwarding).
+    const res = await fetch(`${base}/api/auth/me`, {
+        method: "GET",
+        cache: "no-store",
+    });
+
+    if (!res.ok) {
+        // Não autenticado → redireciona para /login
+        redirect("/");
+    }
+
+    const json = await res.json();
+    const user = json.user;
 
     // Dados fictícios para os gráficos
     const chartDataRegimeTributario = [

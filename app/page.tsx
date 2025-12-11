@@ -2,6 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  username: z
+    .string()
+    .min(1, "O Email é obrigatório")
+    .email("Formato de email inválido"),
+
+  password: z
+  .string().min(1, "Senha é obrigatória"),
+});
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,8 +24,16 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (loading) return;
     setError("");
+
+    // 🔎 1. Validação Zod
+    const parsed = loginSchema.safeParse({ username, password });
+
+    if (!parsed.success) {
+      setError(parsed.error.issues[0].message);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -45,9 +64,8 @@ export default function LoginPage() {
     <>
       {/* Background gradient */}
       <div
-        className="absolute top-0 left-0 right-0 bottom-0 h-full w-full overflow-hidden
-                   bg-gradient-to-b from-[#02022a] to-[#030142]"
-        aria-hidden
+        className="absolute top-0 left-0 bottom-0 leading-5 h-full w-full overflow-hidden 
+          bg-[#030142] bg-linear-to-b from-[#02022a] to-[#030142]"
       />
 
       <div className="relative min-h-screen flex items-center justify-center">
