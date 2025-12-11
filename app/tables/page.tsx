@@ -1,8 +1,8 @@
 "use cliente";
 
 import { Header } from "../../components/layout/header";
-import { DataTable } from "./dataTables";
-import { columns, Payment } from "./column"
+import { DataTable } from "./components/dataTables";
+import { columns, Payment } from "./components/column"
 
 async function getData(): Promise<Payment[]> {
     return [
@@ -25,7 +25,7 @@ async function getData(): Promise<Payment[]> {
             email: "exampleThree@gmail.com",
         },
         {
-            id: "1",
+            id: "4",
             amount: 1050,
             status: "success",
             email: "exampleFour@gmail.com",
@@ -33,14 +33,14 @@ async function getData(): Promise<Payment[]> {
     ]
 }
 
-export default async function Tabels() {
+export default async function tables() {
     const data = await getData();
 
     return (
         <div>
             <Header/>
-            <h1 className="text-3xl m-2 mt-4 font-medium">Tables</h1>
-            <div className="w-fulll h-full p-2">
+            <h1 className="md:text-3xl text-xl m-2 mt-4 font-medium">Tables</h1>
+            <div className="w-full h-full p-2">
                 <DataTable columns={columns} data={data}/>
             </div>
         </div>

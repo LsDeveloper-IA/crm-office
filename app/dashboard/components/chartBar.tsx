@@ -32,14 +32,14 @@ export function ChartBarMixed(info: {nome: string, descricao: string, config: Ch
             data={info.data}
             layout="vertical"
             margin={{
-              left: 0,
+              left: 10,
             }}
           >
             <YAxis
               dataKey="category"
               type="category"
               tickLine={false}
-              tickMargin={5}
+              tickMargin={0}
               axisLine={false}
               tickFormatter={(value) =>
                 info.config[value as keyof typeof info.config]?.label

@@ -4,132 +4,13 @@ import { ChartContainer, ChartTooltipContent, ChartTooltip} from "@/components/u
 import { ChartBarMixed } from "./components/chartBar";
 import { ChartAreaInteractive } from "./components/chartArea";
 import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
+import dataChartBar from "./components/dataChartBar";
 
-export default async function Dashboard() {
-    // Se você está em produção e usa um domínio, defina NEXT_PUBLIC_BASE_URL para evitar problemas de fetch.
-    const base = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+export default async function dashboard() {
+    const user = await getCurrentUser();
 
-    // Fetch server-side: em server components o fetch para o mesmo host encaminha cookies (Next faz forwarding).
-    const res = await fetch(`${base}/api/auth/me`, {
-        method: "GET",
-        cache: "no-store",
-    });
-
-    if (!res.ok) {
-        // Não autenticado → redireciona para /login
-        redirect("/");
-    }
-
-    const json = await res.json();
-    const user = json.user;
-
-    // Dados fictícios para os gráficos
-    const chartDataRegimeTributario = [
-        { category: "simples", value: 27, fill: "var(--color-simples)" },
-        { category: "presumido", value: 20, fill: "var(--color-presumido)" },
-        { category: "real", value: 18, fill: "var(--color-real)" },
-        { category: "mei", value: 17, fill: "var(--color-mei)" },
-    ]
-
-    const chartDataAtividadesPrincipais = [
-        { category: "servico", value: 85, fill: "var(--color-servico)" },
-        { category: "industria", value: 115, fill: "var(--color-industria)" },
-        { category: "comercio", value: 100, fill: "var(--color-comercio)" },
-    ]
-
-    const chartDataEmpresasAtivasPorSetor = [
-        { category: "fiscal", value: 60, fill: "var(--color-fiscal)" },
-        { category: "contabil", value: 100, fill: "var(--color-contabil)" },
-        { category: "pessoal", value: 45, fill: "var(--color-pessoal)" },
-    ]
-
-    const chartDataResponsaveis = [
-        { category: "thais", value: 25, fill: "var(--color-thais)" },
-        { category: "carla", value: 25, fill: "var(--color-carla)" },
-        { category: "fernando", value: 15, fill: "var(--color-fernando)" },
-        { category: "pedroArthur", value: 10, fill: "var(--color-pedroArthur)" },
-    ]
-
-    // Configurações dos gráficos
-    const chartConfigRegimeTributario = {
-        value: {
-            label: "Empresas",
-        },
-        simples: {
-            label: "Simples",
-            color: "var(--color-neutral-200)",
-        },
-        presumido: {
-            label: "Presumido",
-            color: "var(--color-neutral-400)",
-        },
-        real: {
-            label: "Real",
-            color: "var(--color-neutral-600)",
-        },
-        mei: {
-            label: "MEI",
-            color: "var(--color-neutral-800)",
-        },
-    }
-
-    const chartConfigAtividadesPrincipais = {
-        value: {
-            label: "Empresas",
-        },
-        servico: {
-            label: "Serviço",
-            color: "var(--color-neutral-200)",
-        },
-        industria: {
-            label: "Indústria",
-            color: "var(--color-neutral-400)",
-        },
-        comercio: {
-            label: "Comércio",
-            color: "var(--color-neutral-600)",
-        },
-    }
-
-    const chartConfigEmpresasAtivasPorSetor = {
-        value: {
-            label: "Empresas",
-        },
-        fiscal: {
-            label: "Fiscal",
-            color: "var(--color-neutral-200)",
-        },
-        contabil: {
-            label: "Contábil",
-            color: "var(--color-neutral-400)",
-        },
-        pessoal: {
-            label: "Pessoal",
-            color: "var(--color-neutral-600)",
-        },
-    }
-
-    const chartConfigResponsaveis = {
-        value: {
-            label: "Empresas",
-        },
-        thais: {
-            label: "Thais",
-            color: "var(--color-neutral-200)",
-        },
-        carla: {
-            label: "Carla",
-            color: "var(--color-neutral-400)",
-        },
-        fernando: {
-            label: "Fernando",
-            color: "var(--color-neutral-600)",
-        },
-        pedroArthur: {
-            label: "Pedro Arthur",
-            color: "var(--color-neutral-800)",
-        },
-    }
+    if (!user) return redirect("/")
 
     return (
         <div>
@@ -140,30 +21,30 @@ export default async function Dashboard() {
                 <ChartBarMixed
                     nome="Regime Tributário"
                     descricao="Empresas por regime tributário"
-                    config={chartConfigRegimeTributario}
-                    data={chartDataRegimeTributario}
+                    config={dataChartBar.regimeTributario.config}
+                    data={dataChartBar.regimeTributario.data}
                 />
 
                 <ChartBarMixed
                     nome="Atividades Principais"
                     descricao="Empresas por atividade principal"
-                    config={chartConfigAtividadesPrincipais}
-                    data={chartDataAtividadesPrincipais}
+                    config={dataChartBar.atividadesPrincipais.config}
+                    data={dataChartBar.atividadesPrincipais.data}
                 />
 
                 {/* Segunda Coluna */}
                 <ChartBarMixed
                     nome="Empresas Ativas"
                     descricao="Quantidade de empresas ativas por setor"
-                    config={chartConfigEmpresasAtivasPorSetor}
-                    data={chartDataEmpresasAtivasPorSetor}
+                    config={dataChartBar.empresasAtivasPorSetor.config}
+                    data={dataChartBar.empresasAtivasPorSetor.data}
                 />
 
                 <ChartBarMixed
                     nome="Responsáveis"
                     descricao="Quantidade de empresas por responsável"
-                    config={chartConfigResponsaveis}
-                    data={chartDataResponsaveis}
+                    config={dataChartBar.responsaveis.config}
+                    data={dataChartBar.responsaveis.data}
                 />
 
             </div>
