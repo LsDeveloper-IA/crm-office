@@ -1,38 +1,35 @@
+// debug versão - app/api/auth/me/route.ts
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import prisma from "@/lib/prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get("token")?.value;
+    const tokenFromCookie = req.cookies.get("token")?.value;
+    const authHeader = req.headers.get("authorization");
+
+    // Log para console do servidor
+    console.log("tokenFromCookie:", tokenFromCookie);
+    console.log("authorization header:", authHeader);
+
+    // fallback: se veio Authorization, extraia Bearer
+    const token = tokenFromCookie ?? (authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : undefined);
+
     if (!token) {
-      return NextResponse.json({ authenticated: false }, { status: 401 });
+      return NextResponse.json({ authenticated: false, reason: "no_token" }, { status: 401 });
     }
 
-    const payload = jwt.verify(token, JWT_SECRET) as { sub?: number; username?: string; role?: string } | null;
-
-    if (!payload?.sub) {
-      return NextResponse.json({ authenticated: false }, { status: 401 });
+    try {
+      const payload = jwt.verify(token, JWT_SECRET);
+      return NextResponse.json({ authenticated: true, payload });
+    } catch (err) {
+      console.error("jwt verify failed:", err);
+      return NextResponse.json({ authenticated: false, reason: "invalid_token" }, { status: 401 });
     }
-
-    const user = await prisma.user.findUnique({
-      where: { id: Number(payload.sub) },
-      select: { id: true, username: true, role: true, active: true },
-    });
-
-    if (!user) {
-      return NextResponse.json({ authenticated: false }, { status: 401 });
-    }
-    if (!user.active) {
-      return NextResponse.json({ authenticated: false }, { status: 403 });
-    }
-
-    return NextResponse.json({ authenticated: true, user });
   } catch (err) {
-    console.error("auth/me error:", err);
-    return NextResponse.json({ authenticated: false }, { status: 401 });
+    console.error("me debug error:", err);
+    return NextResponse.json({ authenticated: false, reason: "server_error" }, { status: 500 });
   }
 }
