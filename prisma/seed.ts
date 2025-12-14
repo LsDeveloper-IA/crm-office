@@ -1,5 +1,5 @@
 // prisma/seed.ts
-import { PrismaClient, Prisma } from "../app/generated/prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import "dotenv/config";
@@ -51,6 +51,7 @@ export async function main() {
   await prisma.user.upsert({
     where: { username: adminEmail },
     update: {
+      name: "Administrator",
       password: hashedPassword,
       role: "ADMIN",
       active: true,
@@ -58,6 +59,7 @@ export async function main() {
     },
     create: {
       username: adminEmail,
+      name: "Administrator",
       password: hashedPassword,
       role: "ADMIN",
       active: true,

@@ -42,11 +42,11 @@ export async function getCurrentUser(): Promise<CurrentUser> {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, username: true, role: true },
+      select: { id: true, username: true, role: true, name: true },
     });
 
     if (!user) return null;
-    return { id: user.id, username: user.username!, role: user.role! };
+    return { id: user.id, username: user.username!, role: user.role!, name: user.name! };
   } catch (err) {
     console.error("getCurrentUser error:", err);
     return null;
