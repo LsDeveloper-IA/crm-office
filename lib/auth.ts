@@ -2,7 +2,7 @@ import { cookies, headers } from "next/headers";
 import jwt from "jsonwebtoken";
 import prisma from "./prisma"; // ajuste o caminho se o seu arquivo prisma estiver em outro lugar
 
-export type CurrentUser = { id: number; username: string; role: string } | null;
+export type CurrentUser = { id: number; username: string; role: string, name:string } | null;
 
 /**
  * Tenta obter o token do cookie (ou do header como fallback),

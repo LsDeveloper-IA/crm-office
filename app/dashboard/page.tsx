@@ -9,7 +9,7 @@ export default async function DashboardPage() {
   if (!user) return redirect("/"); // login na "/"
 
   return (
-    <main className="p-10">
+    <main>
       <h1 className="text-xl font-bold">Bem-vindo, {user.name}</h1>
       <p>Seu cargo: {user.role}</p>
     </main>
