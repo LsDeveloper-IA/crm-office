@@ -10,8 +10,7 @@ export default async function DashboardPage() {
 
   return (
     <main>
-      <h1 className="text-xl font-bold">Bem-vindo, {user.name}</h1>
-      <p>Seu cargo: {user.role}</p>
+      <h1>Welcome to the Dashboard!</h1>
     </main>
   );
 }

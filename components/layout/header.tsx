@@ -1,14 +1,31 @@
-export function Header() {
+// components/layout/header.tsx
+"use client";
+
+import Image from "next/image";
+
+type HeaderProps = {
+  onToggleSidebar: () => void;
+};
+
+export function Header({ onToggleSidebar }: HeaderProps) {
   return (
-    <header className="w-full bg-white shadow-md p-4 flex items-center justify-between">
+    <header className="w-full h-20 px-7 py-5 flex items-center justify-between">
+      <button onClick={onToggleSidebar}>
+        <Image src="/icons/menu.svg" width={36} height={36} alt="Menu" />
+      </button>
+
       <h1 className="text-xl font-bold">My Application</h1>
+
       <nav>
-        <ul className="flex space-x-4">
-          <li><a href="#" className="text-gray-700 hover:text-gray-900">Home</a></li>
-          <li><a href="#" className="text-gray-700 hover:text-gray-900">About</a></li>
-          <li><a href="#" className="text-gray-700 hover:text-gray-900">Contact</a></li>
+        <ul className="flex space-x-1.5">
+          <li>
+            <Image src="/icons/search.svg" width={36} height={36} alt="Search" />
+          </li>
+          <li>
+            <Image src="/icons/plus.svg" width={36} height={36} alt="Add" />
+          </li>
         </ul>
       </nav>
     </header>
-  )
+  );
 }
