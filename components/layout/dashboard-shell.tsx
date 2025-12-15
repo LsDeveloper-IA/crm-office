@@ -31,7 +31,7 @@ export default function DashboardShell({ children, userName }: Props) {
       </aside>
 
       {/* CONTEÚDO */}
-      <main className="flex flex-col flex-1 min-w-0">
+      <main className="flex flex-col flex-1 min-w-0 bg-[#F5F5FA]">
         <Header onToggleSidebar={() => setSidebarOpen(v => !v)} />
 
         <section className="p-6 flex-1 overflow-auto">
