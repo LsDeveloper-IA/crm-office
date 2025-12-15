@@ -2,7 +2,7 @@ import { cookies, headers } from "next/headers";
 import jwt from "jsonwebtoken";
 import prisma from "./prisma"; // ajuste o caminho se o seu arquivo prisma estiver em outro lugar
 
-export type CurrentUser = { id: number; username: string; role: string } | null;
+export type CurrentUser = { id: number; username: string; role: string, name:string } | null;
 
 /**
  * Tenta obter o token do cookie (ou do header como fallback),
@@ -42,11 +42,11 @@ export async function getCurrentUser(): Promise<CurrentUser> {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, username: true, role: true },
+      select: { id: true, username: true, role: true, name: true },
     });
 
     if (!user) return null;
-    return { id: user.id, username: user.username!, role: user.role! };
+    return { id: user.id, username: user.username!, role: user.role!, name: user.name! };
   } catch (err) {
     console.error("getCurrentUser error:", err);
     return null;
