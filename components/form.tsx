@@ -1,4 +1,28 @@
+import { PatternFormat } from "react-number-format";
+import { normalizeCNPJ, validateCNPJ } from "@/lib/cnpj";
+import { useState } from "react";
+import { normalize } from "path";
+
+
 export default function Form() {
+  const [cnpj, setCnpj] = useState('');
+  const [erro, setErro] = useState('');
+  const isValid = validateCNPJ(cnpj);
+  
+  const handleCnpjChange = (e: { target: { value: any; }; preventDefault: () => void; }) => {
+    const valorOriginal = e.target.value;
+    setCnpj(valorOriginal);
+
+    e.preventDefault();
+    setErro('');
+  
+    if (!isValid) {
+      setErro('O CNPJ digitado é inválido. Verifique os números.');
+      return;
+    }
+  };
+
+
   return (
     <form>
         <div className="border-b border-gray-900/10 pb-12">
@@ -9,16 +33,20 @@ export default function Form() {
                 CNPJ
               </label>
               <div className="mt-2">
-                <input
+                <PatternFormat
                   id="cnpj"
                   name="cnpj"
-                  type="text"
-                  autoComplete="given-name"
+                  format="##.###.###/####-##"
+                  mask="_"
+                  placeholder="00.000.000/0000-00"
                   className="block w-full rounded-md bg-white h-8 px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
+                  value={cnpj}
+                  onChange={handleCnpjChange}
+
+                  />
+                  {erro && (<p className="text-red-500 text-[13px] mt-1">{erro}</p>)}
               </div>
             </div>
-
             <div className="mt-3 sm:col-span-3">
               <label htmlFor="grupo-economico" className="block text-sm/6 font-medium text-gray-900">
                 Grupo Econômico
@@ -87,7 +115,7 @@ export default function Form() {
 
                     <div className="flex items-center ">
                         <label htmlFor="contabil" className="text-sm font-medium text-gray-900">Contábil</label>
-                        <input type="checkbox" id="contabil" className="ml-2 w-4 h-4"/>
+                        <input type="checkbox" id="contabil" className="ml-2 w-4 h-4 bg-green-500"/>
                     </div>
                 </div>
             </div>
