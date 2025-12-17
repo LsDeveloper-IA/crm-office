@@ -26,7 +26,7 @@ export default function ModalForm({ isOpen, onClose, imageUrl }: any) {
     <>
       <Backdrop onClose={onClose}/>
         <div
-            className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-5 w-[35%] h-[75%] shadow-sm rounded-md border z-20'
+            className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-5 w-[35%] h-[80%] shadow-sm rounded-md border z-20'
             // Previne que o clique no conteúdo feche o modal
             onClick={(e) => e.stopPropagation()} 
         >

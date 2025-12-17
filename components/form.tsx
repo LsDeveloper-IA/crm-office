@@ -5,19 +5,31 @@ import { normalize } from "path";
 
 
 export default function Form() {
-  const [cnpj, setCnpj] = useState('');
-  const [erro, setErro] = useState('');
-  const isValid = validateCNPJ(cnpj);
+  const [valueTyped, setCnpj] = useState(''); // Armazena o valor do CNPJ
+  const [erro, setErro] = useState(''); // Armazena a mensagem de erro
+  const [disabled, setDisabled] = useState(false); // Estado para controlar se o botão está desabilitado
   
+  // A função "handleCnpjChange" é chamada sempre que o valor do campo de entrada do CNPJ é alterado.
   const handleCnpjChange = (e: { target: { value: any; }; preventDefault: () => void; }) => {
-    const valorOriginal = e.target.value;
-    setCnpj(valorOriginal);
+    const valueTyped = e.target.value; // Captura o valor digitado no campo de entrada
 
-    e.preventDefault();
-    setErro('');
-  
+    const isValid = validateCNPJ(valueTyped); // Valida o CNPJ usando a função "validateCNPJ"
+
+    setCnpj(valueTyped); // Atualiza o estado com o valor digitado
+
+    e.preventDefault(); 
+    setErro(''); // Limpa qualquer mensagem de erro anterior
+    
+    // Se o CNPJ não for válido, define uma mensagem de erro. Ela será exibida para o usuário.
     if (!isValid) {
       setErro('O CNPJ digitado é inválido. Verifique os números.');
+      setDisabled(true);
+      return;
+    }
+
+    else {
+      setDisabled(false);
+      setErro('');
       return;
     }
   };
@@ -40,7 +52,7 @@ export default function Form() {
                   mask="_"
                   placeholder="00.000.000/0000-00"
                   className="block w-full rounded-md bg-white h-8 px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  value={cnpj}
+                  value={valueTyped}
                   onChange={handleCnpjChange}
 
                   />
@@ -121,7 +133,7 @@ export default function Form() {
             </div>
 
             <div className="mt-3 sm:col-span-3">
-                <input type="submit" value="Enviar" className="bg-gray-600 hover:bg-blue-600 text-white px-2 py-1 rounded-sm"/>
+                <input type="submit" value="Enviar" className={`bg-gray-600 text-white px-2 py-1 rounded-sm transition ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`} disabled={disabled}/>
             </div>
           </div>
     </form>
