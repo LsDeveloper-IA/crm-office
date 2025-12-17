@@ -1,24 +1,23 @@
 import { PatternFormat } from "react-number-format";
-import { normalizeCNPJ, validateCNPJ } from "@/lib/cnpj";
+import { validateCNPJ } from "@/lib/cnpj";
 import { useState } from "react";
-import { normalize } from "path";
 
 
 export default function Form() {
-  const [valueTyped, setCnpj] = useState(''); // Armazena o valor do CNPJ
-  const [erro, setErro] = useState(''); // Armazena a mensagem de erro
-  const [disabled, setDisabled] = useState(false); // Estado para controlar se o botão está desabilitado
+  const [valueTyped, setCnpj] = useState('');
+  const [erro, setErro] = useState('');
+  const [disabled, setDisabled] = useState(false);
   
-  // A função "handleCnpjChange" é chamada sempre que o valor do campo de entrada do CNPJ é alterado.
+  // A função faz a verificação do CNPJ e atualiza o estado conforme o valor digitado
   const handleCnpjChange = (e: { target: { value: any; }; preventDefault: () => void; }) => {
-    const valueTyped = e.target.value; // Captura o valor digitado no campo de entrada
+    const valueTyped = e.target.value;
 
-    const isValid = validateCNPJ(valueTyped); // Valida o CNPJ usando a função "validateCNPJ"
+    const isValid = validateCNPJ(valueTyped);
 
-    setCnpj(valueTyped); // Atualiza o estado com o valor digitado
+    setCnpj(valueTyped);
 
     e.preventDefault(); 
-    setErro(''); // Limpa qualquer mensagem de erro anterior
+    setErro('');
     
     // Se o CNPJ não for válido, define uma mensagem de erro. Ela será exibida para o usuário.
     if (!isValid) {
@@ -33,7 +32,6 @@ export default function Form() {
       return;
     }
   };
-
 
   return (
     <form>
@@ -106,6 +104,23 @@ export default function Form() {
                 >
                   <option>Orlando</option>
                   <option>Augusta</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-3 sm:col-span-3">
+                <label htmlFor="certificate" className="block text-sm/6 font-medium text-gray-900">
+                    Certificado
+                </label>
+                <div className="mt-2 grid grid-cols-1">
+                <select
+                  id="contador"
+                  name="contador"
+                  autoComplete="country-name"
+                  className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                >
+                  <option>Sim</option>
+                  <option>Não</option>
                 </select>
               </div>
             </div>

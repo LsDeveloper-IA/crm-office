@@ -1,6 +1,5 @@
-// components/layout/header.tsx
 "use client";
-
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Form from "../modalForm";
 import { useState } from "react";
@@ -9,11 +8,31 @@ type HeaderProps = {
   onToggleSidebar: () => void;
 };
 
+const PAGE_TITLES: Record<string, string> = {
+  "/dashboard": "Dashboard",
+  "/dashboard/empresas": "Empresas",
+  "/dashboard/usuarios": "Usuários",
+  "/dashboard/configuracoes": "Configurações",
+};
+
 export function Header({ onToggleSidebar }: HeaderProps) {
+<<<<<<< HEAD
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+=======
+  const pathname = usePathname();
+
+  const title =
+    PAGE_TITLES[pathname] ??
+    PAGE_TITLES[
+      Object.keys(PAGE_TITLES).find((route) =>
+        pathname.startsWith(route)
+      ) ?? ""
+    ] ??
+    "My Application";
+>>>>>>> 632e40b40c08b7833bda114484f060fb40bf9b85
 
   return (
     <header className="w-full h-20 px-7 py-5 flex items-center justify-between">
@@ -21,7 +40,9 @@ export function Header({ onToggleSidebar }: HeaderProps) {
         <Image src="/icons/menu.svg" width={36} height={36} alt="Menu" />
       </button>
 
-      <h1 className="text-xl font-bold">My Application</h1>
+      <h1 className="text-xl font-bold text-left w-full mx-5">
+        {title}
+      </h1>
 
       <nav>
         <ul className="flex space-x-1.5">
