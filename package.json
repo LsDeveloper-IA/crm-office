@@ -15,11 +15,7 @@
     "@base-ui-components/react": "1.0.0-rc.0",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
-<<<<<<< HEAD
-    "@tanstack/react-table": "^8.21.3",
-=======
     "@tanstack/angular-table": "^8.21.3",
->>>>>>> 632e40b40c08b7833bda114484f060fb40bf9b85
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -31,6 +27,7 @@
     "pg": "^8.16.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-hook-form": "^7.68.0",
     "react-number-format": "^5.4.4",
     "recharts": "2.15.4",
     "tailwind-merge": "^3.4.0"

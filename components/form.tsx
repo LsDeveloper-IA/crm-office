@@ -1,12 +1,24 @@
 import { PatternFormat } from "react-number-format";
 import { validateCNPJ } from "@/lib/cnpj";
 import { useState } from "react";
+import { SubmitHandler, useForm, Controller } from "react-hook-form";
 
+type Inputs = {
+  cnpj: string,
+  grupoEconomico: string,
+  regimeTributario: string,
+  contador: string,
+  certificate: string,
+  setorResponsavel: string[],
+}
 
 export default function Form() {
   const [valueTyped, setCnpj] = useState('');
   const [erro, setErro] = useState('');
   const [disabled, setDisabled] = useState(false);
+  const { register, handleSubmit, control } = useForm<Inputs>();
+
+  const onSubmit: SubmitHandler<Inputs> = data => console.log(data);
   
   // A função faz a verificação do CNPJ e atualiza o estado conforme o valor digitado
   const handleCnpjChange = (e: { target: { value: any; }; preventDefault: () => void; }) => {
@@ -33,8 +45,10 @@ export default function Form() {
     }
   };
 
+  console.log(valueTyped.replace(/\D/g, ''));
+
   return (
-    <form>
+    <form onSubmit={handleSubmit(onSubmit)}>
         <div className="border-b border-gray-900/10 pb-12">
           <h2 className="text-base/7 font-semibold text-gray-900">Formulário</h2>
           
@@ -43,17 +57,26 @@ export default function Form() {
                 CNPJ
               </label>
               <div className="mt-2">
-                <PatternFormat
-                  id="cnpj"
+                <Controller
                   name="cnpj"
-                  format="##.###.###/####-##"
-                  mask="_"
-                  placeholder="00.000.000/0000-00"
-                  className="block w-full rounded-md bg-white h-8 px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  value={valueTyped}
-                  onChange={handleCnpjChange}
-
-                  />
+                  control={control}
+                  defaultValue=""
+                  render={({field: { onChange, value, name} }) => (
+                    <PatternFormat
+                      id="cnpj"
+                      name="cnpj"
+                      format="##.###.###/####-##"
+                      mask="_"
+                      placeholder="00.000.000/0000-00"
+                      className="block w-full rounded-md bg-white h-8 px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      value={valueTyped.replace(/\D/g, '')}
+                      onChange={(e) => {
+                        onChange(e);
+                        handleCnpjChange(e);
+                      }}
+                    />
+                  )} 
+                />
                   {erro && (<p className="text-red-500 text-[13px] mt-1">{erro}</p>)}
               </div>
             </div>
@@ -63,6 +86,7 @@ export default function Form() {
               </label>
               <div className="mt-2">
                 <input
+                  {...register("grupoEconomico")}
                   id="grupo-economico"
                   name="grupo-economico"
                   type="text"
@@ -77,6 +101,7 @@ export default function Form() {
                 Regime Tributário
               </label>
               <select
+                  {...register("regimeTributario")}
                   id="regime-tributario"
                   name="regime-tributario"
                   autoComplete="country-name"
@@ -97,9 +122,9 @@ export default function Form() {
               </label>
               <div className="mt-2 grid grid-cols-1">
                 <select
+                  {...register("contador")}
                   id="contador"
                   name="contador"
-                  autoComplete="country-name"
                   className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 >
                   <option>Orlando</option>
@@ -114,6 +139,7 @@ export default function Form() {
                 </label>
                 <div className="mt-2 grid grid-cols-1">
                 <select
+                  {...register("certificate")}
                   id="contador"
                   name="contador"
                   autoComplete="country-name"
@@ -132,17 +158,17 @@ export default function Form() {
                 <div className="mt-2 grid grid-cols-3">
                     <div className="flex items-center">
                         <label htmlFor="pessoal" className="text-sm font-medium text-gray-900">Pessoal</label>
-                        <input type="checkbox" id="pessoal" className="ml-2 w-4 h-4"/>
+                        <input type="checkbox" id="pessoal" className="ml-2 w-4 h-4" value="pessoal" {...register("setorResponsavel")} />
                     </div>
 
                     <div className="flex items-center">
                         <label htmlFor="fiscal" className="text-sm font-medium text-gray-900">Fiscal</label>
-                        <input type="checkbox" id="fiscal" className="ml-2 w-4 h-4"/>
+                        <input type="checkbox" id="fiscal" className="ml-2 w-4 h-4" value="fiscal" {...register("setorResponsavel")} />
                     </div>
 
                     <div className="flex items-center ">
                         <label htmlFor="contabil" className="text-sm font-medium text-gray-900">Contábil</label>
-                        <input type="checkbox" id="contabil" className="ml-2 w-4 h-4 bg-green-500"/>
+                        <input type="checkbox" id="contabil" className="ml-2 w-4 h-4 bg-green-500" value="contabil" {...register("setorResponsavel")} />
                     </div>
                 </div>
             </div>

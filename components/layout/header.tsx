@@ -16,12 +16,10 @@ const PAGE_TITLES: Record<string, string> = {
 };
 
 export function Header({ onToggleSidebar }: HeaderProps) {
-<<<<<<< HEAD
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-=======
   const pathname = usePathname();
 
   const title =
@@ -32,7 +30,6 @@ export function Header({ onToggleSidebar }: HeaderProps) {
       ) ?? ""
     ] ??
     "My Application";
->>>>>>> 632e40b40c08b7833bda114484f060fb40bf9b85
 
   return (
     <header className="w-full h-20 px-7 py-5 flex items-center justify-between">
