@@ -10,27 +10,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CompanyDrawer } from "./CompanyDrawer";
-import { Fragment } from "react";
-
-type Company = {
-  id: number;
-  name: string;
-  cnpj: string;
-  taxRegime: string;
-  accountant: string;
-  address?: string;
-  sectors: {
-    name: string;
-    responsible?: { name: string } | null;
-  }[];
-};
+import type { CompanyRowDTO } from "../dto";
 
 type Props = {
-  companies: Company[];
+  companies: CompanyRowDTO[];
 };
 
 export function CompanyTable({ companies }: Props) {
-  const [selected, setSelected] = useState<Company | null>(null);
+  const [selectedCnpj, setSelectedCnpj] = useState<string | null>(null);
 
   return (
     <>
@@ -47,25 +34,36 @@ export function CompanyTable({ companies }: Props) {
 
         <TableBody>
           {companies.map((company, index) => (
-            <Fragment key={company.cnpj}>
-              <TableRow
-              onClick={() => setSelected(company)}
-              className="cursor-pointer hover:bg-muted/50"
-              >
-                <TableCell>{index + 1}</TableCell>
-                <TableCell className="font-medium">{company.name}</TableCell>
-                <TableCell className="font-mono text-sm">{company.cnpj}</TableCell>
-                <TableCell>{company.taxRegime}</TableCell>
-                <TableCell>{company.accountant}</TableCell>
-              </TableRow>
-            </Fragment>
+            <TableRow
+              key={company.cnpj}
+              onClick={() => setSelectedCnpj(company.cnpj)}
+              className="cursor-pointer hovern hover:bg-muted/50"
+            >
+              <TableCell>{index + 1}</TableCell>
+
+              <TableCell className="font-medium">
+                {company.name ?? "-"}
+              </TableCell>
+
+              <TableCell className="font-mono text-sm">
+                {company.cnpj}
+              </TableCell>
+
+              <TableCell>
+                {company.profile?.taxRegime ?? "-"}
+              </TableCell>
+
+              <TableCell>
+                {company.profile?.accountant ?? "-"}
+              </TableCell>
+            </TableRow>
           ))}
         </TableBody>
       </Table>
 
       <CompanyDrawer
-        company={selected}
-        onClose={() => setSelected(null)}
+        cnpj={selectedCnpj}
+        onClose={() => setSelectedCnpj(null)}
       />
     </>
   );

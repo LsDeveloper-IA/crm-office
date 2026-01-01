@@ -1,26 +1,31 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import type { CompanyDetailsDTO } from "../dto/company-details.dto";
+
 type Props = {
-  company: {
-    corporateName: string;
-    cnpj: string;
-    taxRegime: string;
-    accountant: string;
-    publicSpace: string;
-    number: string;
-    district: string;
-    city: string;
-    state: string;
-    sectors: {
-      name: string;
-      responsible?: string;
-    }[];
-  } | null;
+  cnpj: string | null;
   onClose: () => void;
 };
 
-export function CompanyDrawer({ company, onClose }: Props) {
-  if (!company) return null;
+export function CompanyDrawer({ cnpj, onClose }: Props) {
+  const [company, setCompany] = useState<CompanyDetailsDTO | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!cnpj) return;
+
+    setLoading(true);
+    setCompany(null);
+
+    fetch(`/api/company/${cnpj}`)
+      .then((res) => res.json())
+      .then((data) => setCompany(data))
+      .finally(() => setLoading(false));
+  }, [cnpj]);
+
+  if (!cnpj) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex">
       {/* overlay */}
@@ -31,49 +36,53 @@ export function CompanyDrawer({ company, onClose }: Props) {
 
       {/* drawer */}
       <aside className="w-[420px] bg-white p-6 overflow-auto">
-        <div className="flex justify-between items-start mb-6">
-          <h2 className="text-xl font-bold">
-            {company.corporateName}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-sm text-muted-foreground hover:text-black"
-          >
-            Fechar
-          </button>
-        </div>
+        {loading && (
+          <p className="text-sm text-muted-foreground">
+            Carregando dados da empresa...
+          </p>
+        )}
 
-        {/* dados gerais */}
-        <section className="mb-6">
-          <h3 className="font-semibold mb-2">Dados gerais</h3>
-          <p><strong>CNPJ:</strong> {company.cnpj}</p>
-          <p><strong>Regime:</strong> {company.taxRegime}</p>
-          <p><strong>Contador:</strong> {company.accountant}</p>
-          <p><strong>Endereço:</strong> {company.publicSpace}</p>
-          <p><strong>Número:</strong> {company.number}</p>
-          <p><strong>Bairro:</strong> {company.district}</p>
-          <p><strong>Cidade:</strong> {company.city}</p>
-          <p><strong>Estado:</strong> {company.state}</p>
-        </section>
+        {!loading && company && (
+          <>
+            <header className="flex justify-between items-start mb-6">
+              <h2 className="text-xl font-bold">{company.name}</h2>
+              <button onClick={onClose} className="text-sm text-muted-foreground">
+                Fechar
+              </button>
+            </header>
 
-        {/* setores */}
-        <section>
-          <h3 className="font-semibold mb-2">Setores</h3>
+            {/* Dados gerais */}
+            <section className="mb-6 space-y-1">
+              <p><strong>CNPJ:</strong> {company.cnpj}</p>
+              <p><strong>Regime:</strong> {company.profile?.taxRegime ?? "-"}</p>
+              <p><strong>Contador:</strong> {company.profile?.accountant ?? "-"}</p>
+              <p>
+                <strong>Endereço:</strong>{" "}
+                {company.publicSpace}, {company.number} -{" "}
+                {company.district} / {company.city}-{company.state}
+              </p>
+            </section>
 
-          <div className="space-y-3">
-            {company.companySectors.map((sector) => (
-              <div
-                key={sector.name}
-                className="flex justify-between items-center border rounded-lg px-3 py-2"
-              >
-                <span>{sector.name}</span>
-                <span className="text-sm text-muted-foreground">
-                  {sector.responsible ?? "Sem responsável"}
-                </span>
+            {/* Setores */}
+            <section>
+              <h3 className="font-semibold mb-2">Setores</h3>
+
+              <div className="space-y-3">
+                {company.companySectors.map((cs) => (
+                  <div
+                    key={cs.sector.name}
+                    className="flex justify-between items-center border rounded-lg px-3 py-2"
+                  >
+                    <span>{cs.sector.name}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {cs.owner?.username ?? "Sem responsável"}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
+          </>
+        )}
       </aside>
     </div>
   );

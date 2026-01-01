@@ -2,9 +2,10 @@
 import Card from "./components/card";
 import { CompanyTable } from "./components/CompanyTable";
 import prisma from "@/lib/prisma";
+import type { CompanyRowDTO } from "./dto";
 
 export default async function Company() {
-  const companies = await prisma.company.findMany({
+  const companies: CompanyRowDTO[] = await prisma.company.findMany({
     orderBy: { name: "asc" },
     select: {
       cnpj: true,
