@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -11,13 +12,25 @@ import {
 } from "@/components/ui/table";
 import { CompanyDrawer } from "./CompanyDrawer";
 import type { CompanyRowDTO } from "../dto";
+import Link from "next/link";
 
 type Props = {
   companies: CompanyRowDTO[];
+  page: number;
+  totalPages: number;
 };
 
-export function CompanyTable({ companies }: Props) {
-  const [selectedCnpj, setSelectedCnpj] = useState<string | null>(null);
+export function CompanyTable({ companies, page, totalPages }: Props) {
+  const [selectedCnpj, setSelectedCnpj] =
+    useState<string | null>(null);
+
+  const router = useRouter();
+
+  function goToPage(p: number) {
+    router.replace(`/dashboard/empresas?page=${p}`, {
+      scroll: false,
+    });
+  }
 
   return (
     <>
@@ -37,9 +50,11 @@ export function CompanyTable({ companies }: Props) {
             <TableRow
               key={company.cnpj}
               onClick={() => setSelectedCnpj(company.cnpj)}
-              className="cursor-pointer hovern hover:bg-muted/50"
+              className="cursor-pointer hover:bg-muted/50"
             >
-              <TableCell>{index + 1}</TableCell>
+              <TableCell>
+                {(page - 1) * 10 + index + 1}
+              </TableCell>
 
               <TableCell className="font-medium">
                 {company.name ?? "-"}
@@ -50,17 +65,47 @@ export function CompanyTable({ companies }: Props) {
               </TableCell>
 
               <TableCell>
-                {company.profile?.taxRegime ?? "-"}
+                {company.taxRegime ?? "-"}
               </TableCell>
 
               <TableCell>
-                {company.profile?.accountant ?? "-"}
+                {company.accountant ?? "-"}
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
 
+      {/* Paginação */}
+      <div className="flex items-center justify-between mt-4">
+        <span className="text-sm text-muted-foreground">
+          Página {page} de {totalPages}
+        </span>
+
+        <div className="flex gap-2">
+          <Link
+            href={`?page=${page - 1}`}
+            aria-disabled={page <= 1}
+            className={`px-3 py-1 rounded border text-sm
+              ${page <= 1 ? "pointer-events-none opacity-50" : "hover:bg-muted"}
+            `}
+          >
+            Anterior
+          </Link>
+
+          <Link
+            href={`?page=${page + 1}`}
+            aria-disabled={page >= totalPages}
+            className={`px-3 py-1 rounded border text-sm
+              ${page >= totalPages ? "pointer-events-none opacity-50" : "hover:bg-muted"}
+            `}
+          >
+            Próximo
+          </Link>
+        </div>
+      </div>
+
+      {/* Drawer */}
       <CompanyDrawer
         cnpj={selectedCnpj}
         onClose={() => setSelectedCnpj(null)}

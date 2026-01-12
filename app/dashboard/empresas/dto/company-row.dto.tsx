@@ -1,16 +1,8 @@
+// app/dashboard/empresas/dto/company-row.dto.ts
 export type CompanyRowDTO = {
   cnpj: string;
-  name: string | null;
-  profile: {
-    taxRegime: string | null;
-    accountant: string | null;
-  } | null;
-  companySectors: {
-    sector: {
-      name: string;
-    };
-    owner: {
-      username: string;
-    } | null;
-  }[];
+  name: string;
+
+  taxRegime: string;
+  accountant: string;
 };

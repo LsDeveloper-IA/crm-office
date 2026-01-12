@@ -1,42 +1,46 @@
-// app/dashboard/empresas/page.tsx
+export const dynamic = "force-dynamic";
+
 import Card from "./components/card";
 import { CompanyTable } from "./components/CompanyTable";
 import prisma from "@/lib/prisma";
-import type { CompanyRowDTO } from "./dto";
+import { mapCompanyToRowDTO } from "./dto/mapper";
 
-export default async function Company() {
-  const companies: CompanyRowDTO[] = await prisma.company.findMany({
-    orderBy: { name: "asc" },
-    select: {
-      cnpj: true,
-      name: true,
-      publicSpace: true,
-      number: true,
-      district: true,
-      city: true,
-      state: true,
-      profile: {
-        select: {
-          taxRegime: true,
-          accountant: true,
-        },
-      },
-      companySectors: {
-        select: {
-          sector: {
-            select: {
-              name: true,
-            },
-          },
-          owner: {
-            select: {
-              username: true,
-            },
+type Props = {
+  searchParams: Promise<{
+    page?: string;
+  }>;
+};
+
+const PAGE_SIZE = 13;
+
+export default async function Company({ searchParams }: Props) {
+  const params = await searchParams;
+
+  const page = Math.max(Number(params.page) || 1, 1);
+  const skip = (page - 1) * PAGE_SIZE;
+
+  const [companiesRaw, total] = await Promise.all([
+    prisma.company.findMany({
+      orderBy: { name: "asc" },
+      skip,
+      take: PAGE_SIZE,
+      select: {
+        cnpj: true,
+        name: true,
+        profile: {
+          select: {
+            taxRegime: true,
+            accountant: true,
           },
         },
       },
-    },
-  });
+    }),
+
+    prisma.company.count(),
+  ]);
+
+  const companies = companiesRaw.map(mapCompanyToRowDTO);
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <main className="flex flex-col gap-7 flex-1 min-h-0">
@@ -51,7 +55,11 @@ export default async function Company() {
 
       {/* Tabela */}
       <div className="flex-1 bg-white rounded-lg p-7 overflow-auto min-h-0 shadow-2xl">
-        <CompanyTable companies={companies} />
+        <CompanyTable
+          companies={companies}
+          page={page}
+          totalPages={totalPages}
+        />
       </div>
     </main>
   );

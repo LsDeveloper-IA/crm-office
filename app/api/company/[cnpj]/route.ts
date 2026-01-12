@@ -7,9 +7,11 @@ type Params = {
   }>;
 };
 
+/* =========================
+    GET — Buscar empresa
+========================= */
 export async function GET(_: Request, { params }: Params) {
   const { cnpj: rawCnpj } = await params;
-
   const cnpj = rawCnpj.replace(/\D/g, "");
 
   if (!cnpj || cnpj.length !== 14) {
@@ -38,6 +40,21 @@ export async function GET(_: Request, { params }: Params) {
       city: true,
       state: true,
 
+      qsas: {
+        select: {
+          nome: true,
+          qualificacao: true,
+        },
+      },
+
+      activities: {
+        select: {
+          cnaeCode: true,
+          description: true,
+          kind: true,
+        },
+      },
+
       companySectors: {
         select: {
           sector: { select: { name: true } },
@@ -55,4 +72,63 @@ export async function GET(_: Request, { params }: Params) {
   }
 
   return NextResponse.json(company);
+}
+
+/* =========================
+    PATCH — Editar empresa
+========================= */
+export async function PATCH(
+  req: Request,
+  { params }: Params
+) {
+  const { cnpj: rawCnpj } = await params;
+  const cnpj = rawCnpj.replace(/\D/g, "");
+
+  if (!cnpj || cnpj.length !== 14) {
+    return NextResponse.json(
+      { error: "CNPJ inválido" },
+      { status: 400 }
+    );
+  }
+
+  const body = await req.json();
+
+  const {
+    taxRegime,
+    accountant,
+    companySectors,
+  } = body;
+
+  await prisma.$transaction(async (tx) => {
+    // 🔹 Atualiza perfil (regime + contador)
+    await tx.companyProfile.upsert({
+      where: { companyCnpj: cnpj },
+      update: {
+        taxRegime,
+        accountant,
+      },
+      create: {
+        companyCnpj: cnpj,
+        taxRegime,
+        accountant,
+      },
+    });
+
+    // 🔹 Atualiza setores (se enviados)
+    if (Array.isArray(companySectors)) {
+      await tx.companySector.deleteMany({
+        where: { companyCnpj: cnpj },
+      });
+
+      await tx.companySector.createMany({
+        data: companySectors.map((s: any) => ({
+          companyCnpj: cnpj,
+          sectorId: s.sectorId,
+          ownerId: s.ownerId ?? null,
+        })),
+      });
+    }
+  });
+
+  return NextResponse.json({ ok: true });
 }
