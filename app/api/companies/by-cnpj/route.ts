@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { normalizeCNPJ, isValidCNPJ } from "@/lib/cnpj";
-import { getOrCreateCompanyByCnpj } from "@/lib/company.service";
+import { getOrCreateCompanyByCnpj } from "@/lib/company/company.create";
+
 
 export async function POST( req: NextRequest ) {
   try {
