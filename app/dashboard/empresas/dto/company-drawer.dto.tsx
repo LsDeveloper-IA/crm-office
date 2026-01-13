@@ -5,7 +5,7 @@ export type CompanyDrawerDTO = {
   taxRegime?: string;
   accountant?: string;
 
-  address: {
+  address?: {
     publicSpace?: string;
     number?: string;
     district?: string;
@@ -14,10 +14,9 @@ export type CompanyDrawerDTO = {
   };
 
   companySectors: {
-    sectorId: string;     // 🔥 ESSENCIAL
+    sectorId: string;        // ✅ SEMPRE STRING
     sectorName: string;
     owner?: string;
-    ownerId?: string | null;
   }[];
 
   qsas: {
@@ -27,7 +26,7 @@ export type CompanyDrawerDTO = {
 
   activities: {
     cnaeCode: string;
-    description?: string;
-    kind: "PRIMARY" | "SECONDARY";
+    description: string;
+    kind: string;
   }[];
 };

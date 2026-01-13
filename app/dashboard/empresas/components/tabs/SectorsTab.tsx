@@ -1,6 +1,6 @@
 import type { CompanyDrawerDTO } from "../../dto/company-drawer.dto";
 
-type Sector = CompanyDrawerDTO["companySectors"][number] & {
+type UISector = CompanyDrawerDTO["companySectors"][number] & {
   tempId: string;
 };
 
@@ -10,11 +10,12 @@ type AvailableSector = {
 };
 
 type Props = {
-  sectors: Sector[];
+  sectors: UISector[];
   availableSectors: AvailableSector[];
   isEditing: boolean;
-  onChange: (sectors: Sector[]) => void;
+  onChange: (sectors: UISector[]) => void;
 };
+
 
 export function SectorsTab({
   sectors,

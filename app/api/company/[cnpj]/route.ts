@@ -94,7 +94,7 @@ export async function GET(_: Request, { params }: Params) {
     activities: company.activities,
 
     companySectors: company.companySectors.map((cs) => ({
-      sectorId: cs.sector.id,
+      sectorId: String(cs.sector.id),
       sectorName: cs.sector.name,
       owner: cs.ownerName ?? undefined, // ✅ simples
     })),

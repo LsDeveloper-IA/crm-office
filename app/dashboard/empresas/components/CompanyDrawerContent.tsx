@@ -45,6 +45,13 @@ export function CompanyDrawerContent({
     companySectors: company.companySectors ?? [],
   });
 
+  const uiSectors = useMemo(() => {
+    return edit.data.companySectors.map((s) => ({
+      ...s,
+      tempId: crypto.randomUUID(),
+    }));
+  }, [edit.data.companySectors]);
+
   async function refreshFromReceita() {
     await fetch(`/api/company/${company.cnpj}/refresh`, {
       method: "POST",
@@ -100,11 +107,14 @@ export function CompanyDrawerContent({
 
           {activeTab === "setores" && (
             <SectorsTab
-              sectors={edit.data.companySectors}
+              sectors={uiSectors}
               availableSectors={availableSectors}
               isEditing={isEditing}
               onChange={(v) =>
-                edit.update("companySectors", v)
+                edit.update(
+                  "companySectors",
+                  v.map(({ tempId, ...rest }) => rest) // 🔥 remove tempId antes de salvar
+                )
               }
             />
           )}
