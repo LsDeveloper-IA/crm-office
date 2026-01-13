@@ -3,35 +3,46 @@
 import { useEffect, useRef, useState } from "react";
 import type { CompanyEditDTO } from "../dto/company-edit.dto";
 
+type UISector = CompanyEditDTO["companySectors"][number] & {
+  tempId: string;
+};
+
+function withTempIds(
+  sectors: CompanyEditDTO["companySectors"]
+): UISector[] {
+  return (sectors ?? []).map((s) => ({
+    ...s,
+    tempId: crypto.randomUUID(),
+  }));
+}
+
 export function useCompanyEdit(
   cnpj: string,
   initial: CompanyEditDTO
 ) {
-  const [data, setData] = useState<CompanyEditDTO>(() => ({
+  const [data, setData] = useState<CompanyEditDTO & {
+    companySectors: UISector[];
+  }>(() => ({
     ...initial,
-    companySectors: (initial.companySectors ?? []).map((s) => ({
-      ...s,
-      tempId: crypto.randomUUID(),
-    })),
+    companySectors: withTempIds(initial.companySectors),
   }));
 
   const [loading, setLoading] = useState(false);
   const lastCnpjRef = useRef<string | null>(null);
 
+  // 🔁 troca de empresa
   useEffect(() => {
     if (!cnpj) return;
 
     if (lastCnpjRef.current !== cnpj) {
       setData({
         ...initial,
-        companySectors: (initial.companySectors ?? []).map((s) => ({
-          ...s,
-          tempId: crypto.randomUUID(),
-        })),
+        companySectors: withTempIds(initial.companySectors),
       });
+
       lastCnpjRef.current = cnpj;
     }
-  }, [cnpj]); // 🚫 NÃO dependa de initial
+  }, [cnpj]); // ❗ não depende de initial
 
   function update<K extends keyof CompanyEditDTO>(
     key: K,
@@ -44,23 +55,50 @@ export function useCompanyEdit(
   }
 
   function reset() {
-    setData((prev) => ({
+    setData({
       ...initial,
-      companySectors: prev.companySectors, // mantém identidade
-    }));
+      companySectors: withTempIds(initial.companySectors),
+    });
   }
 
   async function save() {
-    setLoading(true);
+  setLoading(true);
 
-    await fetch(`/api/company/${cnpj}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+  const payload = {
+    ...data,
+    taxRegime:
+      data.taxRegime && typeof data.taxRegime === "object"
+        ? data.taxRegime.key
+        : typeof data.taxRegime === "string"
+        ? data.taxRegime
+        : undefined,
+  };
 
-    setLoading(false);
+  const res = await fetch(`/api/company/${cnpj}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let errMsg = "Erro ao salvar empresa";
+
+    try {
+      const err = await res.json();
+      errMsg = err.error ?? errMsg;
+    } catch {}
+
+    throw new Error(errMsg);
   }
 
-  return { data, update, reset, save, loading };
+  setLoading(false);
+}
+
+  return {
+    data,
+    update,
+    reset,
+    save,
+    loading,
+  };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { GeneralTab } from "./tabs/GeneralTab";
 import { SectorsTab } from "./tabs/SectorsTab";
 import { QsaTab } from "./tabs/QsaTab";
@@ -8,9 +8,6 @@ import { ActivitiesTab } from "./tabs/ActivitiesTab";
 import { useCompanyEdit } from "../hooks/useCompanyEdit";
 import type { CompanyDrawerDTO } from "../dto/company-drawer.dto";
 import { useSectors } from "../hooks/useSectors";
-
-
-
 
 const tabs = ["geral", "setores", "QSA", "atividades"] as const;
 type Tab = typeof tabs[number];
@@ -25,39 +22,27 @@ export function CompanyDrawerContent({
   onClose,
 }: Props) {
   const availableSectors = useSectors();
-  const [activeTab, setActiveTab] =
-    useState<Tab>("geral");
-  const [isEditing, setIsEditing] =
-    useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("geral");
+  const [isEditing, setIsEditing] = useState(false);
 
+  const initialEditData = useMemo(
+    () => ({
+      name: company.name,
+      taxRegime: company.taxRegime,
+      accountant: company.accountant,
 
-  const edit = useCompanyEdit(company.cnpj, {
-    name: company.name,
-    taxRegime: company.taxRegime,
-    accountant: company.accountant,
+      publicSpace: company.address?.publicSpace ?? "",
+      number: company.address?.number ?? "",
+      district: company.address?.district ?? "",
+      city: company.address?.city ?? "",
+      state: company.address?.state ?? "",
 
-    publicSpace: company.address?.publicSpace ?? "",
-    number: company.address?.number ?? "",
-    district: company.address?.district ?? "",
-    city: company.address?.city ?? "",
-    state: company.address?.state ?? "",
+      companySectors: company.companySectors ?? [],
+    }),
+    [company]
+  );
 
-    companySectors: company.companySectors ?? [],
-  });
-
-  const uiSectors = useMemo(() => {
-    return edit.data.companySectors.map((s) => ({
-      ...s,
-      tempId: crypto.randomUUID(),
-    }));
-  }, [edit.data.companySectors]);
-
-  async function refreshFromReceita() {
-    await fetch(`/api/company/${company.cnpj}/refresh`, {
-      method: "POST",
-    });
-    window.location.reload();
-  }
+  const edit = useCompanyEdit(company.cnpj, initialEditData);
 
   return (
     <div className="fixed inset-0 z-50 flex">
@@ -66,9 +51,7 @@ export function CompanyDrawerContent({
       <aside className="w-[480px] bg-white flex flex-col">
         {/* HEADER */}
         <header className="border-b px-6 py-4">
-          <h2 className="text-lg font-bold">
-            {company.name}
-          </h2>
+          <h2 className="text-lg font-bold">{company.name}</h2>
           <p className="text-sm text-muted-foreground">
             CNPJ: {company.cnpj}
           </p>
@@ -78,12 +61,11 @@ export function CompanyDrawerContent({
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1.5 rounded-md text-sm capitalize
-                  ${
-                    activeTab === tab
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
-                  }`}
+                className={`px-3 py-1.5 rounded-md text-sm capitalize ${
+                  activeTab === tab
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted"
+                }`}
               >
                 {tab}
               </button>
@@ -107,57 +89,44 @@ export function CompanyDrawerContent({
 
           {activeTab === "setores" && (
             <SectorsTab
-              sectors={uiSectors}
+              sectors={edit.data.companySectors}
               availableSectors={availableSectors}
               isEditing={isEditing}
               onChange={(v) =>
-                edit.update(
-                  "companySectors",
-                  v.map(({ tempId, ...rest }) => rest) // 🔥 remove tempId antes de salvar
-                )
+                edit.update("companySectors", v)
               }
             />
           )}
 
-          {activeTab === "QSA" && (
-            <QsaTab qsas={company.qsas} />
-          )}
+          {activeTab === "QSA" && <QsaTab qsas={company.qsas} />}
 
           {activeTab === "atividades" && (
-            <ActivitiesTab
-              activities={company.activities}
-            />
+            <ActivitiesTab activities={company.activities} />
           )}
         </div>
 
         {/* FOOTER */}
         <footer className="border-t p-4 flex justify-between">
           {!isEditing ? (
-            <>
-              <button onClick={() => setIsEditing(true)}>
-                Editar
-              </button>
-              <button onClick={refreshFromReceita}>
-                Atualizar da Receita
-              </button>
-            </>
+            <button onClick={() => setIsEditing(true)}>
+              Editar
+            </button>
           ) : (
             <>
               <button
                 onClick={() => {
                   setIsEditing(false);
-                  edit.reset(); // 🔥 agora funciona
+                  edit.reset();
                 }}
               >
                 Cancelar
               </button>
               <button
                 onClick={async () => {
-                  await edit.save();   // 🔹 salva no backend
-                  setIsEditing(false); // 🔹 sai do modo edição
+                  await edit.save();
+                  setIsEditing(false);
                 }}
                 disabled={edit.loading}
-                className="text-sm font-medium"
               >
                 Salvar
               </button>

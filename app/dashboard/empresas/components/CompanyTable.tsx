@@ -65,7 +65,7 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
               </TableCell>
 
               <TableCell>
-                {company.taxRegime ?? "-"}
+                {company.taxRegime?.name ?? "-"}
               </TableCell>
 
               <TableCell>

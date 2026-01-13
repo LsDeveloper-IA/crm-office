@@ -1,10 +1,7 @@
-import type { CompanyEditDTO } from "../../dto/company-edit.dto";
+"use client";
 
-const TAX_REGIMES = [
-  "Simples Nacional",
-  "Lucro Presumido",
-  "Lucro Real",
-] as const;
+import type { CompanyEditDTO } from "../../dto/company-edit.dto";
+import { useTaxRegimes } from "../../hooks/useTaxRegimes";
 
 type AccountantOption = {
   id: string;
@@ -27,9 +24,10 @@ export function GeneralTab({
   isEditing,
   accountants,
 }: Props) {
+  const { taxRegimes, loading } = useTaxRegimes();
+
   return (
     <div className="space-y-5">
-
       {/* 📍 ENDEREÇO — SOMENTE LEITURA */}
       <div>
         <label className="text-sm font-medium">Endereço</label>
@@ -48,21 +46,32 @@ export function GeneralTab({
         {isEditing ? (
           <select
             className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
-            value={company.taxRegime ?? ""}
-            onChange={(e) =>
-              onChange("taxRegime", e.target.value)
-            }
+            value={company.taxRegime?.key ?? ""}
+            disabled={loading}
+            onChange={(e) => {
+              const selected = taxRegimes.find(
+                (r) => r.key === e.target.value
+              );
+
+              onChange(
+                "taxRegime",
+                selected
+                  ? { key: selected.key, name: selected.name }
+                  : undefined
+              );
+            }}
           >
             <option value="">Selecione um regime</option>
-            {TAX_REGIMES.map((regime) => (
-              <option key={regime} value={regime}>
-                {regime}
+
+            {taxRegimes.map((regime) => (
+              <option key={regime.key} value={regime.key}>
+                {regime.name}
               </option>
             ))}
           </select>
         ) : (
           <p className="mt-1 text-sm text-muted-foreground">
-            {company.taxRegime ?? "-"}
+            {company.taxRegime?.name ?? "-"}
           </p>
         )}
       </div>
@@ -92,7 +101,6 @@ export function GeneralTab({
           </p>
         )}
       </div>
-
     </div>
   );
 }

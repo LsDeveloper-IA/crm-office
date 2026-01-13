@@ -79,7 +79,14 @@ export async function GET(_: Request, { params }: Params) {
   return NextResponse.json({
     cnpj: company.cnpj,
     name: company.name,
-    taxRegime: company.profile?.taxRegime,
+
+    taxRegime: company.profile?.taxRegime
+      ? {
+          key: company.profile.taxRegime.key,
+          name: company.profile.taxRegime.name,
+        }
+      : undefined,
+
     accountant: company.profile?.accountant,
 
     address: {
@@ -96,7 +103,7 @@ export async function GET(_: Request, { params }: Params) {
     companySectors: company.companySectors.map((cs) => ({
       sectorId: String(cs.sector.id),
       sectorName: cs.sector.name,
-      owner: cs.ownerName ?? undefined, // ✅ simples
+      owner: cs.ownerName ?? undefined,
     })),
   });
 }
@@ -104,10 +111,7 @@ export async function GET(_: Request, { params }: Params) {
 /* =========================
     PATCH — Editar empresa
 ========================= */
-export async function PATCH(
-  req: Request,
-  { params }: Params
-) {
+export async function PATCH(req: Request, { params }: Params) {
   const { cnpj: rawCnpj } = await params;
   const cnpj = rawCnpj.replace(/\D/g, "");
 
@@ -122,24 +126,68 @@ export async function PATCH(
   const { taxRegime, accountant, companySectors } = body;
 
   await prisma.$transaction(async (tx) => {
-    // 🔹 Perfil
+    // 🔹 upsert do profile SEM taxRegime
     await tx.companyProfile.upsert({
       where: { companyCnpj: cnpj },
-      update: { taxRegime, accountant },
-      create: { companyCnpj: cnpj, taxRegime, accountant },
+      update: {
+        accountant,
+      },
+      create: {
+        companyCnpj: cnpj,
+        accountant,
+      },
     });
 
-    // 🔹 Setores
+    // 🔹 agora trata o regime separadamente
+    if (taxRegime) {
+      const exists = await tx.taxRegime.findUnique({
+        where: { key: taxRegime },
+        select: { key: true },
+      });
+
+      if (!exists) {
+        throw new Error("Regime tributário inválido");
+      }
+
+      await tx.companyProfile.update({
+        where: { companyCnpj: cnpj },
+        data: {
+          taxRegime: {
+            connect: { key: taxRegime },
+          },
+        },
+      });
+    } else {
+      // remove regime
+      await tx.companyProfile.update({
+        where: { companyCnpj: cnpj },
+        data: {
+          taxRegime: {
+            disconnect: true,
+          },
+        },
+      });
+    }
+
+    // 🔹 setores
     if (Array.isArray(companySectors)) {
       await tx.companySector.deleteMany({
         where: { companyCnpj: cnpj },
       });
 
+      const cleanSectors = Array.isArray(companySectors)
+        ? companySectors.filter(
+            (s: any) =>
+              s.sectorId &&
+              !Number.isNaN(Number(s.sectorId))
+          )
+        : [];
+
       await tx.companySector.createMany({
-        data: companySectors.map((s: any) => ({
+        data: cleanSectors.map((s: any) => ({
           companyCnpj: cnpj,
           sectorId: Number(s.sectorId),
-          ownerName: s.owner || null, // ✅ salva nome
+          ownerName: s.owner?.trim() || null,
         })),
       });
     }

@@ -1,6 +1,12 @@
+// dto/company-edit.dto.ts
 export type CompanyEditDTO = {
   name: string;
-  taxRegime?: string;
+
+  taxRegime?: {
+    key: string;
+    name: string;
+  };
+
   accountant?: string;
 
   publicSpace?: string;

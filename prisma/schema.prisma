@@ -357,7 +357,9 @@ model CompanyProfile {
   id          Int    @id @default(autoincrement())
   companyCnpj String @unique @db.VarChar(14)
 
-  taxRegime  String?
+  taxRegimeId Int?
+  taxRegime   TaxRegime? @relation(fields: [taxRegimeId], references: [id])
+
   accountant String?
   notes      String?
 
@@ -367,4 +369,16 @@ model CompanyProfile {
   company Company @relation(fields: [companyCnpj], references: [cnpj])
 
   @@index([companyCnpj])
+}
+
+model TaxRegime {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique   // SIMPLES, LUCRO_REAL, etc
+  name      String             // Simples Nacional, Lucro Real...
+  active    Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companies CompanyProfile[]
 }

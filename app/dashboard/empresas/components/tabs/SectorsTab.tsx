@@ -16,7 +16,6 @@ type Props = {
   onChange: (sectors: UISector[]) => void;
 };
 
-
 export function SectorsTab({
   sectors,
   availableSectors,
@@ -46,7 +45,7 @@ export function SectorsTab({
     onChange(
       sectors.map((s) =>
         s.tempId === tempId
-          ? { ...s, owner: value || undefined }
+          ? { ...s, owner: value }
           : s
       )
     );
@@ -59,7 +58,7 @@ export function SectorsTab({
         tempId: crypto.randomUUID(),
         sectorId: "",
         sectorName: "",
-        owner: undefined,
+        owner: "",
       },
     ]);
   }
@@ -67,8 +66,6 @@ export function SectorsTab({
   function removeSector(tempId: string) {
     onChange(sectors.filter((s) => s.tempId !== tempId));
   }
-  console.log("SECTORS STATE:", sectors);
-  console.log("AVAILABLE:", availableSectors);
 
   return (
     <div className="space-y-3">
@@ -86,10 +83,7 @@ export function SectorsTab({
                 updateSector(sector.tempId, e.target.value)
               }
             >
-              <option value="">
-                Selecione um setor
-              </option>
-
+              <option value="">Selecione um setor</option>
               {availableSectors.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -114,16 +108,14 @@ export function SectorsTab({
             />
           ) : (
             <span className="text-sm text-muted-foreground">
-              {sector.owner ?? "Sem responsável"}
+              {sector.owner || "Sem responsável"}
             </span>
           )}
 
           {isEditing && (
             <button
               className="text-xs text-red-500"
-              onClick={() =>
-                removeSector(sector.tempId)
-              }
+              onClick={() => removeSector(sector.tempId)}
             >
               Remover
             </button>
