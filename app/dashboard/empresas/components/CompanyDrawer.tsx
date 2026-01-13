@@ -9,11 +9,10 @@ type Props = {
 };
 
 export function CompanyDrawer({ cnpj, onClose }: Props) {
-  if (!cnpj) return null;
 
   const { data: company, loading } =
     useCompanyDrawerData(cnpj);
-
+console.log(company)
   if (loading || !company) {
     return (
       <div className="fixed inset-0 z-50 flex">

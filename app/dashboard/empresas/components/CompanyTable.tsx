@@ -106,10 +106,12 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
       </div>
 
       {/* Drawer */}
-      <CompanyDrawer
-        cnpj={selectedCnpj}
-        onClose={() => setSelectedCnpj(null)}
-      />
+      {selectedCnpj && (
+        <CompanyDrawer
+          cnpj={selectedCnpj}
+          onClose={() => setSelectedCnpj(null)}
+        />
+      )}
     </>
   );
 }

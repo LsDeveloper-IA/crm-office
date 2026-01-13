@@ -16,7 +16,9 @@ export type CompanyEditDTO = {
 
   // setores editáveis
   companySectors: {
+    sectorId: number | string;
     sectorName: string;
     owner?: string;
+    tempId?: string;
   }[];
 };

@@ -3,22 +3,35 @@
 import { useEffect, useRef, useState } from "react";
 import type { CompanyEditDTO } from "../dto/company-edit.dto";
 
-export function useCompanyEdit(cnpj: string, initial: CompanyEditDTO) {
-  const [data, setData] = useState<CompanyEditDTO>(initial);
-  const [loading, setLoading] = useState(false);
+export function useCompanyEdit(
+  cnpj: string,
+  initial: CompanyEditDTO
+) {
+  const [data, setData] = useState<CompanyEditDTO>(() => ({
+    ...initial,
+    companySectors: (initial.companySectors ?? []).map((s) => ({
+      ...s,
+      tempId: crypto.randomUUID(),
+    })),
+  }));
 
-  // 🔐 Guarda o último CNPJ sincronizado
+  const [loading, setLoading] = useState(false);
   const lastCnpjRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!cnpj) return;
 
-    // 🔥 só reseta se mudou de empresa
     if (lastCnpjRef.current !== cnpj) {
-      setData(initial);
+      setData({
+        ...initial,
+        companySectors: (initial.companySectors ?? []).map((s) => ({
+          ...s,
+          tempId: crypto.randomUUID(),
+        })),
+      });
       lastCnpjRef.current = cnpj;
     }
-  }, [cnpj, initial]);
+  }, [cnpj]); // 🚫 NÃO dependa de initial
 
   function update<K extends keyof CompanyEditDTO>(
     key: K,
@@ -31,13 +44,14 @@ export function useCompanyEdit(cnpj: string, initial: CompanyEditDTO) {
   }
 
   function reset() {
-    setData(initial);
+    setData((prev) => ({
+      ...initial,
+      companySectors: prev.companySectors, // mantém identidade
+    }));
   }
 
   async function save() {
     setLoading(true);
-
-    const { taxRegime, accountant, companySectors } = data;
 
     await fetch(`/api/company/${cnpj}`, {
       method: "PATCH",
@@ -48,11 +62,5 @@ export function useCompanyEdit(cnpj: string, initial: CompanyEditDTO) {
     setLoading(false);
   }
 
-  return {
-    data,
-    update,
-    reset,
-    save,
-    loading,
-  };
+  return { data, update, reset, save, loading };
 }

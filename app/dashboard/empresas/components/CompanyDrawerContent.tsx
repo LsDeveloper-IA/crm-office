@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { GeneralTab } from "./tabs/GeneralTab";
 import { SectorsTab } from "./tabs/SectorsTab";
 import { QsaTab } from "./tabs/QsaTab";
 import { ActivitiesTab } from "./tabs/ActivitiesTab";
 import { useCompanyEdit } from "../hooks/useCompanyEdit";
 import type { CompanyDrawerDTO } from "../dto/company-drawer.dto";
+import { useSectors } from "../hooks/useSectors";
+
+
+
 
 const tabs = ["geral", "setores", "QSA", "atividades"] as const;
 type Tab = typeof tabs[number];
@@ -20,10 +24,12 @@ export function CompanyDrawerContent({
   company,
   onClose,
 }: Props) {
+  const availableSectors = useSectors();
   const [activeTab, setActiveTab] =
     useState<Tab>("geral");
   const [isEditing, setIsEditing] =
     useState(false);
+
 
   const edit = useCompanyEdit(company.cnpj, {
     name: company.name,
@@ -38,8 +44,6 @@ export function CompanyDrawerContent({
 
     companySectors: company.companySectors ?? [],
   });
-
-  console.log( company);
 
   async function refreshFromReceita() {
     await fetch(`/api/company/${company.cnpj}/refresh`, {
@@ -97,6 +101,7 @@ export function CompanyDrawerContent({
           {activeTab === "setores" && (
             <SectorsTab
               sectors={edit.data.companySectors}
+              availableSectors={availableSectors}
               isEditing={isEditing}
               onChange={(v) =>
                 edit.update("companySectors", v)

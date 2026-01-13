@@ -13,6 +13,13 @@ export type CompanyDrawerDTO = {
     state?: string;
   };
 
+  companySectors: {
+    sectorId: string;     // 🔥 ESSENCIAL
+    sectorName: string;
+    owner?: string;
+    ownerId?: string | null;
+  }[];
+
   qsas: {
     nome: string;
     qualificacao: string;
@@ -22,10 +29,5 @@ export type CompanyDrawerDTO = {
     cnaeCode: string;
     description?: string;
     kind: "PRIMARY" | "SECONDARY";
-  }[];
-
-  companySectors: {
-    sectorName: string;
-    owner?: string;
   }[];
 };

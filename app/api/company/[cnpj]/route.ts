@@ -57,8 +57,13 @@ export async function GET(_: Request, { params }: Params) {
 
       companySectors: {
         select: {
-          sector: { select: { name: true } },
-          owner: { select: { username: true } },
+          sector: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          ownerName: true, // ✅ APENAS TEXTO
         },
       },
     },
@@ -71,7 +76,29 @@ export async function GET(_: Request, { params }: Params) {
     );
   }
 
-  return NextResponse.json(company);
+  return NextResponse.json({
+    cnpj: company.cnpj,
+    name: company.name,
+    taxRegime: company.profile?.taxRegime,
+    accountant: company.profile?.accountant,
+
+    address: {
+      publicSpace: company.publicSpace,
+      number: company.number,
+      district: company.district,
+      city: company.city,
+      state: company.state,
+    },
+
+    qsas: company.qsas,
+    activities: company.activities,
+
+    companySectors: company.companySectors.map((cs) => ({
+      sectorId: cs.sector.id,
+      sectorName: cs.sector.name,
+      owner: cs.ownerName ?? undefined, // ✅ simples
+    })),
+  });
 }
 
 /* =========================
@@ -92,29 +119,17 @@ export async function PATCH(
   }
 
   const body = await req.json();
-
-  const {
-    taxRegime,
-    accountant,
-    companySectors,
-  } = body;
+  const { taxRegime, accountant, companySectors } = body;
 
   await prisma.$transaction(async (tx) => {
-    // 🔹 Atualiza perfil (regime + contador)
+    // 🔹 Perfil
     await tx.companyProfile.upsert({
       where: { companyCnpj: cnpj },
-      update: {
-        taxRegime,
-        accountant,
-      },
-      create: {
-        companyCnpj: cnpj,
-        taxRegime,
-        accountant,
-      },
+      update: { taxRegime, accountant },
+      create: { companyCnpj: cnpj, taxRegime, accountant },
     });
 
-    // 🔹 Atualiza setores (se enviados)
+    // 🔹 Setores
     if (Array.isArray(companySectors)) {
       await tx.companySector.deleteMany({
         where: { companyCnpj: cnpj },
@@ -123,8 +138,8 @@ export async function PATCH(
       await tx.companySector.createMany({
         data: companySectors.map((s: any) => ({
           companyCnpj: cnpj,
-          sectorId: s.sectorId,
-          ownerId: s.ownerId ?? null,
+          sectorId: Number(s.sectorId),
+          ownerName: s.owner || null, // ✅ salva nome
         })),
       });
     }

@@ -57,11 +57,10 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  companySectors CompanySector[]
-  notes          Note[]
-  attachments    Attachment[]    @relation("AttachmentUploader")
-  certificates   Certificate[]   @relation("CertificateUploader")
-  auditLogs      AuditLog[]
+  notes        Note[]
+  attachments  Attachment[]  @relation("AttachmentUploader")
+  certificates Certificate[] @relation("CertificateUploader")
+  auditLogs    AuditLog[]
 
   // NEW: forms created by this user
   forms Form[]
@@ -195,7 +194,8 @@ model CompanySector {
   companyCnpj String              @db.VarChar(14)
   sectorId    Int
   status      CompanySectorStatus @default(NOT_REGISTERED)
-  ownerId     Int?
+
+  ownerName String? // ✅ RESPONSÁVEL EM TEXTO
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -203,7 +203,6 @@ model CompanySector {
 
   company Company @relation(fields: [companyCnpj], references: [cnpj])
   sector  Sector  @relation(fields: [sectorId], references: [id])
-  owner   User?   @relation(fields: [ownerId], references: [id])
 
   notes Note[]
 
@@ -354,17 +353,17 @@ model AuditLog {
 }
 
 model CompanyProfile {
-  id           Int      @id @default(autoincrement())
-  companyCnpj  String   @unique @db.VarChar(14)
+  id          Int    @id @default(autoincrement())
+  companyCnpj String @unique @db.VarChar(14)
 
-  taxRegime    String?
-  accountant   String?
-  notes        String?
+  taxRegime  String?
+  accountant String?
+  notes      String?
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  company      Company  @relation(fields: [companyCnpj], references: [cnpj])
+  company Company @relation(fields: [companyCnpj], references: [cnpj])
 
   @@index([companyCnpj])
 }

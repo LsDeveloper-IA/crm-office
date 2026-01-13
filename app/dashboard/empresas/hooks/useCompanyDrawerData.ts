@@ -11,7 +11,6 @@ export function useCompanyDrawerData(cnpj: string | null) {
     if (!cnpj) return;
 
     let active = true;
-
     setLoading(true);
 
     fetch(`/api/company/${cnpj}`)
@@ -21,37 +20,9 @@ export function useCompanyDrawerData(cnpj: string | null) {
         }
         return res.json();
       })
-      .then((company) => {
+      .then((company: CompanyDrawerDTO) => {
         if (!active) return;
-
-        const mapped: CompanyDrawerDTO = {
-          cnpj: company.cnpj,
-          name: company.name,
-
-          taxRegime: company.profile?.taxRegime,
-          accountant: company.profile?.accountant,
-
-          address: {
-            publicSpace: company.publicSpace,
-            number: company.number,
-            district: company.district,
-            city: company.city,
-            state: company.state,
-          },
-
-          companySectors: company.companySectors.map(
-            (cs: any) => ({
-              sectorName: cs.sector.name,
-              owner: cs.owner?.username,
-            })
-          ),
-
-          qsas: company.qsas ?? [],
-
-          activities: company.activities ?? [],
-        };
-
-        setData(mapped);
+        setData(company); // 🔥 SEM MAPEAR
       })
       .catch(() => {
         setData(null);

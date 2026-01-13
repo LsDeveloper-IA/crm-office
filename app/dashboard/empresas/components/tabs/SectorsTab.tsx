@@ -1,79 +1,143 @@
 import type { CompanyDrawerDTO } from "../../dto/company-drawer.dto";
 
-type Sector = CompanyDrawerDTO["companySectors"][number];
+type Sector = CompanyDrawerDTO["companySectors"][number] & {
+  tempId: string;
+};
+
+type AvailableSector = {
+  id: string;
+  name: string;
+};
 
 type Props = {
   sectors: Sector[];
+  availableSectors: AvailableSector[];
   isEditing: boolean;
-  onChange?: (sectors: Sector[]) => void;
+  onChange: (sectors: Sector[]) => void;
 };
 
-export function SectorsTab({ sectors, isEditing, onChange }: Props) {
-  if (sectors.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        Nenhum setor vinculado a esta empresa
-      </p>
+export function SectorsTab({
+  sectors,
+  availableSectors,
+  isEditing,
+  onChange,
+}: Props) {
+  function updateSector(tempId: string, sectorId: string) {
+    const sector = availableSectors.find(
+      (s) => s.id === sectorId
+    );
+    if (!sector) return;
+
+    onChange(
+      sectors.map((s) =>
+        s.tempId === tempId
+          ? {
+              ...s,
+              sectorId: sector.id,
+              sectorName: sector.name,
+            }
+          : s
+      )
     );
   }
 
-  function updateOwner(index: number, value: string) {
-    if (!onChange) return;
-
-    const updated = [...sectors];
-    updated[index] = {
-      ...updated[index],
-      owner: value || undefined,
-    };
-
-    onChange(updated);
+  function updateOwner(tempId: string, value: string) {
+    onChange(
+      sectors.map((s) =>
+        s.tempId === tempId
+          ? { ...s, owner: value || undefined }
+          : s
+      )
+    );
   }
 
-  function removeSector(index: number) {
-    if (!onChange) return;
-
-    const updated = sectors.filter((_, i) => i !== index);
-    onChange(updated);
+  function addSector() {
+    onChange([
+      ...sectors,
+      {
+        tempId: crypto.randomUUID(),
+        sectorId: "",
+        sectorName: "",
+        owner: undefined,
+      },
+    ]);
   }
+
+  function removeSector(tempId: string) {
+    onChange(sectors.filter((s) => s.tempId !== tempId));
+  }
+  console.log("SECTORS STATE:", sectors);
+  console.log("AVAILABLE:", availableSectors);
 
   return (
     <div className="space-y-3">
-      {sectors.map((sector, index) => (
+      {sectors.map((sector) => (
         <div
-          key={`${sector.sectorName}-${index}`}
-          className="border rounded-lg px-4 py-3 flex justify-between items-center gap-4"
+          key={sector.tempId}
+          className="border rounded-lg px-4 py-3 flex items-center gap-3"
         >
-          {/* Nome do setor (não editável) */}
-          <span className="font-medium">
-            {sector.sectorName}
-          </span>
-
-          {/* Responsável */}
+          {/* SETOR */}
           {isEditing ? (
-            <div className="flex items-center gap-2">
-              <input
-                className="input text-sm"
-                placeholder="Responsável"
-                value={sector.owner ?? ""}
-                onChange={(e) =>
-                  updateOwner(index, e.target.value)
-                }
-              />
+            <select
+              className="input text-sm flex-1"
+              value={sector.sectorId}
+              onChange={(e) =>
+                updateSector(sector.tempId, e.target.value)
+              }
+            >
+              <option value="">
+                Selecione um setor
+              </option>
 
-              <button
-                className="text-xs text-red-500"
-                onClick={() => removeSector(index)}
-              >
-                Remover
-              </button>
-            </div>
+              {availableSectors.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <span className="font-medium flex-1">
+              {sector.sectorName || "-"}
+            </span>
+          )}
+
+          {/* RESPONSÁVEL */}
+          {isEditing ? (
+            <input
+              className="input text-sm w-40"
+              placeholder="Responsável"
+              value={sector.owner ?? ""}
+              onChange={(e) =>
+                updateOwner(sector.tempId, e.target.value)
+              }
+            />
           ) : (
             <span className="text-sm text-muted-foreground">
               {sector.owner ?? "Sem responsável"}
             </span>
           )}
+
+          {isEditing && (
+            <button
+              className="text-xs text-red-500"
+              onClick={() =>
+                removeSector(sector.tempId)
+              }
+            >
+              Remover
+            </button>
+          )}
         </div>
       ))}
+
+      {isEditing && (
+        <button
+          className="text-sm text-muted-foreground"
+          onClick={addSector}
+        >
+          + Adicionar setor
+        </button>
+      )}
     </div>
   );
 }
