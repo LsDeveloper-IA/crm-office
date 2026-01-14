@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { normalizeCNPJ, isValidCNPJ } from "@/lib/cnpj";
 import { getOrCreateCompanyByCnpj } from "@/lib/company/company.create";
 
+// POST /api/companies
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -15,66 +16,68 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    /**
-     * 🔹 1. RECEITA / SEFAZ
-     */
-    const company = await getOrCreateCompanyByCnpj(cnpj);
-
-    /**
-     * 🔹 2. PERFIL (regime + contador)
-     */
-    await prisma.companyProfile.upsert({
-      where: { companyCnpj: cnpj },
-      update: {
-        taxRegime: body.taxRegime,
-        accountant: body.accountant,
-      },
-      create: {
-        companyCnpj: cnpj,
-        taxRegime: body.taxRegime,
-        accountant: body.accountant,
-      },
-    });
-
-    /**
-     * 🔹 3. SETORES (múltiplos)
-     */
-    if (Array.isArray(body.companySectors)) {
-      await prisma.companySector.deleteMany({
-        where: { companyCnpj: cnpj },
-      });
-
-      await prisma.companySector.createMany({
-        data: body.companySectors.map((s: any) => ({
-          companyCnpj: cnpj,
-          sectorId: Number(s.sectorId),
-          ownerName: null,
-        })),
-      });
-    }
-
-    /**
-     * 🔹 4. CONTATO (opcional)
-     */
-    if (body.email || body.phone) {
-      // opcional: remover contatos antigos
-      await prisma.contact.deleteMany({
-        where: { companyCnpj: cnpj },
-      });
-
-      await prisma.contact.create({
-        data: {
-          companyCnpj: cnpj,
-          firstName: "Contato principal",
-          email: body.email,
-          phone: body.phone,
+    await prisma.$transaction(async (tx) => {
+      // 1️⃣ cria ou garante empresa
+      await tx.company.upsert({
+        where: { cnpj },
+        update: {},
+        create: {
+          cnpj,
+          name: body.name ?? "Empresa sem nome",
         },
       });
-    }
+
+      // 2️⃣ cria/atualiza profile SEM taxRegime
+      await tx.companyProfile.upsert({
+        where: { companyCnpj: cnpj },
+        update: {
+          accountant: body.accountant,
+        },
+        create: {
+          companyCnpj: cnpj,
+          accountant: body.accountant,
+        },
+      });
+
+      // 3️⃣ conecta regime (se existir)
+      if (body.taxRegime) {
+        const regime = await tx.taxRegime.findUnique({
+          where: { key: body.taxRegime },
+          select: { id: true },
+        });
+
+        if (!regime) {
+          throw new Error("Regime tributário inválido");
+        }
+
+        await tx.companyProfile.update({
+          where: { companyCnpj: cnpj },
+          data: {
+            taxRegime: {
+              connect: { key: body.taxRegime },
+            },
+          },
+        });
+      }
+
+      // 4️⃣ setores
+      if (Array.isArray(body.companySectors)) {
+        await tx.companySector.createMany({
+          data: body.companySectors
+            .filter((s: any) => s.sectorId)
+            .map((s: any) => ({
+              companyCnpj: cnpj,
+              sectorId: Number(s.sectorId),
+              ownerName: s.owner || null,
+            })),
+          skipDuplicates: true,
+        });
+      }
+    });
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {
-    console.error(err);
+    console.error("POST /api/companies ERROR:", err);
     return NextResponse.json(
       { error: err.message || "Erro interno" },
       { status: 500 }
