@@ -104,7 +104,10 @@ export function Header({ onToggleSidebar }: HeaderProps) {
       <NewCompanyModal
         open={isAddOpen}
         onClose={() => setIsAddOpen(false)}
-        onSubmit={handleCreateCompany}
+        onCreated={() => {
+          setIsAddOpen(false);
+          // aqui depois você pode recarregar a tabela
+        }}
         sectors={sectors}
       />
     </>
