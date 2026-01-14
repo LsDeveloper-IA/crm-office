@@ -126,7 +126,7 @@ export async function PATCH(req: Request, { params }: Params) {
   const { taxRegime, accountant, companySectors } = body;
 
   await prisma.$transaction(async (tx) => {
-    // 🔹 upsert do profile SEM taxRegime
+    // 🔹 1. upsert do profile SEM taxRegime
     await tx.companyProfile.upsert({
       where: { companyCnpj: cnpj },
       update: {
@@ -138,11 +138,11 @@ export async function PATCH(req: Request, { params }: Params) {
       },
     });
 
-    // 🔹 agora trata o regime separadamente
+    // 🔹 2. trata regime tributário
     if (taxRegime) {
       const exists = await tx.taxRegime.findUnique({
         where: { key: taxRegime },
-        select: { key: true },
+        select: { id: true },
       });
 
       if (!exists) {
@@ -158,7 +158,6 @@ export async function PATCH(req: Request, { params }: Params) {
         },
       });
     } else {
-      // remove regime
       await tx.companyProfile.update({
         where: { companyCnpj: cnpj },
         data: {
@@ -169,22 +168,18 @@ export async function PATCH(req: Request, { params }: Params) {
       });
     }
 
-    // 🔹 setores
+    // 🔹 3. setores
     if (Array.isArray(companySectors)) {
       await tx.companySector.deleteMany({
         where: { companyCnpj: cnpj },
       });
 
-      const cleanSectors = Array.isArray(companySectors)
-        ? companySectors.filter(
-            (s: any) =>
-              s.sectorId &&
-              !Number.isNaN(Number(s.sectorId))
-          )
-        : [];
+      const clean = companySectors.filter(
+        (s: any) => s.sectorId && !Number.isNaN(Number(s.sectorId))
+      );
 
       await tx.companySector.createMany({
-        data: cleanSectors.map((s: any) => ({
+        data: clean.map((s: any) => ({
           companyCnpj: cnpj,
           sectorId: Number(s.sectorId),
           ownerName: s.owner?.trim() || null,
