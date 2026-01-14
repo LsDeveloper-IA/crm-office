@@ -2,7 +2,11 @@ export type CompanyDrawerDTO = {
   cnpj: string;
   name: string;
 
-  taxRegime?: string;
+  taxRegime?: {
+    key: string;
+    name: string;
+  };
+  
   accountant?: string;
 
   address?: {

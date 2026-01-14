@@ -28,7 +28,11 @@ export function CompanyDrawerContent({
   const initialEditData = useMemo(
     () => ({
       name: company.name,
-      taxRegime: company.taxRegime,
+      taxRegime: company.taxRegime ? {
+        key: company.taxRegime.key,
+        name: company.taxRegime.name,
+      } : undefined,
+      
       accountant: company.accountant,
 
       publicSpace: company.address?.publicSpace ?? "",
