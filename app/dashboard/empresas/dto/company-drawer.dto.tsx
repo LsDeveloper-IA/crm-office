@@ -33,4 +33,9 @@ export type CompanyDrawerDTO = {
     description: string;
     kind: string;
   }[];
+
+  companySectorsOwners: {
+    companySectorId: string;
+    name: string;
+  }[];
 };

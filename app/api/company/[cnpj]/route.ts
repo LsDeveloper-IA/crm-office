@@ -29,8 +29,13 @@ export async function GET(_: Request, { params }: Params) {
 
       profile: {
         select: {
-          taxRegime: true,
           accountant: true,
+          taxRegime: {
+            select: {
+              key: true,
+              name: true,
+            },
+          },
         },
       },
 
@@ -57,13 +62,20 @@ export async function GET(_: Request, { params }: Params) {
 
       companySectors: {
         select: {
+          id: true,
+          ownerName: true, // 🔒 legado
           sector: {
             select: {
               id: true,
               name: true,
             },
           },
-          ownerName: true, // ✅ APENAS TEXTO
+          owners: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
     },
@@ -80,14 +92,8 @@ export async function GET(_: Request, { params }: Params) {
     cnpj: company.cnpj,
     name: company.name,
 
-    taxRegime: company.profile?.taxRegime
-      ? {
-          key: company.profile.taxRegime.key,
-          name: company.profile.taxRegime.name,
-        }
-      : undefined,
-
-    accountant: company.profile?.accountant,
+    taxRegime: company.profile?.taxRegime ?? undefined,
+    accountant: company.profile?.accountant ?? undefined,
 
     address: {
       publicSpace: company.publicSpace,
@@ -101,9 +107,18 @@ export async function GET(_: Request, { params }: Params) {
     activities: company.activities,
 
     companySectors: company.companySectors.map((cs) => ({
+      companySectorId: cs.id,
       sectorId: String(cs.sector.id),
       sectorName: cs.sector.name,
-      owner: cs.ownerName ?? undefined,
+
+      // legado
+      ownerLegacy: cs.ownerName ?? undefined,
+
+      // novo modelo
+      owners: cs.owners.map((o) => ({
+        id: o.id,
+        name: o.name,
+      })),
     })),
   });
 }
@@ -126,19 +141,19 @@ export async function PATCH(req: Request, { params }: Params) {
   const { taxRegime, accountant, companySectors } = body;
 
   await prisma.$transaction(async (tx) => {
-    // 🔹 1. upsert do profile SEM taxRegime
+    /* ======================
+        PROFILE
+    ====================== */
+
     await tx.companyProfile.upsert({
       where: { companyCnpj: cnpj },
-      update: {
-        accountant,
-      },
+      update: { accountant },
       create: {
         companyCnpj: cnpj,
         accountant,
       },
     });
 
-    // 🔹 2. trata regime tributário
     if (taxRegime) {
       const exists = await tx.taxRegime.findUnique({
         where: { key: taxRegime },
@@ -161,30 +176,100 @@ export async function PATCH(req: Request, { params }: Params) {
       await tx.companyProfile.update({
         where: { companyCnpj: cnpj },
         data: {
-          taxRegime: {
-            disconnect: true,
-          },
+          taxRegime: { disconnect: true },
         },
       });
     }
 
-    // 🔹 3. setores
-    if (Array.isArray(companySectors)) {
-      await tx.companySector.deleteMany({
-        where: { companyCnpj: cnpj },
-      });
+    /* ======================
+        SECTORS + OWNERS
+    ====================== */
 
-      const clean = companySectors.filter(
-        (s: any) => s.sectorId && !Number.isNaN(Number(s.sectorId))
-      );
+    if (!Array.isArray(companySectors)) return;
 
-      await tx.companySector.createMany({
-        data: clean.map((s: any) => ({
+    const incomingSectorIds = companySectors
+      .map((s: any) => s.companySectorId)
+      .filter(Boolean);
+
+    // 🔥 remove setores excluídos no front
+    await tx.companySector.deleteMany({
+      where: {
+        companyCnpj: cnpj,
+        id: { notIn: incomingSectorIds },
+      },
+    });
+
+    for (const s of companySectors) {
+      if (!s.sectorId || Number.isNaN(Number(s.sectorId))) continue;
+
+      const owners =
+        Array.isArray(s.owners)
+          ? s.owners
+              .map((o: any) => o.name?.trim())
+              .filter(Boolean)
+          : [];
+
+      /* ======================
+          UPSERT SECTOR
+      ====================== */
+
+      const sector = await tx.companySector.upsert({
+        where: {
+          id: s.companySectorId ?? "",
+        },
+        update: {
+          sectorId: Number(s.sectorId),
+
+          // 🔥 legado: apaga se não houver owners
+          ownerName:
+            owners.length > 0
+              ? owners.join(", ")
+              : null,
+        },
+        create: {
           companyCnpj: cnpj,
           sectorId: Number(s.sectorId),
-          ownerName: s.owner?.trim() || null,
-        })),
+          ownerName:
+            owners.length > 0
+              ? owners.join(", ")
+              : null,
+        },
       });
+
+      /* ======================
+          OWNERS (NOVO MODELO)
+      ====================== */
+
+      // 🔥 remove owners excluídos
+      await tx.companySectorOwner.deleteMany({
+        where: {
+          companySectorId: sector.id,
+          name: { notIn: owners },
+        },
+      });
+
+      // 🔥 cria owners novos
+      const existing = await tx.companySectorOwner.findMany({
+        where: { companySectorId: sector.id },
+        select: { name: true },
+      });
+
+      const existingNames = new Set(
+        existing.map((o) => o.name)
+      );
+
+      const toCreate = owners.filter(
+        (name: string) => !existingNames.has(name)
+      );
+
+      if (toCreate.length > 0) {
+        await tx.companySectorOwner.createMany({
+          data: toCreate.map((name: string) => ({
+            companySectorId: sector.id,
+            name,
+          })),
+        });
+      }
     }
   });
 

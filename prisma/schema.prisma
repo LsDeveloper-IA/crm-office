@@ -196,7 +196,9 @@ model CompanySector {
   sectorId    Int
   status      CompanySectorStatus @default(NOT_REGISTERED)
 
-  ownerName String? // ✅ RESPONSÁVEL EM TEXTO
+  ownerName String? // 🔒 LEGADO — NÃO REMOVER
+
+  owners CompanySectorOwner[] // ✅ NOVO
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -381,4 +383,16 @@ model TaxRegime {
   updatedAt DateTime @updatedAt
 
   companies CompanyProfile[]
+}
+
+model CompanySectorOwner {
+  id              Int      @id @default(autoincrement())
+  companySectorId Int
+  name            String
+
+  createdAt DateTime @default(now())
+
+  companySector CompanySector @relation(fields: [companySectorId], references: [id])
+
+  @@index([companySectorId])
 }
