@@ -19,5 +19,10 @@ export type CompanyEditDTO = {
     sectorId: string;
     sectorName: string;
     owner?: string;
+
+    owners?: {
+      id?: string;
+      name: string;
+    }[];
   }[];
 };

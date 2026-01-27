@@ -4,8 +4,8 @@ import prisma from "@/lib/prisma";
 const CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTy5agvCnMhLz83s5JLOiRzrlczrQW51XkhtxwCKgYor-9r6y2I7AzwFthV_NgZUA/pub?gid=2081804269&single=true&output=csv";
 
-const FIXED_SECTOR_ID = 1;
-const LIMITE_ATUALIZACOES = 2; // 👈 controle de teste
+const FIXED_SECTOR_ID = 3;
+const LIMITE_ATUALIZACOES = 2; // 👈 CONTROLE AQUI
 
 const CHAVES = [
   "nomeEmpresa",
@@ -14,9 +14,6 @@ const CHAVES = [
 ];
 
 export async function PATCH() {
-  /**
-   * 1️⃣ Busca o CSV
-   */
   const response = await fetch(CSV_URL);
 
   if (!response.ok) {
@@ -29,10 +26,6 @@ export async function PATCH() {
   const csv = await response.text();
   const linhas = csv.split("\n").filter(Boolean);
 
-  /**
-   * 2️⃣ Converte CSV → objetos
-   * ignora cabeçalho (linha 0)
-   */
   const registros = linhas.slice(1).map((linha) => {
     const valores = linha.split(",");
     const obj: any = {};
@@ -44,24 +37,18 @@ export async function PATCH() {
     return obj;
   });
 
-  /**
-   * 3️⃣ Resultado de execução
-   */
   const resultado = {
     processados: 0,
-    setoresGarantidos: 0,
+    setoresCriados: 0,
     responsaveisCriados: 0,
     interrompidoEm: null as string | null,
     erros: [] as any[],
   };
 
-  /**
-   * 4️⃣ Processa registros
-   */
   for (const item of registros) {
     if (resultado.processados >= LIMITE_ATUALIZACOES) {
       resultado.interrompidoEm = item.cnpj;
-      break; // ⛔ interrupção controlada
+      break; // ⛔ para a execução
     }
 
     const cnpj = item.cnpj?.replace(/\D/g, "");
@@ -71,14 +58,13 @@ export async function PATCH() {
         cnpj: item.cnpj,
         erro: "CNPJ inválido",
       });
-      resultado.processados++;
       continue;
     }
 
     try {
       await prisma.$transaction(async (tx) => {
         /**
-         * 5️⃣ Garante o setor fixo (não altera dados existentes)
+         * 1️⃣ Garante o setor fixo
          */
         const companySector = await tx.companySector.upsert({
           where: {
@@ -87,18 +73,15 @@ export async function PATCH() {
               sectorId: FIXED_SECTOR_ID,
             },
           },
-          update: {}, // 👈 NÃO altera nada
+          update: {},
           create: {
             companyCnpj: cnpj,
             sectorId: FIXED_SECTOR_ID,
           },
         });
 
-        resultado.setoresGarantidos++;
-
         /**
-         * 6️⃣ Cria UM NOVO responsável
-         * (sem apagar nem sobrescrever os existentes)
+         * 2️⃣ Cria um NOVO responsável (sem apagar os anteriores)
          */
         if (item.responsavelSetor?.trim()) {
           await tx.companySectorOwner.create({
@@ -121,8 +104,5 @@ export async function PATCH() {
     resultado.processados++;
   }
 
-  /**
-   * 7️⃣ Retorno final
-   */
   return NextResponse.json(resultado);
 }

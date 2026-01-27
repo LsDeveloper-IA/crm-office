@@ -1,23 +1,19 @@
-import type { CompanyDrawerDTO } from "../../dto/company-drawer.dto";
-
-/* ======================
-    TYPES
-====================== */
-
+// Defined types
 type UIOwner = {
   id?: string;
   name: string;
   tempId: string;
-};
+}; // Tables types companySectorsOwners
 
 type UISector = {
   tempId: string;
   sectorId: string;
   sectorName: string;
 
+  // Secondary owners
   owners: UIOwner[];
 
-  // legado (somente leitura)
+  // Primary owner
   ownerLegacy?: string;
 };
 
@@ -33,19 +29,12 @@ type Props = {
   onChange: (sectors: UISector[]) => void;
 };
 
-/* ======================
-    COMPONENT
-====================== */
-
 export function SectorsTab({
   sectors,
   availableSectors,
   isEditing,
   onChange,
 }: Props) {
-  /* ======================
-      SECTOR
-  ====================== */
 
   function updateSector(tempId: string, sectorId: string) {
     const sector = availableSectors.find((s) => s.id === sectorId);
@@ -79,10 +68,6 @@ export function SectorsTab({
   function removeSector(tempId: string) {
     onChange(sectors.filter((s) => s.tempId !== tempId));
   }
-
-  /* ======================
-      OWNERS
-  ====================== */
 
   function addOwner(sectorTempId: string) {
     onChange(
@@ -142,6 +127,22 @@ export function SectorsTab({
     );
   }
 
+  function updateOwnerLegacy(
+    sectorTempId: string,
+    value: string
+  ) {
+    onChange(
+      sectors.map((s) =>
+        s.tempId === sectorTempId
+          ? {
+              ...s,
+              ownerLegacy: value,
+            }
+          : s
+      )
+    );
+  }
+
   /* ======================
       RENDER
   ====================== */
@@ -157,7 +158,7 @@ export function SectorsTab({
           <div className="flex items-center gap-3">
             {isEditing ? (
               <select
-                className="input text-sm flex-1"
+                className="input text-sm flex-1 cursor-pointer"
                 value={sector.sectorId}
                 onChange={(e) =>
                   updateSector(sector.tempId, e.target.value)
@@ -178,7 +179,7 @@ export function SectorsTab({
 
             {isEditing && (
               <button
-                className="text-xs text-red-500"
+                className="text-xs text-red-500 cursor-pointer"
                 onClick={() => removeSector(sector.tempId)}
               >
                 Remover setor
@@ -189,11 +190,23 @@ export function SectorsTab({
           {/* RESPONSÁVEIS */}
           <div className="space-y-1 pl-1">
             {/* LEGADO */}
-            {sector.ownerLegacy && (
-              <span className="text-sm italic text-muted-foreground block">
-                Responsável Principal: {sector.ownerLegacy}
-              </span>
+            {isEditing ? (
+              <input
+                className="input text-sm"
+                placeholder="Responsável Principal"
+                value={sector.ownerLegacy ?? ""}
+                onChange={(e) =>
+                  updateOwnerLegacy(sector.tempId, e.target.value)
+                }
+              />
+            ) : (
+              sector.ownerLegacy && (
+                <span className="text-sm italic text-muted-foreground block">
+                  Responsável Principal: {sector.ownerLegacy}
+                </span>
+              )
             )}
+
 
             {/* NOVOS */}
             {isEditing ? (
@@ -205,7 +218,7 @@ export function SectorsTab({
                   >
                     <input
                       className="input text-sm flex-1"
-                      placeholder="Responsável"
+                      placeholder="Responsável Assistente"
                       value={owner.name}
                       onChange={(e) =>
                         updateOwner(
@@ -217,7 +230,7 @@ export function SectorsTab({
                     />
 
                     <button
-                      className="text-xs text-red-500"
+                      className="text-xs text-red-500 cursor-pointer"
                       onClick={() =>
                         removeOwner(
                           sector.tempId,
@@ -231,7 +244,7 @@ export function SectorsTab({
                 ))}
 
                 <button
-                  className="text-xs text-muted-foreground"
+                  className="text-xs text-muted-foreground cursor-pointer"
                   onClick={() => addOwner(sector.tempId)}
                 >
                   + Adicionar responsável
@@ -250,7 +263,7 @@ export function SectorsTab({
 
       {isEditing && (
         <button
-          className="text-sm text-muted-foreground"
+          className="text-sm text-muted-foreground cursor-pointer"
           onClick={addSector}
         >
           + Adicionar setor

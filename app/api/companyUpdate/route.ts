@@ -4,8 +4,8 @@ import prisma from "@/lib/prisma";
 const CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTy5agvCnMhLz83s5JLOiRzrlczrQW51XkhtxwCKgYor-9r6y2I7AzwFthV_NgZUA/pub?gid=2081804269&single=true&output=csv";
 
-const FIXED_SECTOR_ID = 2;
-const LIMITE_ATUALIZACOES = 2; // 👈 CONTROLE AQUI
+const FIXED_SECTOR_ID = 3;
+// const LIMITE_ATUALIZACOES = 2;
 
 const CHAVES = [
   "nomeEmpresa",
@@ -26,7 +26,7 @@ export async function PATCH() {
   const csv = await response.text();
   const linhas = csv.split("\n").filter(Boolean);
 
-  const registros = linhas.slice(1).map((linha) => {
+  const registros = linhas.slice(5).map((linha) => {
     const valores = linha.split(",");
     const obj: any = {};
 
@@ -46,10 +46,10 @@ export async function PATCH() {
   };
 
   for (const item of registros) {
-    if (resultado.processados >= LIMITE_ATUALIZACOES) {
-      resultado.interrompidoEm = item.cnpj;
-      break; // ⛔ para a execução
-    }
+    // if (resultado.processados >= LIMITE_ATUALIZACOES) {
+    //   resultado.interrompidoEm = item.cnpj;
+    //   break;
+    // }
 
     const cnpj = item.cnpj?.replace(/\D/g, "");
 
@@ -64,7 +64,7 @@ export async function PATCH() {
     try {
       await prisma.$transaction(async (tx) => {
         /**
-         * 1️⃣ Garante o setor fixo
+         * 1️⃣ Garante o vínculo empresa + setor
          */
         const companySector = await tx.companySector.upsert({
           where: {
@@ -81,13 +81,15 @@ export async function PATCH() {
         });
 
         /**
-         * 2️⃣ Cria um NOVO responsável (sem apagar os anteriores)
+         * 2️⃣ Atualiza o responsável (sem criar duplicado)
          */
         if (item.responsavelSetor?.trim()) {
-          await tx.companySectorOwner.create({
+          await tx.companySector.update({
+            where: {
+              id: companySector.id,
+            },
             data: {
-              companySectorId: companySector.id,
-              name: item.responsavelSetor.trim(),
+              ownerName: item.responsavelSetor.trim(),
             },
           });
 
