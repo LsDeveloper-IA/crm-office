@@ -191,7 +191,7 @@ export async function PATCH(req: Request, { params }: Params) {
       .map((s: any) => s.companySectorId)
       .filter(Boolean);
 
-    // 🔥 remove setores excluídos no front
+    // remove setores deletados no front
     await tx.companySector.deleteMany({
       where: {
         companyCnpj: cnpj,
@@ -202,74 +202,78 @@ export async function PATCH(req: Request, { params }: Params) {
     for (const s of companySectors) {
       if (!s.sectorId || Number.isNaN(Number(s.sectorId))) continue;
 
-      const owners =
-        Array.isArray(s.owners)
-          ? s.owners
-              .map((o: any) => o.name?.trim())
-              .filter(Boolean)
-          : [];
+      const ownersPayload = Array.isArray(s.owners) ? s.owners : [];
 
       /* ======================
-          UPSERT SECTOR
+          CREATE / UPDATE SECTOR
       ====================== */
 
-      const sector = await tx.companySector.upsert({
-        where: {
-          id: s.companySectorId ?? "",
-        },
-        update: {
-          sectorId: Number(s.sectorId),
-
-          // 🔥 legado: apaga se não houver owners
-          ownerName:
-            owners.length > 0
-              ? owners.join(", ")
-              : null,
-        },
-        create: {
-          companyCnpj: cnpj,
-          sectorId: Number(s.sectorId),
-          ownerName:
-            owners.length > 0
-              ? owners.join(", ")
-              : null,
-        },
-      });
+      const sector = s.companySectorId
+        ? await tx.companySector.update({
+            where: { id: s.companySectorId },
+            data: {
+              sectorId: Number(s.sectorId),
+            },
+          })
+        : await tx.companySector.create({
+            data: {
+              companyCnpj: cnpj,
+              sectorId: Number(s.sectorId),
+            },
+          });
 
       /* ======================
-          OWNERS (NOVO MODELO)
+          OWNERS SYNC
       ====================== */
 
-      // 🔥 remove owners excluídos
+      const incomingOwnerIds = ownersPayload
+        .map((o: any) => o.id)
+        .filter(Boolean);
+
+      // remove owners excluídos
       await tx.companySectorOwner.deleteMany({
         where: {
           companySectorId: sector.id,
-          name: { notIn: owners },
+          id: { notIn: incomingOwnerIds },
         },
       });
 
-      // 🔥 cria owners novos
-      const existing = await tx.companySectorOwner.findMany({
-        where: { companySectorId: sector.id },
-        select: { name: true },
-      });
+      // atualiza existentes
+      for (const owner of ownersPayload) {
+        if (owner.id) {
+          await tx.companySectorOwner.update({
+            where: { id: owner.id },
+            data: {
+              name: owner.name.trim(),
+            },
+          });
+        }
+      }
 
-      const existingNames = new Set(
-        existing.map((o) => o.name)
-      );
-
-      const toCreate = owners.filter(
-        (name: string) => !existingNames.has(name)
+      // cria novos
+      const toCreate = ownersPayload.filter(
+        (o: any) => !o.id && o.name?.trim()
       );
 
       if (toCreate.length > 0) {
         await tx.companySectorOwner.createMany({
-          data: toCreate.map((name: string) => ({
+          data: toCreate.map((o: any) => ({
             companySectorId: sector.id,
-            name,
+            name: o.name.trim(),
           })),
         });
       }
+
+      /* ======================
+          LEGADO — ownerName
+      ====================== */
+
+      await tx.companySector.update({
+        where: { id: sector.id },
+        data: {
+          ownerName: s.ownerLegacy?.trim() || null,
+        },
+      });
     }
   });
 

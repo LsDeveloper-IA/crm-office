@@ -66,7 +66,7 @@ export function CompanyDrawerContent({
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1.5 rounded-md text-sm capitalize ${
+                className={`px-3 py-1.5 rounded-md text-sm capitalize cursor-pointer ${
                   activeTab === tab
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
@@ -113,12 +113,12 @@ export function CompanyDrawerContent({
         {/* FOOTER */}
         <footer className="border-t p-4 flex justify-between">
           {!isEditing ? (
-            <button onClick={() => setIsEditing(true)}>
+            <button className="cursor-pointer" onClick={() => setIsEditing(true)}>
               Editar
             </button>
           ) : (
             <>
-              <button
+              <button className="cursor-pointer" 
                 onClick={() => {
                   setIsEditing(false);
                   edit.reset();
@@ -126,7 +126,7 @@ export function CompanyDrawerContent({
               >
                 Cancelar
               </button>
-              <button
+              <button className="cursor-pointer" 
                 onClick={async () => {
                   await edit.save();
                   setIsEditing(false);

@@ -3,16 +3,27 @@
 import { useEffect, useRef, useState } from "react";
 import type { CompanyEditDTO } from "../dto/company-edit.dto";
 
+type UIOwner = {
+  id?: string;
+  name: string;
+  tempId: string;
+};
+
 type UISector = CompanyEditDTO["companySectors"][number] & {
   tempId: string;
+  owners: UIOwner[];
 };
 
 function withTempIds(
   sectors: CompanyEditDTO["companySectors"]
 ): UISector[] {
-  return (sectors ?? []).map((s) => ({
+  return sectors.map((s) => ({
     ...s,
     tempId: crypto.randomUUID(),
+    owners: (s.owners ?? []).map((o) => ({
+      ...o,
+      tempId: crypto.randomUUID(),
+    })),
   }));
 }
 
@@ -93,6 +104,8 @@ export function useCompanyEdit(
 
   setLoading(false);
 }
+
+  console.log("RESET COM", initial.companySectors);
 
   return {
     data,
