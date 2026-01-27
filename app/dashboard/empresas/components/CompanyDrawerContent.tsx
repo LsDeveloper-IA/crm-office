@@ -47,6 +47,7 @@ export function CompanyDrawerContent({
   );
 
   const edit = useCompanyEdit(company.cnpj, initialEditData);
+  
 
   return (
     <div className="fixed inset-0 z-50 flex">
