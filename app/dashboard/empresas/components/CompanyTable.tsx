@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -23,14 +22,6 @@ type Props = {
 export function CompanyTable({ companies, page, totalPages }: Props) {
   const [selectedCnpj, setSelectedCnpj] =
     useState<string | null>(null);
-
-  const router = useRouter();
-
-  function goToPage(p: number) {
-    router.replace(`/dashboard/empresas?page=${p}`, {
-      scroll: false,
-    });
-  }
 
   return (
     <>
