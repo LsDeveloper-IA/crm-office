@@ -12,6 +12,7 @@ import {
 import { CompanyDrawer } from "./CompanyDrawer";
 import type { CompanyRowDTO } from "../dto";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 type Props = {
   companies: CompanyRowDTO[];
@@ -53,7 +54,15 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
               </TableCell>
 
               <TableCell>
-                {company.paysFees ? "Sim" : "Não"}
+                {company.paysFees ? (
+                  <Badge className="bg-green-100 text-green-700 border-green-300">
+                    Com Honorários
+                  </Badge>
+                ) : (
+                  <Badge className="bg-red-100 text-red-700 border-red-300">
+                    Sem Honorários
+                  </Badge>
+                )}
               </TableCell>
 
               <TableCell className="font-mono text-sm">
