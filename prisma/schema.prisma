@@ -365,6 +365,8 @@ model CompanyProfile {
   accountant String?
   notes      String?
 
+  paysFees   Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

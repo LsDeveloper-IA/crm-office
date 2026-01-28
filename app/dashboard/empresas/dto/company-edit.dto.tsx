@@ -8,6 +8,7 @@ export type CompanyEditDTO = {
   };
 
   accountant?: string;
+  paysFees: boolean;
 
   publicSpace?: string;
   number?: string;

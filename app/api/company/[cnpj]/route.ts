@@ -36,6 +36,7 @@ export async function GET(_: Request, { params }: Params) {
               name: true,
             },
           },
+          paysFees: true,
         },
       },
 
@@ -94,6 +95,7 @@ export async function GET(_: Request, { params }: Params) {
 
     taxRegime: company.profile?.taxRegime ?? undefined,
     accountant: company.profile?.accountant ?? undefined,
+    paysFees: company.profile?.paysFees ?? false,
 
     address: {
       publicSpace: company.publicSpace,
@@ -138,7 +140,7 @@ export async function PATCH(req: Request, { params }: Params) {
   }
 
   const body = await req.json();
-  const { taxRegime, accountant, companySectors } = body;
+  const { taxRegime, accountant, paysFees, companySectors } = body;
 
   await prisma.$transaction(async (tx) => {
     /* ======================
@@ -147,10 +149,11 @@ export async function PATCH(req: Request, { params }: Params) {
 
     await tx.companyProfile.upsert({
       where: { companyCnpj: cnpj },
-      update: { accountant },
+      update: { accountant, paysFees: Boolean(paysFees) },
       create: {
         companyCnpj: cnpj,
         accountant,
+        paysFees: Boolean(paysFees),
       },
     });
 

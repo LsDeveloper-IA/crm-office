@@ -31,6 +31,7 @@ export default async function Company({ searchParams }: Props) {
           select: {
             taxRegime: true,
             accountant: true,
+            paysFees: true,
           },
         },
       },

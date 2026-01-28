@@ -39,6 +39,7 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
           <TableRow>
             <TableHead>#</TableHead>
             <TableHead>Razão Social</TableHead>
+            <TableHead>Honorários</TableHead>
             <TableHead>CNPJ</TableHead>
             <TableHead>Regime</TableHead>
             <TableHead>Contador</TableHead>
@@ -58,6 +59,10 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
 
               <TableCell className="font-medium">
                 {company.name ?? "-"}
+              </TableCell>
+
+              <TableCell>
+                {company.paysFees ? "Sim" : "Não"}
               </TableCell>
 
               <TableCell className="font-mono text-sm">

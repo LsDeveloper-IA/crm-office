@@ -34,6 +34,7 @@ export function CompanyDrawerContent({
       } : undefined,
       
       accountant: company.accountant,
+      paysFees: company.paysFees,
 
       publicSpace: company.address?.publicSpace ?? "",
       number: company.address?.number ?? "",

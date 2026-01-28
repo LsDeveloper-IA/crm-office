@@ -8,4 +8,5 @@ export type CompanyRowDTO = {
     name: string;
   };
   accountant: string;
+  paysFees: boolean;
 };
