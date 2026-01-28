@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 
 import {
   Table,
@@ -14,7 +13,6 @@ import {
 
 import { CompanyDrawer } from "./CompanyDrawer";
 import type { CompanyRowDTO } from "../dto";
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { SortableHead } from "./CompanyTable/SortableHead";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -54,8 +52,6 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
     setCnpjInUrl(null);         // remove da URL
   }
 
-  const searchParams = useSearchParams();
-  const router = useRouter();
 
   function goToPage(newPage: number) {
     const params = new URLSearchParams(searchParams.toString());

@@ -570,10 +570,12 @@ async function run() {
         `   ✅ ${company.name} importada com sucesso`
       );
       success++;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : String(err);
       console.error(
         `   ❌ Falha ao importar ${cnpj}:`,
-        err?.message ?? err
+        message
       );
       failed++;
     }

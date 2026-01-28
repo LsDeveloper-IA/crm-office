@@ -94,10 +94,12 @@ export async function PATCH() {
           resultado.responsaveisCriados++;
         }
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Erro inesperado";
       resultado.erros.push({
         cnpj,
-        erro: err.message,
+        erro: message,
       });
     }
 

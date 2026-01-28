@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { CompanyEditDTO } from "../dto/company-edit.dto";
 
 type UIOwner = {
@@ -39,21 +39,6 @@ export function useCompanyEdit(
   }));
 
   const [loading, setLoading] = useState(false);
-  const lastCnpjRef = useRef<string | null>(null);
-
-  // 🔁 troca de empresa
-  useEffect(() => {
-    if (!cnpj) return;
-
-    if (lastCnpjRef.current !== cnpj) {
-      setData({
-        ...initial,
-        companySectors: withTempIds(initial.companySectors),
-      });
-
-      lastCnpjRef.current = cnpj;
-    }
-  }, [cnpj]); // ❗ não depende de initial
 
   function update<K extends keyof CompanyEditDTO>(
     key: K,
@@ -73,37 +58,37 @@ export function useCompanyEdit(
   }
 
   async function save() {
-  setLoading(true);
+    setLoading(true);
 
-  const payload = {
-    ...data,
-    taxRegime:
-      data.taxRegime && typeof data.taxRegime === "object"
-        ? data.taxRegime.key
-        : typeof data.taxRegime === "string"
-        ? data.taxRegime
-        : undefined,
-  };
+    const payload = {
+      ...data,
+      taxRegime:
+        data.taxRegime && typeof data.taxRegime === "object"
+          ? data.taxRegime.key
+          : typeof data.taxRegime === "string"
+          ? data.taxRegime
+          : undefined,
+    };
 
-  const res = await fetch(`/api/company/${cnpj}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+    const res = await fetch(`/api/company/${cnpj}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-  if (!res.ok) {
-    let errMsg = "Erro ao salvar empresa";
+    if (!res.ok) {
+      let errMsg = "Erro ao salvar empresa";
 
-    try {
-      const err = await res.json();
-      errMsg = err.error ?? errMsg;
-    } catch {}
+      try {
+        const err = await res.json();
+        errMsg = err.error ?? errMsg;
+      } catch {}
 
-    throw new Error(errMsg);
+      throw new Error(errMsg);
+    }
+
+    setLoading(false);
   }
-
-  setLoading(false);
-}
 
   console.log("RESET COM", initial.companySectors);
 

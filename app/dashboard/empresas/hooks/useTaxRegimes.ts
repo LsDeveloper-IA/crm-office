@@ -25,8 +25,11 @@ export function useTaxRegimes() {
 
         const json = await res.json();
         if (active) setData(json);
-      } catch (err: any) {
-        if (active) setError(err.message);
+      } catch (err: unknown) {
+        if (!active) return;
+        const message =
+          err instanceof Error ? err.message : "Erro ao carregar regimes";
+        setError(message);
       } finally {
         if (active) setLoading(false);
       }

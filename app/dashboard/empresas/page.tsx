@@ -4,6 +4,7 @@ import Card from "./components/card";
 import { CompanyTable } from "./components/CompanyTable";
 import prisma from "@/lib/prisma";
 import { mapCompanyToRowDTO } from "./dto/mapper";
+import type { Prisma } from "@prisma/client";
 
 type Props = {
   searchParams: Promise<{
@@ -16,7 +17,7 @@ type Props = {
 const PAGE_SIZE = 13;
 
 // 🔒 mapa seguro de ordenação
-const SORT_MAP: Record<string, any> = {
+const SORT_MAP: Record<string, Prisma.CompanyOrderByWithRelationInput> = {
   name: { name: "asc" },
   cnpj: { cnpj: "asc" },
 

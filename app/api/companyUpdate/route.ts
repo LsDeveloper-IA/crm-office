@@ -11,7 +11,18 @@ const CHAVES = [
   "nomeEmpresa",
   "cnpj",
   "responsavelSetor",
-];
+] as const;
+
+type CsvRow = {
+  nomeEmpresa: string | null;
+  cnpj: string | null;
+  responsavelSetor: string | null;
+};
+
+type ErrorItem = {
+  cnpj: string | null;
+  erro: string;
+};
 
 export async function PATCH() {
   const response = await fetch(CSV_URL);
@@ -28,7 +39,11 @@ export async function PATCH() {
 
   const registros = linhas.slice(5).map((linha) => {
     const valores = linha.split(",");
-    const obj: any = {};
+    const obj: CsvRow = {
+      nomeEmpresa: null,
+      cnpj: null,
+      responsavelSetor: null,
+    };
 
     CHAVES.forEach((chave, index) => {
       obj[chave] = valores[index]?.trim() || null;
@@ -42,7 +57,7 @@ export async function PATCH() {
     setoresCriados: 0,
     responsaveisCriados: 0,
     interrompidoEm: null as string | null,
-    erros: [] as any[],
+    erros: [] as ErrorItem[],
   };
 
   for (const item of registros) {
@@ -96,10 +111,12 @@ export async function PATCH() {
           resultado.responsaveisCriados++;
         }
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Erro inesperado";
       resultado.erros.push({
         cnpj,
-        erro: err.message,
+        erro: message,
       });
     }
 

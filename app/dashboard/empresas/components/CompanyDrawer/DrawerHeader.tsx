@@ -1,4 +1,3 @@
-// DrawerHeader.tsx
 import type { CompanyDetailsDTO } from "../../dto";
 
 type Props = {

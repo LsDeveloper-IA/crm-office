@@ -26,6 +26,7 @@ console.log(company)
   console.log(company)
   return (
     <CompanyDrawerContent
+      key={company.cnpj}
       company={company}
       onClose={onClose}
     />

@@ -1,4 +1,3 @@
-// SectionAddress.tsx
 import type { CompanyDetailsDTO } from "../../dto";
 
 type Props = {

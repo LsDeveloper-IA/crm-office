@@ -14,7 +14,6 @@ export function SortableHead({ label, sortKey }: Props) {
 
   const currentSort = searchParams.get("sort");
   const currentDir = searchParams.get("dir") ?? "asc";
-  const page = searchParams.get("page") ?? "1";
 
   function toggleSort() {
     const nextDir =

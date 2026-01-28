@@ -11,10 +11,10 @@ export function useSectors() {
   useEffect(() => {
     fetch("/api/sectors")
       .then((res) => res.json())
-      .then((sectors) =>
+      .then((sectors: Array<{ id: string | number; name: string }>) =>
         setData(
-          sectors.map((s: any) => ({
-            id: String(s.id), // 🔥 AQUI
+          sectors.map((s) => ({
+            id: String(s.id),
             name: s.name,
           }))
         )
