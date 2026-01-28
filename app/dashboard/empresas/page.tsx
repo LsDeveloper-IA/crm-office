@@ -19,7 +19,7 @@ export default async function Company({ searchParams }: Props) {
   const page = Math.max(Number(params.page) || 1, 1);
   const skip = (page - 1) * PAGE_SIZE;
 
-  const [companiesRaw, total] = await Promise.all([
+  const [companiesRaw, total, totalPagantes] = await Promise.all([
     prisma.company.findMany({
       orderBy: { name: "asc" },
       skip,
@@ -36,8 +36,16 @@ export default async function Company({ searchParams }: Props) {
         },
       },
     }),
-
     prisma.company.count(),
+    prisma.company.count({
+      where: {
+        profile: {
+          is: {
+            paysFees: true,
+          },
+        },
+      },
+    }),
   ]);
 
   const companies = companiesRaw.map(mapCompanyToRowDTO);
@@ -47,20 +55,16 @@ export default async function Company({ searchParams }: Props) {
     <main className="flex flex-col gap-7 flex-1 min-h-0">
       {/* Cards */}
       <div className="w-full h-24 flex items-center gap-4 justify-between">
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
+        <Card title="Total de empresas" value={total}/>
+        <Card title="Total Honorários" value={totalPagantes}/>
+        <Card title="Card 3" value="-" />
+        <Card title="Card 4" value="-" />
+        <Card title="Card 5" value="-" />
       </div>
 
       {/* Tabela */}
       <div className="flex-1 bg-white rounded-lg p-7 overflow-auto min-h-0 shadow-2xl">
-        <CompanyTable
-          companies={companies}
-          page={page}
-          totalPages={totalPages}
-        />
+        <CompanyTable companies={companies} page={page} totalPages={totalPages} />
       </div>
     </main>
   );
