@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+
 import {
   Table,
   TableBody,
@@ -9,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import { CompanyDrawer } from "./CompanyDrawer";
 import type { CompanyRowDTO } from "../dto";
 import Link from "next/link";
@@ -19,10 +22,35 @@ type Props = {
   page: number;
   totalPages: number;
 };
-
 export function CompanyTable({ companies, page, totalPages }: Props) {
-  const [selectedCnpj, setSelectedCnpj] =
-    useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // state só serve pra clique do usuário (quando você quiser forçar abrir algo)
+  const [selectedCnpj, setSelectedCnpj] = useState<string | null>(null);
+
+  const cnpjFromUrl = searchParams.get("cnpj");
+
+  const selected = selectedCnpj ?? cnpjFromUrl;
+
+  function setCnpjInUrl(cnpj: string | null) {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (cnpj) params.set("cnpj", cnpj);
+    else params.delete("cnpj");
+
+    router.replace(`?${params.toString()}`);
+  }
+
+  function handleSelectCompany(cnpj: string) {
+    setSelectedCnpj(cnpj);      // abre imediatamente
+    setCnpjInUrl(cnpj);         // sincroniza na URL
+  }
+
+  function handleCloseDrawer() {
+    setSelectedCnpj(null);      // limpa clique manual
+    setCnpjInUrl(null);         // remove da URL
+  }
 
   return (
     <>
@@ -42,7 +70,7 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
           {companies.map((company, index) => (
             <TableRow
               key={company.cnpj}
-              onClick={() => setSelectedCnpj(company.cnpj)}
+              onClick={() => handleSelectCompany(company.cnpj)}
               className="cursor-pointer hover:bg-muted/50"
             >
               <TableCell>
@@ -111,10 +139,10 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
       </div>
 
       {/* Drawer */}
-      {selectedCnpj && (
+      {selected && (
         <CompanyDrawer
-          cnpj={selectedCnpj}
-          onClose={() => setSelectedCnpj(null)}
+          cnpj={selected}
+          onClose={handleCloseDrawer}
         />
       )}
     </>

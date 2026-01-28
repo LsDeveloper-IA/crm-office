@@ -1,12 +1,69 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { normalizeCNPJ, isValidCNPJ } from "@/lib/cnpj";
-import { getOrCreateCompanyByCnpj } from "@/lib/company/company.create";
+import type { Prisma } from "@prisma/client";
+
+type CompanySectorInput = {
+  sectorId?: number | string | null;
+  owner?: string | null;
+};
+
+type CompanyPayload = {
+  cnpj: string;
+  name?: string | null;
+  accountant?: string | null;
+  taxRegime?: string | null;
+  companySectors?: CompanySectorInput[] | null;
+};
+
+
+// GET /api/companies?q=...&limit=12
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+
+    const q = (searchParams.get("q") ?? "").trim();
+    const limit = Math.min(Number(searchParams.get("limit") ?? 12), 20);
+
+    if (!q) {
+      return NextResponse.json({ items: [] });
+    }
+
+    // normaliza para buscar CNPJ por dígitos também
+    const qDigits = q.replace(/\D/g, "");
+
+    const items = await prisma.company.findMany({
+      take: limit,
+      orderBy: { name: "asc" },
+      where: {
+        OR: [
+          { name: { contains: q, mode: "insensitive" } },
+          ...(qDigits
+            ? [{ cnpj: { contains: qDigits } }]
+            : []),
+        ],
+      },
+      select: {
+        cnpj: true,
+        name: true,
+      },
+    });
+
+    return NextResponse.json({ items });
+  } catch (err: unknown) {
+    console.error("GET /api/companies ERROR:", err);
+    const message = err instanceof Error ? err.message : "Erro interno";
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    );
+  }
+}
 
 // POST /api/companies
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body = (await req.json()) as CompanyPayload;
     const cnpj = normalizeCNPJ(body.cnpj);
 
     if (!isValidCNPJ(cnpj)) {
@@ -16,7 +73,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // 1️⃣ cria ou garante empresa
       await tx.company.upsert({
         where: { cnpj },
@@ -64,8 +121,8 @@ export async function POST(req: NextRequest) {
       if (Array.isArray(body.companySectors)) {
         await tx.companySector.createMany({
           data: body.companySectors
-            .filter((s: any) => s.sectorId)
-            .map((s: any) => ({
+            .filter((s) => s.sectorId !== null && s.sectorId !== undefined)
+            .map((s) => ({
               companyCnpj: cnpj,
               sectorId: Number(s.sectorId),
               ownerName: s.owner || null,
@@ -76,10 +133,11 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ ok: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("POST /api/companies ERROR:", err);
+    const message = err instanceof Error ? err.message : "Erro interno";
     return NextResponse.json(
-      { error: err.message || "Erro interno" },
+      { error: message },
       { status: 500 }
     );
   }
