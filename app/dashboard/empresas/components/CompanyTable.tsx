@@ -13,6 +13,8 @@ import { CompanyDrawer } from "./CompanyDrawer";
 import type { CompanyRowDTO } from "../dto";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { SortableHead } from "./CompanyTable/SortableHead";
+import { useSearchParams, useRouter } from "next/navigation";
 
 type Props = {
   companies: CompanyRowDTO[];
@@ -24,15 +26,27 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
   const [selectedCnpj, setSelectedCnpj] =
     useState<string | null>(null);
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  function goToPage(newPage: number) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(newPage));
+
+    router.replace(`?${params.toString()}`, {
+      scroll: false,
+    });
+  }
+
   return (
     <>
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>#</TableHead>
-            <TableHead>Razão Social</TableHead>
-            <TableHead>Honorários</TableHead>
-            <TableHead>CNPJ</TableHead>
+            <SortableHead label="Razão Social" sortKey="name" />
+            <SortableHead label="Honorários" sortKey="paysFees" />
+            <SortableHead label="CNPJ" sortKey="cnpj" />
             <TableHead>Regime</TableHead>
             <TableHead>Contador</TableHead>
           </TableRow>
@@ -88,25 +102,20 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
         </span>
 
         <div className="flex gap-2">
-          <Link
-            href={`?page=${page - 1}`}
-            aria-disabled={page <= 1}
-            className={`px-3 py-1 rounded border text-sm
-              ${page <= 1 ? "pointer-events-none opacity-50" : "hover:bg-muted"}
-            `}
+          <button
+            disabled={page <= 1}
+            onClick={() => goToPage(page - 1)}
+            className="px-3 py-1 rounded border text-sm"
           >
             Anterior
-          </Link>
-
-          <Link
-            href={`?page=${page + 1}`}
-            aria-disabled={page >= totalPages}
-            className={`px-3 py-1 rounded border text-sm
-              ${page >= totalPages ? "pointer-events-none opacity-50" : "hover:bg-muted"}
-            `}
+          </button>
+          <button
+            disabled={page >= totalPages}
+            onClick={() => goToPage(page + 1)}
+            className="px-3 py-1 rounded border text-sm"
           >
             Próximo
-          </Link>
+          </button>
         </div>
       </div>
 

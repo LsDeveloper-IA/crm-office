@@ -8,6 +8,6 @@ export function mapCompanyToRowDTO(company: any): CompanyRowDTO {
 
     taxRegime: company.profile?.taxRegime ?? "—",
     accountant: company.profile?.accountant ?? "—",
-    paysFees: company.profile?.paysFees ?? false,
+    paysFees: company.profile?.paysFees === true,
   };
 }
