@@ -158,23 +158,59 @@ export async function PATCH(req: Request, { params }: Params) {
     );
   }
 
-  const body = (await req.json()) as PatchBody;
-  const { taxRegime, accountant, paysFees, companySectors } = body;
+  const body = await req.json();
+  const {
+    taxRegime,
+    accountant,
+
+    paysFees,
+    feesType,
+    feesValue,
+
+    paysSystem,
+    systemName,
+    systemValue,
+
+    companySectors,
+  } = body;
 
   await prisma.$transaction(async (tx) => {
     /* ======================
         PROFILE
     ====================== */
 
-    await tx.companyProfile.upsert({
-      where: { companyCnpj: cnpj },
-      update: { accountant, paysFees: Boolean(paysFees) },
-      create: {
-        companyCnpj: cnpj,
-        accountant,
-        paysFees: Boolean(paysFees),
-      },
-    });
+  await tx.companyProfile.upsert({
+    where: { companyCnpj: cnpj },
+
+    update: {
+      accountant,
+
+      // HONORÁRIOS
+      paysFees: Boolean(paysFees),
+      feesType: paysFees ? feesType ?? null : null,
+      feesValue: paysFees ? feesValue ?? null : null,
+
+      // SISTEMA
+      paysSystem: Boolean(paysSystem),
+      systemName: paysSystem ? systemName?.trim() || null : null,
+      systemValue: paysSystem ? systemValue ?? null : null,
+    },
+
+    create: {
+      companyCnpj: cnpj,
+      accountant,
+
+      // HONORÁRIOS
+      paysFees: Boolean(paysFees),
+      feesType: paysFees ? feesType ?? null : null,
+      feesValue: paysFees ? feesValue ?? null : null,
+
+      // SISTEMA
+      paysSystem: Boolean(paysSystem),
+      systemName: paysSystem ? systemName?.trim() || null : null,
+      systemValue: paysSystem ? systemValue ?? null : null,
+    },
+  });
 
     if (taxRegime) {
       const exists = await tx.taxRegime.findUnique({

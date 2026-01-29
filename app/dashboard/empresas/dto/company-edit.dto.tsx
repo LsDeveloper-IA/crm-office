@@ -1,6 +1,5 @@
-// dto/company-edit.dto.ts
 export type CompanyEditDTO = {
-  name: string;
+  name?: string;
 
   taxRegime?: {
     key: string;
@@ -8,7 +7,16 @@ export type CompanyEditDTO = {
   };
 
   accountant?: string;
-  paysFees: boolean;
+
+  // HONORÁRIOS
+  paysFees?: boolean;
+  feesType?: "FIXO" | "PERCENTUAL" | "PACOTE";
+  feesValue?: number;
+
+  // SISTEMA
+  paysSystem?: boolean;
+  systemName?: string;
+  systemValue?: number;
 
   publicSpace?: string;
   number?: string;
@@ -20,10 +28,5 @@ export type CompanyEditDTO = {
     sectorId: string;
     sectorName: string;
     owner?: string;
-
-    owners?: {
-      id?: string;
-      name: string;
-    }[];
   }[];
 };
