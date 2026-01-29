@@ -92,12 +92,112 @@ export function GeneralTab({
             {accountants.map((acc) => (
               <option key={acc.id} value={acc.name}>
                 {acc.name}
-              </option>
+              </option> 
             ))}
           </select>
         ) : (
           <p className="mt-1 text-sm text-muted-foreground">
             {company.accountant ?? "-"}
+          </p>
+        )}
+      </div>
+      {/* 💰 HONORÁRIOS */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Honorários</label>
+
+        {isEditing ? (
+          <>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={company.paysFees ?? false}
+                onChange={(e) =>
+                  onChange("paysFees", e.target.checked)
+                }
+              />
+              Paga honorários
+            </label>
+
+            {company.paysFees && (
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                <select
+                  className="rounded-md border px-3 py-2 text-sm"
+                  value={company.feesType ?? ""}
+                  onChange={(e) =>
+                    onChange("feesType", e.target.value as any)
+                  }
+                >
+                  <option value="">Tipo</option>
+                  <option value="FIXO">Fixo</option>
+                  <option value="PERCENTUAL">Percentual</option>
+                  <option value="PACOTE">Pacote</option>
+                </select>
+
+                <input
+                  type="number"
+                  className="rounded-md border px-3 py-2 text-sm"
+                  placeholder="Valor"
+                  value={company.feesValue ?? ""}
+                  onChange={(e) =>
+                    onChange("feesValue", Number(e.target.value))
+                  }
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {company.paysFees
+              ? `Sim (${company.feesType ?? "-"})`
+              : "Não paga honorários"}
+          </p>
+        )}
+      </div>
+      {/* 🖥️ SISTEMA */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Sistema</label>
+
+        {isEditing ? (
+          <>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={company.paysSystem ?? false}
+                onChange={(e) =>
+                  onChange("paysSystem", e.target.checked)
+                }
+              />
+              Paga sistema
+            </label>
+
+            {company.paysSystem && (
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                <input
+                  className="rounded-md border px-3 py-2 text-sm"
+                  placeholder="Nome do sistema"
+                  value={company.systemName ?? ""}
+                  onChange={(e) =>
+                    onChange("systemName", e.target.value)
+                  }
+                />
+
+                <input
+                  type="number"
+                  className="rounded-md border px-3 py-2 text-sm"
+                  placeholder="Valor"
+                  value={company.systemValue ?? ""}
+                  onChange={(e) =>
+                    onChange("systemValue", Number(e.target.value))
+                  }
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {company.paysSystem
+              ? `${company.systemName ?? "Sistema"}`
+              : "Não paga sistema"}
           </p>
         )}
       </div>

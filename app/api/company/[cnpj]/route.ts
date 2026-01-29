@@ -7,6 +7,25 @@ type Params = {
   }>;
 };
 
+type CompanySectorOwnerInput = {
+  id?: string | number | null;
+  name?: string | null;
+};
+
+type CompanySectorInput = {
+  companySectorId?: string | number | null;
+  sectorId?: string | number | null;
+  owners?: CompanySectorOwnerInput[] | null;
+  ownerLegacy?: string | null;
+};
+
+type PatchBody = {
+  taxRegime?: string | null;
+  accountant?: string | null;
+  paysFees?: boolean | null;
+  companySectors?: CompanySectorInput[] | null;
+};
+
 /* =========================
     GET — Buscar empresa
 ========================= */
@@ -140,22 +159,58 @@ export async function PATCH(req: Request, { params }: Params) {
   }
 
   const body = await req.json();
-  const { taxRegime, accountant, paysFees, companySectors } = body;
+  const {
+    taxRegime,
+    accountant,
+
+    paysFees,
+    feesType,
+    feesValue,
+
+    paysSystem,
+    systemName,
+    systemValue,
+
+    companySectors,
+  } = body;
 
   await prisma.$transaction(async (tx) => {
     /* ======================
         PROFILE
     ====================== */
 
-    await tx.companyProfile.upsert({
-      where: { companyCnpj: cnpj },
-      update: { accountant, paysFees: Boolean(paysFees) },
-      create: {
-        companyCnpj: cnpj,
-        accountant,
-        paysFees: Boolean(paysFees),
-      },
-    });
+  await tx.companyProfile.upsert({
+    where: { companyCnpj: cnpj },
+
+    update: {
+      accountant,
+
+      // HONORÁRIOS
+      paysFees: Boolean(paysFees),
+      feesType: paysFees ? feesType ?? null : null,
+      feesValue: paysFees ? feesValue ?? null : null,
+
+      // SISTEMA
+      paysSystem: Boolean(paysSystem),
+      systemName: paysSystem ? systemName?.trim() || null : null,
+      systemValue: paysSystem ? systemValue ?? null : null,
+    },
+
+    create: {
+      companyCnpj: cnpj,
+      accountant,
+
+      // HONORÁRIOS
+      paysFees: Boolean(paysFees),
+      feesType: paysFees ? feesType ?? null : null,
+      feesValue: paysFees ? feesValue ?? null : null,
+
+      // SISTEMA
+      paysSystem: Boolean(paysSystem),
+      systemName: paysSystem ? systemName?.trim() || null : null,
+      systemValue: paysSystem ? systemValue ?? null : null,
+    },
+  });
 
     if (taxRegime) {
       const exists = await tx.taxRegime.findUnique({
@@ -191,8 +246,12 @@ export async function PATCH(req: Request, { params }: Params) {
     if (!Array.isArray(companySectors)) return;
 
     const incomingSectorIds = companySectors
-      .map((s: any) => s.companySectorId)
-      .filter(Boolean);
+      .map((s) =>
+        s.companySectorId === null || s.companySectorId === undefined
+          ? null
+          : Number(s.companySectorId)
+      )
+      .filter((id): id is number => Number.isFinite(id));
 
     // remove setores deletados no front
     await tx.companySector.deleteMany({
@@ -205,15 +264,22 @@ export async function PATCH(req: Request, { params }: Params) {
     for (const s of companySectors) {
       if (!s.sectorId || Number.isNaN(Number(s.sectorId))) continue;
 
-      const ownersPayload = Array.isArray(s.owners) ? s.owners : [];
+      const ownersPayload: CompanySectorOwnerInput[] = Array.isArray(s.owners)
+        ? s.owners
+        : [];
 
       /* ======================
           CREATE / UPDATE SECTOR
       ====================== */
 
-      const sector = s.companySectorId
+      const sectorId =
+        s.companySectorId === null || s.companySectorId === undefined
+          ? null
+          : Number(s.companySectorId);
+
+      const sector = Number.isFinite(sectorId)
         ? await tx.companySector.update({
-            where: { id: s.companySectorId },
+            where: { id: Number(sectorId) },
             data: {
               sectorId: Number(s.sectorId),
             },
@@ -230,8 +296,10 @@ export async function PATCH(req: Request, { params }: Params) {
       ====================== */
 
       const incomingOwnerIds = ownersPayload
-        .map((o: any) => o.id)
-        .filter(Boolean);
+        .map((o) =>
+          o.id === null || o.id === undefined ? null : Number(o.id)
+        )
+        .filter((id): id is number => Number.isFinite(id));
 
       // remove owners excluídos
       await tx.companySectorOwner.deleteMany({
@@ -243,11 +311,16 @@ export async function PATCH(req: Request, { params }: Params) {
 
       // atualiza existentes
       for (const owner of ownersPayload) {
-        if (owner.id) {
+        const ownerId =
+          owner.id === null || owner.id === undefined
+            ? null
+            : Number(owner.id);
+
+        if (Number.isFinite(ownerId)) {
           await tx.companySectorOwner.update({
-            where: { id: owner.id },
+            where: { id: Number(ownerId) },
             data: {
-              name: owner.name.trim(),
+              name: owner.name?.trim() ?? "",
             },
           });
         }
@@ -255,14 +328,14 @@ export async function PATCH(req: Request, { params }: Params) {
 
       // cria novos
       const toCreate = ownersPayload.filter(
-        (o: any) => !o.id && o.name?.trim()
+        (o) => !o.id && o.name?.trim()
       );
 
       if (toCreate.length > 0) {
         await tx.companySectorOwner.createMany({
-          data: toCreate.map((o: any) => ({
+          data: toCreate.map((o) => ({
             companySectorId: sector.id,
-            name: o.name.trim(),
+            name: o.name?.trim() ?? "",
           })),
         });
       }

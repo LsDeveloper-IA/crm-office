@@ -2,8 +2,6 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from '@prisma/adapter-pg';
 
 declare global {
-  // allow global prisma during dev to avoid exhausting connections
-  // eslint-disable-next-line no-var
   var __prisma: PrismaClient | undefined;
 }
 

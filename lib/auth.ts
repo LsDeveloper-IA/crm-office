@@ -30,7 +30,7 @@ export async function getCurrentUser(): Promise<CurrentUser> {
     if (!finalToken) return null;
 
     // verificar token
-    let payload: any;
+    let payload;
     try {
       payload = jwt.verify(finalToken, process.env.JWT_SECRET!);
     } catch {

@@ -11,7 +11,18 @@ const CHAVES = [
   "nomeEmpresa",
   "cnpj",
   "responsavelSetor",
-];
+] as const;
+
+type Registro = {
+  nomeEmpresa: string | null;
+  cnpj: string | null;
+  responsavelSetor: string | null;
+};
+
+type ResultadoErro = {
+  cnpj: string | null;
+  erro: string;
+};
 
 export async function PATCH() {
   const response = await fetch(CSV_URL);
@@ -26,9 +37,13 @@ export async function PATCH() {
   const csv = await response.text();
   const linhas = csv.split("\n").filter(Boolean);
 
-  const registros = linhas.slice(1).map((linha) => {
+  const registros: Registro[] = linhas.slice(1).map((linha) => {
     const valores = linha.split(",");
-    const obj: any = {};
+    const obj: Record<(typeof CHAVES)[number], string | null> = {
+      nomeEmpresa: null,
+      cnpj: null,
+      responsavelSetor: null,
+    };
 
     CHAVES.forEach((chave, index) => {
       obj[chave] = valores[index]?.trim() || null;
@@ -37,12 +52,18 @@ export async function PATCH() {
     return obj;
   });
 
-  const resultado = {
+  const resultado: {
+    processados: number;
+    setoresCriados: number;
+    responsaveisCriados: number;
+    interrompidoEm: string | null;
+    erros: ResultadoErro[];
+  } = {
     processados: 0,
     setoresCriados: 0,
     responsaveisCriados: 0,
     interrompidoEm: null as string | null,
-    erros: [] as any[],
+    erros: [],
   };
 
   for (const item of registros) {
@@ -94,10 +115,12 @@ export async function PATCH() {
           resultado.responsaveisCriados++;
         }
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Erro inesperado";
       resultado.erros.push({
         cnpj,
-        erro: err.message,
+        erro: message,
       });
     }
 

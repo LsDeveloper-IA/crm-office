@@ -28,13 +28,16 @@ export function CompanyDrawerContent({
   const initialEditData = useMemo(
     () => ({
       name: company.name,
-      taxRegime: company.taxRegime ? {
-        key: company.taxRegime.key,
-        name: company.taxRegime.name,
-      } : undefined,
-      
+
+      taxRegime: company.taxRegime
+        ? {
+            key: company.taxRegime.key,
+            name: company.taxRegime.name,
+          }
+        : undefined,
+
       accountant: company.accountant,
-      paysFees: company.paysFees,
+      paysFees: company.paysFees ?? false,
 
       publicSpace: company.address?.publicSpace ?? "",
       number: company.address?.number ?? "",
@@ -42,7 +45,20 @@ export function CompanyDrawerContent({
       city: company.address?.city ?? "",
       state: company.address?.state ?? "",
 
-      companySectors: company.companySectors ?? [],
+      companySectors: (company.companySectors ?? []).map((s) => ({
+        companySectorId: s.companySectorId,
+
+        sectorId: s.sectorId,
+        sectorName: s.sectorName,
+
+        // ✅ NOVO MODELO (obrigatório)
+        owners: Array.isArray(s.owners)
+          ? s.owners.map((o) => ({
+              id: o.id,
+              name: o.name,
+            }))
+          : [],
+      })),
     }),
     [company]
   );

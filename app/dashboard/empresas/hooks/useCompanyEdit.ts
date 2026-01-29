@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { CompanyEditDTO } from "../dto/company-edit.dto";
 
 type UIOwner = {
-  id?: string;
+  id?: number;
   name: string;
   tempId: string;
 };
@@ -31,33 +31,23 @@ export function useCompanyEdit(
   cnpj: string,
   initial: CompanyEditDTO
 ) {
-  const [data, setData] = useState<CompanyEditDTO & {
-    companySectors: UISector[];
-  }>(() => ({
+  const [data, setData] = useState<
+    Omit<CompanyEditDTO, "companySectors"> & {
+      companySectors: UISector[];
+    }
+  >(() => ({
     ...initial,
     companySectors: withTempIds(initial.companySectors),
   }));
 
   const [loading, setLoading] = useState(false);
-  const lastCnpjRef = useRef<string | null>(null);
 
-  // 🔁 troca de empresa
-  useEffect(() => {
-    if (!cnpj) return;
-
-    if (lastCnpjRef.current !== cnpj) {
-      setData({
-        ...initial,
-        companySectors: withTempIds(initial.companySectors),
-      });
-
-      lastCnpjRef.current = cnpj;
-    }
-  }, [cnpj]); // ❗ não depende de initial
-
+  // 🔧 update tipado corretamente
   function update<K extends keyof CompanyEditDTO>(
     key: K,
-    value: CompanyEditDTO[K]
+    value: K extends "companySectors"
+      ? UISector[]
+      : CompanyEditDTO[K]
   ) {
     setData((prev) => ({
       ...prev,
@@ -73,45 +63,34 @@ export function useCompanyEdit(
   }
 
   async function save() {
-  setLoading(true);
+    setLoading(true);
 
-  const payload = {
-    ...data,
-    taxRegime:
-      data.taxRegime && typeof data.taxRegime === "object"
-        ? data.taxRegime.key
-        : typeof data.taxRegime === "string"
-        ? data.taxRegime
-        : undefined,
-  };
+    const payload = {
+      ...data,
+      taxRegime:
+        data.taxRegime && typeof data.taxRegime === "object"
+          ? data.taxRegime.key
+          : undefined,
+    };
 
-  const res = await fetch(`/api/company/${cnpj}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+    const res = await fetch(`/api/company/${cnpj}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-  if (!res.ok) {
-    let errMsg = "Erro ao salvar empresa";
+    if (!res.ok) {
+      let msg = "Erro ao salvar empresa";
+      try {
+        const err = await res.json();
+        msg = err.error ?? msg;
+      } catch {}
+      setLoading(false);
+      throw new Error(msg);
+    }
 
-    try {
-      const err = await res.json();
-      errMsg = err.error ?? errMsg;
-    } catch {}
-
-    throw new Error(errMsg);
+    setLoading(false);
   }
 
-  setLoading(false);
-}
-
-  console.log("RESET COM", initial.companySectors);
-
-  return {
-    data,
-    update,
-    reset,
-    save,
-    loading,
-  };
+  return { data, update, reset, save, loading };
 }

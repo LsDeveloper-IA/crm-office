@@ -26,7 +26,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    // 🔎 1. Validação Zod
     const parsed = loginSchema.safeParse({ username, password });
 
     if (!parsed.success) {

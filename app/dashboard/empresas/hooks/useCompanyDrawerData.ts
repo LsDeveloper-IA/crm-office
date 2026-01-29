@@ -8,28 +8,41 @@ export function useCompanyDrawerData(cnpj: string | null) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!cnpj) return;
-
     let active = true;
-    setLoading(true);
 
-    fetch(`/api/company/${cnpj}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Erro ao buscar empresa");
-        }
-        return res.json();
-      })
-      .then((company: CompanyDrawerDTO) => {
-        if (!active) return;
-        setData(company); // 🔥 SEM MAPEAR
-      })
-      .catch(() => {
+    const start = async () => {
+      await Promise.resolve();
+      if (!active) return;
+
+      if (!cnpj) {
         setData(null);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+
+      fetch(`/api/company/${cnpj}`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Erro ao buscar empresa");
+          }
+          return res.json();
+        })
+        .then((company: CompanyDrawerDTO) => {
+          if (!active) return;
+          setData(company);
+        })
+        .catch(() => {
+          if (!active) return;
+          setData(null);
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+    };
+
+    start();
 
     return () => {
       active = false;

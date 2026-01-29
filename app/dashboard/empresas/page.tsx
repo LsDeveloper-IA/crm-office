@@ -4,6 +4,7 @@ import Card from "./components/card";
 import { CompanyTable } from "./components/CompanyTable";
 import prisma from "@/lib/prisma";
 import { mapCompanyToRowDTO } from "./dto/mapper";
+import type { Prisma } from "@prisma/client";
 
 type Props = {
   searchParams: Promise<{
@@ -16,7 +17,7 @@ type Props = {
 const PAGE_SIZE = 13;
 
 // 🔒 mapa seguro de ordenação
-const SORT_MAP: Record<string, any> = {
+const SORT_MAP: Record<string, Prisma.CompanyOrderByWithRelationInput> = {
   name: { name: "asc" },
   cnpj: { cnpj: "asc" },
 
@@ -59,7 +60,7 @@ export default async function Company({ searchParams }: Props) {
     JSON.stringify(baseOrder).replace(/"asc"/g, `"${dir}"`)
   );
 
-  const [companiesRaw, total, totalPagantes] = await Promise.all([
+  const [companiesRaw, total, totalSimples, totalNaoSimples, totalPagantes] = await Promise.all([
     prisma.company.findMany({
       orderBy,
       skip,
@@ -78,6 +79,20 @@ export default async function Company({ searchParams }: Props) {
     }),
 
     prisma.company.count(),
+
+    prisma.company.count({
+      where: { profile: { is: { taxRegime: { key: "SIMPLES" } } } },
+    }),
+
+    prisma.company.count({
+      where: {
+        OR: [
+          { profile: null },
+          { profile: { is: { taxRegime: null } } },
+          { profile: { is: { taxRegime: { key: { not: "SIMPLES" } } } } },
+        ],
+      },
+    }),
 
     prisma.company.count({
       where: {
@@ -100,8 +115,11 @@ export default async function Company({ searchParams }: Props) {
         <Card title="Total de empresas" value={total} />
         <Card title="Total Honorários" value={totalPagantes} />
         <Card title="Card 3" value="-" />
-        <Card title="Card 4" value="-" />
-        <Card title="Card 5" value="-" />
+        <Card title="Simples Nacional"
+          valueLeft={totalSimples}
+          subtitleLeft="Optantes"
+          valueRight={totalNaoSimples}
+          subtitleRight="Não optantes" />
       </div>
 
       {/* Tabela */}

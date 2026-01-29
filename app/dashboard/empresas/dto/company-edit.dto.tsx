@@ -1,6 +1,5 @@
-// dto/company-edit.dto.ts
 export type CompanyEditDTO = {
-  name: string;
+  name?: string;
 
   taxRegime?: {
     key: string;
@@ -8,7 +7,7 @@ export type CompanyEditDTO = {
   };
 
   accountant?: string;
-  paysFees: boolean;
+  paysFees?: boolean;
 
   publicSpace?: string;
   number?: string;
@@ -17,13 +16,17 @@ export type CompanyEditDTO = {
   state?: string;
 
   companySectors: {
+    companySectorId?: number;
     sectorId: string;
     sectorName: string;
-    owner?: string;
 
-    owners?: {
-      id?: string;
+    // 🔥 NOVO MODELO
+    owners: {
+      id?: number;
       name: string;
     }[];
+
+    // 🔒 legado (opcional)
+    ownerLegacy?: string;
   }[];
 };

@@ -93,8 +93,10 @@ export function NewCompanyModal({
 
       onCreated?.();
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Erro ao criar empresa";
+      setError(message);
     } finally {
       setLoading(false);
     }
