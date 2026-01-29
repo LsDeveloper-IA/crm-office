@@ -4,13 +4,12 @@ import prisma from "@/lib/prisma";
 const CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTy5agvCnMhLz83s5JLOiRzrlczrQW51XkhtxwCKgYor-9r6y2I7AzwFthV_NgZUA/pub?gid=2081804269&single=true&output=csv";
 
-const FIXED_SECTOR_ID = 3;
-const LIMITE_ATUALIZACOES = 2;
+// const LIMITE_ATUALIZACOES = 2;
 
 const CHAVES = [
   "nomeEmpresa",
   "cnpj",
-  "responsavelSetor",
+  "paysfree",
 ];
 
 export async function PATCH() {
@@ -26,7 +25,7 @@ export async function PATCH() {
   const csv = await response.text();
   const linhas = csv.split("\n").filter(Boolean);
 
-  const registros = linhas.slice(5).map((linha) => {
+  const registros = linhas.slice(1).map((linha) => {
     const valores = linha.split(",");
     const obj: any = {};
 
@@ -39,17 +38,16 @@ export async function PATCH() {
 
   const resultado = {
     processados: 0,
-    setoresCriados: 0,
-    responsaveisCriados: 0,
+    atualizados: 0,
     interrompidoEm: null as string | null,
     erros: [] as any[],
   };
 
   for (const item of registros) {
-    if (resultado.processados >= LIMITE_ATUALIZACOES) {
-      resultado.interrompidoEm = item.cnpj;
-      break;
-    }
+    // if (resultado.processados >= LIMITE_ATUALIZACOES) {
+    //   resultado.interrompidoEm = item.cnpj;
+    //   break;
+    // }
 
     const cnpj = item.cnpj?.replace(/\D/g, "");
 
@@ -61,41 +59,32 @@ export async function PATCH() {
       continue;
     }
 
+    const paysFees =
+      item.paysfree?.toLowerCase() === "sim";
+
+    if (!paysFees) {
+      resultado.processados++;
+      continue;
+    }
+
     try {
-      await prisma.$transaction(async (tx) => {
-        /**
-         * 1️⃣ Garante o vínculo empresa + setor
-         */
-        const companySector = await tx.companySector.upsert({
-          where: {
-            companyCnpj_sectorId: {
-              companyCnpj: cnpj,
-              sectorId: FIXED_SECTOR_ID,
-            },
-          },
-          update: {},
-          create: {
-            companyCnpj: cnpj,
-            sectorId: FIXED_SECTOR_ID,
-          },
-        });
-
-        /**
-         * 2️⃣ Atualiza o responsável (sem criar duplicado)
-         */
-        if (item.responsavelSetor?.trim()) {
-          await tx.companySector.update({
-            where: {
-              id: companySector.id,
-            },
-            data: {
-              ownerName: item.responsavelSetor.trim(),
-            },
-          });
-
-          resultado.responsaveisCriados++;
-        }
+      const updated = await prisma.companyProfile.updateMany({
+        where: {
+          companyCnpj: cnpj,
+        },
+        data: {
+          paysFees: true,
+        },
       });
+
+      if (updated.count === 0) {
+        resultado.erros.push({
+          cnpj,
+          erro: "CompanyProfile não encontrado",
+        });
+      } else {
+        resultado.atualizados++;
+      }
     } catch (err: any) {
       resultado.erros.push({
         cnpj,
