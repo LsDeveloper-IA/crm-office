@@ -25,7 +25,7 @@ export async function PATCH() {
   const csv = await response.text();
   const linhas = csv.split("\n").filter(Boolean);
 
-  const registros = linhas.slice(1).map((linha) => {
+  const registros = linhas.slice(3).map((linha) => {
     const valores = linha.split(",");
     const obj: any = {};
 
