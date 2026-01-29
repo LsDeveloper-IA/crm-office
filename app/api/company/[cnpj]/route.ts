@@ -264,7 +264,9 @@ export async function PATCH(req: Request, { params }: Params) {
     for (const s of companySectors) {
       if (!s.sectorId || Number.isNaN(Number(s.sectorId))) continue;
 
-      const ownersPayload = Array.isArray(s.owners) ? s.owners : [];
+      const ownersPayload: CompanySectorOwnerInput[] = Array.isArray(s.owners)
+        ? s.owners
+        : [];
 
       /* ======================
           CREATE / UPDATE SECTOR
