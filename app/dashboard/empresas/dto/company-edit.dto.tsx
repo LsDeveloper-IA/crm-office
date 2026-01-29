@@ -7,16 +7,7 @@ export type CompanyEditDTO = {
   };
 
   accountant?: string;
-
-  // HONORÁRIOS
   paysFees?: boolean;
-  feesType?: "FIXO" | "PERCENTUAL" | "PACOTE";
-  feesValue?: number;
-
-  // SISTEMA
-  paysSystem?: boolean;
-  systemName?: string;
-  systemValue?: number;
 
   publicSpace?: string;
   number?: string;
@@ -25,8 +16,17 @@ export type CompanyEditDTO = {
   state?: string;
 
   companySectors: {
+    companySectorId?: number;
     sectorId: string;
     sectorName: string;
-    owner?: string;
+
+    // 🔥 NOVO MODELO
+    owners: {
+      id?: number;
+      name: string;
+    }[];
+
+    // 🔒 legado (opcional)
+    ownerLegacy?: string;
   }[];
 };
