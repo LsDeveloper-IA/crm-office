@@ -16,6 +16,8 @@ type NewUserRequest = {
 export async function POST(req: NextRequest) {
     try {
         const body: NewUserRequest = await req.json();
+        const emailValid = await isValidEmail(body.username.toString())
+        const passwordValid = await isValidPassword(body.password.toString())
 
         // Verifica se todas as informações foram enviadas com sucesso
         if (!body.name || !body.username || !body.password || !body.role) {
@@ -25,43 +27,44 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const active = Boolean(body.active);
-        const name = body.name.toString();
-        const email = body.username.toString().trim();
-        const password = body.password.toString();
-        const role = body.role.toString();
-        const saltRounds = 10;
-
-        if (!isValidEmail(email)) {
+        if (!emailValid) {
             return NextResponse.json(
                 { error: "Email inválido" },
                 { status: 400 }
             );
         }
 
-        if (!isValidPassword(password)) {
+        if (!passwordValid) {
             return NextResponse.json(
                 { error: "Senha inválida" },
                 { status: 400 }
-            )
+            );
         }
 
-        await prisma.$transaction(async (tx) => {
-            await tx.user.upsert({
-                where: { username: email },
-                update: {
-                    active: active,
-                    name: name,
-                    role: role,
-                },
-                create: {
-                    username: email,
-                    name: name,
-                    password: await bcrypt.hash(password, saltRounds),
-                    role: role,
-                }
-            });
-        });
+        const active = Boolean(body.active);
+        const name = body.name.toString();
+        const email = body.username.toString().trim();
+        const password = body.password.toString();
+        const role = body.role;
+        const saltRounds = 10;
+
+
+        // await prisma.$transaction(async (tx) => {
+        //     await tx.user.upsert({
+        //         where: { username: email },
+        //         update: {
+        //             active: active,
+        //             name: name,
+        //             role: role,
+        //         },
+        //         create: {
+        //             username: email,
+        //             name: name,
+        //             password: await bcrypt.hash(password, saltRounds),
+        //             role: role,
+        //         }
+        //     });
+        // });
 
         return NextResponse.json({ ok: true});
     }

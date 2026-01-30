@@ -2,6 +2,7 @@
 
 import dns from "dns/promises";
 import prisma from "@/lib/prisma";
+import { boolean } from "zod";
 
 const blockedDomains = [
     "mailinator.com",
@@ -43,7 +44,7 @@ function isDisposableEmail(domain: string): boolean {
 
 
 // Function Primary
-export async function isValidEmail(email: string) {
+export async function isValidEmail(email: string): Promise<boolean>{
     const domain = getDomain(email);
 
     if (!isValidEmailFormat(email)) {
