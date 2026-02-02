@@ -20,13 +20,11 @@ export type CompanyEditDTO = {
     sectorId: string;
     sectorName: string;
 
-    // 🔥 NOVO MODELO
     owners: {
       id?: number;
       name: string;
     }[];
 
-    // 🔒 legado (opcional)
     ownerLegacy?: string;
   }[];
 };
