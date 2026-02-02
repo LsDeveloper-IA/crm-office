@@ -5,7 +5,7 @@ const CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTy5agvCnMhLz83s5JLOiRzrlczrQW51XkhtxwCKgYor-9r6y2I7AzwFthV_NgZUA/pub?gid=2081804269&single=true&output=csv";
 
 const FIXED_SECTOR_ID = 3;
-// const LIMITE_ATUALIZACOES = 2;
+const LIMITE_ATUALIZACOES = 2;
 
 const CHAVES = [
   "nomeEmpresa",
@@ -61,10 +61,10 @@ export async function PATCH() {
   };
 
   for (const item of registros) {
-    // if (resultado.processados >= LIMITE_ATUALIZACOES) {
-    //   resultado.interrompidoEm = item.cnpj;
-    //   break;
-    // }
+    if (resultado.processados >= LIMITE_ATUALIZACOES) {
+      resultado.interrompidoEm = item.cnpj;
+      break;
+    }
 
     const cnpj = item.cnpj?.replace(/\D/g, "");
 
