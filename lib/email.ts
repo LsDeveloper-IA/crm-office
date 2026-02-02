@@ -2,7 +2,6 @@
 
 import dns from "dns/promises";
 import prisma from "@/lib/prisma";
-import { boolean } from "zod";
 
 const blockedDomains = [
     "mailinator.com",
@@ -29,27 +28,35 @@ async function hasMxRecord(domain: string): Promise<boolean> {
     }
 }
 
-async function emailAlreadyExists(email: string): Promise<boolean> {
+
+function isDisposableEmail(domain: string): boolean {
+    return blockedDomains.includes(domain)
+}
+
+// -------------------------------------------------------------------
+
+// Functions Primary
+// Verifica se já existe no banco
+export async function emailAlreadyExists(email: string): Promise<boolean> {
+    const normalizedEmail = email.trim().toLowerCase()
+
     const user = await prisma.user.findUnique({
-        where: {username: email},
+        where: {username: normalizedEmail},
         select: {username: true}
     });
 
     return !!user
 }
 
-function isDisposableEmail(domain: string): boolean {
-    return blockedDomains.includes(domain)
-}
-
-
-// Function Primary
+// Verifica o formato, domínio, etc...
 export async function isValidEmail(email: string): Promise<boolean>{
-    const domain = getDomain(email);
+    const normalizedEmail = email.trim().toLowerCase()
 
-    if (!isValidEmailFormat(email)) {
+    if (!isValidEmailFormat(normalizedEmail)) {
         return false;
     }
+
+    const domain = getDomain(normalizedEmail);
 
     if(isDisposableEmail(domain)) {
         return false;
@@ -58,12 +65,6 @@ export async function isValidEmail(email: string): Promise<boolean>{
     const hasDomain = await hasMxRecord(domain)
 
     if (!hasDomain) {
-        return false;
-    }
-
-    const existsInDb = await emailAlreadyExists(email);
-
-    if (existsInDb) {
         return false;
     }
 
