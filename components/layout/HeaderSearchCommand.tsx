@@ -136,7 +136,6 @@ export function HeaderSearchCommand({ open, onOpenChange }: Props) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            {/* overlay com blur (igual tailwind palette) */}
             <DialogOverlay className="bg-black/50 backdrop-blur-sm" />
 
             <DialogContent className="p-0 overflow-hidden max-w-2xl">
@@ -146,7 +145,6 @@ export function HeaderSearchCommand({ open, onOpenChange }: Props) {
                         onValueChange={setQuery}
                         placeholder="Pesquisar empresa por nome ou CNPJ..."
                     />
-
                     <CommandList className="max-h-[360px]">
                         <CommandEmpty>
                             {loading ? "Buscando..." : "Nenhuma empresa encontrada."}
