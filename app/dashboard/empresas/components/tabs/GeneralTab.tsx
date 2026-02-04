@@ -136,8 +136,6 @@ export function GeneralTab({
           </p>
         )}
       </div>
-<<<<<<< HEAD
-=======
       {/* 💰 HONORÁRIOS */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Honorários</label>
@@ -279,7 +277,6 @@ export function GeneralTab({
           </p>
         )}
       </div>
->>>>>>> origin/feature/Filter
     </div>
   );
 }
