@@ -22,9 +22,18 @@ type Props = {
   page: number;
   totalPages: number;
 };
+
+const GROUPS_OPTIONS = [
+  { value: "mr2", label: "MR2" },
+  { value: "", label: "Todas as Empresas"}
+];
+
 export function CompanyTable({ companies, page, totalPages }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // 🔎 grupo atual vindo da URL
+  const selectedGroup = searchParams.get("group") ?? "";
 
   // state só serve pra clique do usuário (quando você quiser forçar abrir algo)
   const [selectedCnpj, setSelectedCnpj] = useState<string | null>(null);
@@ -52,6 +61,17 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
     setCnpjInUrl(null);         // remove da URL
   }
 
+  // 🎯 quando o usuário troca o grupo
+  function handleChangeGroup(group: string) {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (group) params.set("group", group);
+    else params.delete("group");
+
+    params.set("page", "1"); // 👈 reseta paginação
+
+    router.replace(`?${params.toString()}`);
+  }
 
   function goToPage(newPage: number) {
     const params = new URLSearchParams(searchParams.toString());
@@ -64,6 +84,21 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
 
   return (
     <>
+      <div className="flex justify-end">
+        <select 
+          value={selectedGroup}
+          onChange={(e) => handleChangeGroup(e.target.value)}
+          className="p-1 mb-2 border rounded-md hover:bg-gray-200 cursor-pointer"
+          >
+          <option value="" disabled>Selecione um Grupo</option>
+          
+          {GROUPS_OPTIONS.map((group) => (
+            <option key={group.label} value={group.value}>
+              {group.label}
+            </option>
+          ))}
+        </select>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>

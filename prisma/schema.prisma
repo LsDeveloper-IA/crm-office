@@ -359,22 +359,30 @@ model CompanyProfile {
   id          Int    @id @default(autoincrement())
   companyCnpj String @unique @db.VarChar(14)
 
-  taxRegimeId Int?
-  taxRegime   TaxRegime? @relation(fields: [taxRegimeId], references: [id])
+  // HONORÁRIOS
+  paysFees     Boolean  @default(false)
+  feesType     FeesType?
+  feesValue    Decimal? @db.Decimal(10, 2)
 
-  accountant String?
-  notes      String?
+  // SERVIÇOS EXTRAS
+  paysSystem   Boolean  @default(false)
+  systemName   String?
+  systemValue  Decimal? @db.Decimal(10, 2)
 
-  paysFees   Boolean @default(false)
+  accountant   String?
+  taxRegimeId  Int?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // GRUPO
+  group String?
 
-  thirteenthSalary Boolean @default(false)
+  company   Company   @relation(fields: [companyCnpj], references: [cnpj])
+  taxRegime TaxRegime? @relation(fields: [taxRegimeId], references: [id])
+}
 
-  company Company @relation(fields: [companyCnpj], references: [cnpj])
-
-  @@index([companyCnpj])
+enum FeesType {
+  FIXO
+  PERCENTUAL
+  PACOTE
 }
 
 model TaxRegime {

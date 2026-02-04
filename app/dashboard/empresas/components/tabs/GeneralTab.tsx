@@ -2,6 +2,11 @@
 
 import type { CompanyEditDTO } from "../../dto/company-edit.dto";
 import { useTaxRegimes } from "../../hooks/useTaxRegimes";
+import { CompanyDrawerDTO } from "../../dto/company-drawer.dto";
+
+const GROUPS_OPTIONS = [
+  { value: "mr2", label: "MR2" },
+];
 
 type AccountantOption = {
   id: string;
@@ -16,13 +21,43 @@ type Props = {
     value: CompanyEditDTO[K]
   ) => void;
   accountants: AccountantOption[];
+  errors?: {
+    systemName?: string;
+    systemValue?: string;
+  };
 };
+
+type SystemErrors = {
+  systemName?: string;
+  systemValue?: string;
+};
+
+export function validateForm(company: CompanyDrawerDTO): SystemErrors {
+  const errors: SystemErrors = {};
+
+  if (company.paysSystem) {
+    if (!company.systemName || company.systemName.trim() === "") {
+      errors.systemName = "Informe o nome do sistema";
+    }
+
+    if (
+      company.systemValue === undefined ||
+      isNaN(company.systemValue) ||
+      company.systemValue < 0
+    ) {
+      errors.systemValue = "Informe um valor válido";
+    }
+  }
+
+  return errors;
+}
 
 export function GeneralTab({
   company,
   onChange,
   isEditing,
   accountants,
+  errors,
 }: Props) {
   const { taxRegimes, loading } = useTaxRegimes();
 
@@ -101,6 +136,150 @@ export function GeneralTab({
           </p>
         )}
       </div>
+<<<<<<< HEAD
+=======
+      {/* 💰 HONORÁRIOS */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Honorários</label>
+
+        {isEditing ? (
+          <>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={company.paysFees ?? false}
+                onChange={(e) =>
+                  onChange("paysFees", e.target.checked)
+                }
+              />
+              Paga honorários
+            </label>
+
+            {company.paysFees && (
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                <select
+                  className="rounded-md border px-3 py-2 text-sm"
+                  value={company.feesType ?? ""}
+                  onChange={(e) =>
+                    onChange("feesType", e.target.value as any)
+                  }
+                >
+                  <option value="">Tipo</option>
+                  <option value="FIXO">Fixo</option>
+                  <option value="PERCENTUAL">Percentual</option>
+                  <option value="PACOTE">Pacote</option>
+                </select>
+
+                <input
+                  type="number"
+                  className="rounded-md border px-3 py-2 text-sm"
+                  placeholder="Valor"
+                  value={company.feesValue ?? ""}
+                  onChange={(e) =>
+                    onChange("feesValue", Number(e.target.value))
+                  }
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {company.paysFees
+              ? `Sim (${company.feesType ?? "-"})`
+              : "Não paga honorários"}
+          </p>
+        )}
+      </div>
+      {/* 🖥️ SISTEMA */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Sistema</label>
+
+        {isEditing ? (
+          <>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={company.paysSystem ?? false}
+                onChange={(e) =>
+                  onChange("paysSystem", e.target.checked)
+                }
+              />
+              Paga sistema
+            </label>
+
+            {company.paysSystem && (
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                <div>
+                  <input
+                    className="rounded-md border px-3 py-2 text-sm"
+                    placeholder="Nome do sistema"
+                    value={company.systemName ?? ""}
+                    onChange={(e) =>
+                      onChange("systemName", e.target.value)
+                    }
+                  />
+                  {errors?.systemName && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.systemName}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <input
+                    type="number"
+                    className="rounded-md border px-3 py-2 text-sm"
+                    placeholder="Valor"
+                    value={company.systemValue ?? ""}
+                    onChange={(e) =>
+                      onChange("systemValue", Number(e.target.value))
+                    }
+                  />
+                  {errors?.systemValue && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.systemValue}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {company.paysSystem ? 
+            `${company.systemName ?? "Sistema"}` 
+            : "Não paga sistema"}
+          </p>
+        )}
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Grupo</label>
+
+        {isEditing ? (
+          <select
+            className="ml-2 rounded-md border px-3 py-2 text-sm"
+            value={company.group ?? ""}
+            onChange={(e) => onChange("group", e.target.value)}
+          >
+            <option value="" disabled>
+              Selecione um grupo
+            </option>
+
+            {GROUPS_OPTIONS.map((group) => (
+              <option key={group.value} value={group.value}>
+                {group.label}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {GROUPS_OPTIONS.find(
+              (group) => group.value === company.group
+            )?.label ?? "Sem grupo definido"}
+          </p>
+        )}
+      </div>
+>>>>>>> origin/feature/Filter
     </div>
   );
 }

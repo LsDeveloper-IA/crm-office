@@ -22,6 +22,10 @@ export function CompanyDrawer({ cnpj, onClose }: Props) {
       </div>
     );
   }
+<<<<<<< HEAD
+=======
+  
+>>>>>>> origin/feature/Filter
   return (
     <CompanyDrawerContent
       key={company.cnpj}

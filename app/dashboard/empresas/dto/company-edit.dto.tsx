@@ -8,7 +8,19 @@ export type CompanyEditDTO = {
   };
 
   accountant?: string;
+<<<<<<< HEAD
   paysFees: boolean;
+=======
+  paysFees?: boolean;
+  group?: string;
+  
+  feesType?: string;
+  feesValue?: number;
+  
+  paysSystem?: boolean;
+  systemName?: string;
+  systemValue?: number;
+>>>>>>> origin/feature/Filter
 
   publicSpace?: string;
   number?: string;

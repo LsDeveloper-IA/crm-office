@@ -24,6 +24,7 @@ type PatchBody = {
   accountant?: string | null;
   paysFees?: boolean | null;
   companySectors?: CompanySectorInput[] | null;
+  group?: string | null;
 };
 
 /* =========================
@@ -56,6 +57,12 @@ export async function GET(_: Request, { params }: Params) {
             },
           },
           paysFees: true,
+          feesType: true,
+          feesValue: true,
+          group: true,
+          paysSystem: true,
+          systemName: true,
+          systemValue: true,
         },
       },
 
@@ -115,6 +122,12 @@ export async function GET(_: Request, { params }: Params) {
     taxRegime: company.profile?.taxRegime ?? undefined,
     accountant: company.profile?.accountant ?? undefined,
     paysFees: company.profile?.paysFees ?? false,
+    feesType: company.profile?.feesType ?? undefined,
+    feesValue: company.profile?.feesValue ?? undefined,
+    group: company.profile?.group ?? undefined,
+    paysSystem: company.profile?.paysSystem ?? false,
+    systemName: company.profile?.systemName ?? undefined,
+    systemValue: company.profile?.systemValue ?? undefined,
 
     address: {
       publicSpace: company.publicSpace,
@@ -158,14 +171,35 @@ export async function PATCH(req: Request, { params }: Params) {
     );
   }
 
+<<<<<<< HEAD
   const body = (await req.json()) as PatchBody;
   const { taxRegime, accountant, paysFees, companySectors } = body;
+=======
+  const body = await req.json();
+  const {
+    taxRegime,
+    accountant,
+
+    paysFees,
+    feesType,
+    feesValue,
+
+    paysSystem,
+    systemName,
+    systemValue,
+
+    group,
+
+    companySectors,
+  } = body;
+>>>>>>> origin/feature/Filter
 
   await prisma.$transaction(async (tx) => {
     /* ======================
         PROFILE
     ====================== */
 
+<<<<<<< HEAD
     await tx.companyProfile.upsert({
       where: { companyCnpj: cnpj },
       update: { accountant, paysFees: Boolean(paysFees) },
@@ -175,6 +209,46 @@ export async function PATCH(req: Request, { params }: Params) {
         paysFees: Boolean(paysFees),
       },
     });
+=======
+  await tx.companyProfile.upsert({
+    where: { companyCnpj: cnpj },
+
+    update: {
+      accountant,
+
+      // HONORÁRIOS
+      paysFees: Boolean(paysFees),
+      feesType: paysFees ? feesType ?? null : null,
+      feesValue: paysFees ? feesValue ?? null : null,
+
+      // SISTEMA
+      paysSystem: Boolean(paysSystem),
+      systemName: paysSystem ? systemName?.trim() || null : null,
+      systemValue: paysSystem ? systemValue ?? null : null,
+
+      // GRUPO
+      group: group ?? null,
+    },
+
+    create: {
+      companyCnpj: cnpj,
+      accountant,
+
+      // HONORÁRIOS
+      paysFees: Boolean(paysFees),
+      feesType: paysFees ? feesType ?? null : null,
+      feesValue: paysFees ? feesValue ?? null : null,
+
+      // SISTEMA
+      paysSystem: Boolean(paysSystem),
+      systemName: paysSystem ? systemName?.trim() || null : null,
+      systemValue: paysSystem ? systemValue ?? null : null,
+
+      //GRUPO
+      group: group ?? null,
+    },
+  });
+>>>>>>> origin/feature/Filter
 
     if (taxRegime) {
       const exists = await tx.taxRegime.findUnique({
