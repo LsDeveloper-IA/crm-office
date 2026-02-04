@@ -4,19 +4,19 @@ import prisma from "@/lib/prisma";
 const CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTy5agvCnMhLz83s5JLOiRzrlczrQW51XkhtxwCKgYor-9r6y2I7AzwFthV_NgZUA/pub?gid=2081804269&single=true&output=csv";
 
-const FIXED_SECTOR_ID = 3;
-const LIMITE_ATUALIZACOES = 2;
+const LIMITE_ATUALIZACOES = 2; // 👈 CONTROLE AQUI
+const FIXED_SECTOR_ID = 2;
 
 const CHAVES = [
-  "nomeEmpresa",
+  "nomeEmpresa", // ignorado
   "cnpj",
-  "responsavelSetor",
+  "responsavel",
 ] as const;
 
 type CsvRow = {
   nomeEmpresa: string | null;
   cnpj: string | null;
-  responsavelSetor: string | null;
+  responsavel: string | null;
 };
 
 type ErrorItem = {
@@ -37,12 +37,13 @@ export async function PATCH() {
   const csv = await response.text();
   const linhas = csv.split("\n").filter(Boolean);
 
-  const registros = linhas.slice(5).map((linha) => {
+  const registros: CsvRow[] = linhas.slice(3).map((linha) => {
     const valores = linha.split(",");
+
     const obj: CsvRow = {
       nomeEmpresa: null,
       cnpj: null,
-      responsavelSetor: null,
+      responsavel: null,
     };
 
     CHAVES.forEach((chave, index) => {
@@ -54,8 +55,6 @@ export async function PATCH() {
 
   const resultado = {
     processados: 0,
-    setoresCriados: 0,
-    responsaveisCriados: 0,
     interrompidoEm: null as string | null,
     erros: [] as ErrorItem[],
   };
@@ -63,7 +62,7 @@ export async function PATCH() {
   for (const item of registros) {
     if (resultado.processados >= LIMITE_ATUALIZACOES) {
       resultado.interrompidoEm = item.cnpj;
-      break;
+      break; // ⛔ trava controlada
     }
 
     const cnpj = item.cnpj?.replace(/\D/g, "");
@@ -79,7 +78,18 @@ export async function PATCH() {
     try {
       await prisma.$transaction(async (tx) => {
         /**
-         * 1️⃣ Garante o vínculo empresa + setor
+         * 1️⃣ Empresa
+         */
+        const company = await tx.company.findUnique({
+          where: { cnpj },
+        });
+
+        if (!company) {
+          throw new Error("Empresa não encontrada");
+        }
+
+        /**
+         * 2️⃣ Garante CompanySector
          */
         const companySector = await tx.companySector.upsert({
           where: {
@@ -96,24 +106,21 @@ export async function PATCH() {
         });
 
         /**
-         * 2️⃣ Atualiza o responsável (sem criar duplicado)
+         * 3️⃣ Cria responsável (NOVO MODELO)
          */
-        if (item.responsavelSetor?.trim()) {
-          await tx.companySector.update({
-            where: {
-              id: companySector.id,
-            },
+        if (item.responsavel?.trim()) {
+          await tx.companySectorOwner.create({
             data: {
-              ownerName: item.responsavelSetor.trim(),
+              companySectorId: companySector.id,
+              name: item.responsavel.trim(),
             },
           });
-
-          resultado.responsaveisCriados++;
         }
       });
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Erro inesperado";
+
       resultado.erros.push({
         cnpj,
         erro: message,
