@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { FeesType } from "@prisma/client";
 import prisma from "@/lib/prisma";
 
 type Params = {
@@ -23,9 +24,26 @@ type PatchBody = {
   taxRegime?: string | null;
   accountant?: string | null;
   paysFees?: boolean | null;
+  feesType?: FeesType | string | null;
+  feesValue?: number | null;
+  paysSystem?: boolean | null;
+  systemName?: string | null;
+  systemValue?: number | null;
   companySectors?: CompanySectorInput[] | null;
   group?: string | null;
 };
+
+const isCompanySectorInputArray = (
+  value: unknown
+): value is CompanySectorInput[] => Array.isArray(value);
+
+const isCompanySectorOwnerInputArray = (
+  value: unknown
+): value is CompanySectorOwnerInput[] => Array.isArray(value);
+
+const isFeesType = (value: unknown): value is FeesType =>
+  typeof value === "string" &&
+  (Object.values(FeesType) as string[]).includes(value);
 
 /* =========================
     GET — Buscar empresa
@@ -171,7 +189,7 @@ export async function PATCH(req: Request, { params }: Params) {
     );
   }
 
-  const body = await req.json();
+  const body = (await req.json()) as PatchBody;
   const {
     taxRegime,
     accountant,
@@ -202,7 +220,7 @@ export async function PATCH(req: Request, { params }: Params) {
 
       // HONORÁRIOS
       paysFees: Boolean(paysFees),
-      feesType: paysFees ? feesType ?? null : null,
+      feesType: paysFees ? (isFeesType(feesType) ? feesType : null) : null,
       feesValue: paysFees ? feesValue ?? null : null,
 
       // SISTEMA
@@ -220,7 +238,7 @@ export async function PATCH(req: Request, { params }: Params) {
 
       // HONORÁRIOS
       paysFees: Boolean(paysFees),
-      feesType: paysFees ? feesType ?? null : null,
+      feesType: paysFees ? (isFeesType(feesType) ? feesType : null) : null,
       feesValue: paysFees ? feesValue ?? null : null,
 
       // SISTEMA
@@ -264,7 +282,7 @@ export async function PATCH(req: Request, { params }: Params) {
         SECTORS + OWNERS
     ====================== */
 
-    if (!Array.isArray(companySectors)) return;
+    if (!isCompanySectorInputArray(companySectors)) return;
 
     const incomingSectorIds = companySectors
       .map((s) =>
@@ -272,7 +290,7 @@ export async function PATCH(req: Request, { params }: Params) {
           ? null
           : Number(s.companySectorId)
       )
-      .filter((id): id is number => Number.isFinite(id));
+      .filter((id: number | null): id is number => Number.isFinite(id));
 
     // remove setores deletados no front
     await tx.companySector.deleteMany({
@@ -285,7 +303,9 @@ export async function PATCH(req: Request, { params }: Params) {
     for (const s of companySectors) {
       if (!s.sectorId || Number.isNaN(Number(s.sectorId))) continue;
 
-      const ownersPayload = Array.isArray(s.owners) ? s.owners : [];
+      const ownersPayload = isCompanySectorOwnerInputArray(s.owners)
+        ? s.owners
+        : [];
 
       /* ======================
           CREATE / UPDATE SECTOR
@@ -318,7 +338,7 @@ export async function PATCH(req: Request, { params }: Params) {
         .map((o) =>
           o.id === null || o.id === undefined ? null : Number(o.id)
         )
-        .filter((id): id is number => Number.isFinite(id));
+        .filter((id: number | null): id is number => Number.isFinite(id));
 
       // remove owners excluídos
       await tx.companySectorOwner.deleteMany({
