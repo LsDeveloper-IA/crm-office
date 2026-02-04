@@ -1,5 +1,6 @@
+
 export type CompanyEditDTO = {
-  name?: string;
+  name: string;
 
   taxRegime?: {
     key: string;
@@ -24,17 +25,13 @@ export type CompanyEditDTO = {
   state?: string;
 
   companySectors: {
-    companySectorId?: number;
     sectorId: string;
     sectorName: string;
+    owner?: string;
 
-    // 🔥 NOVO MODELO
-    owners: {
-      id?: number;
+    owners?: {
+      id?: string;
       name: string;
     }[];
-
-    // 🔒 legado (opcional)
-    ownerLegacy?: string;
   }[];
 };

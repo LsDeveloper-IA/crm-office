@@ -6,7 +6,7 @@ export type CompanyDrawerDTO = {
     key: string;
     name: string;
   };
-
+  
   accountant?: string;
   group?: string;
 
@@ -28,18 +28,9 @@ export type CompanyDrawerDTO = {
   };
 
   companySectors: {
-    companySectorId?: number; // 🔑 vínculo com o banco
-    sectorId: string;
+    sectorId: string;        // ✅ SEMPRE STRING
     sectorName: string;
-
-    // ✅ NOVO MODELO
-    owners: {
-      id?: number;
-      name: string;
-    }[];
-
-    // 🔒 LEGADO (opcional, pode matar depois)
-    ownerLegacy?: string;
+    owner?: string;
   }[];
 
   qsas: {
@@ -51,5 +42,10 @@ export type CompanyDrawerDTO = {
     cnaeCode: string;
     description: string;
     kind: string;
+  }[];
+
+  companySectorsOwners: {
+    companySectorId: string;
+    name: string;
   }[];
 };

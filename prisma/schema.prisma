@@ -356,8 +356,8 @@ model AuditLog {
 }
 
 model CompanyProfile {
-  id           Int      @id @default(autoincrement())
-  companyCnpj  String   @unique @db.VarChar(14)
+  id          Int    @id @default(autoincrement())
+  companyCnpj String @unique @db.VarChar(14)
 
   // HONORÁRIOS
   paysFees     Boolean  @default(false)

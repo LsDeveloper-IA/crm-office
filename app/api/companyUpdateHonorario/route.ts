@@ -6,11 +6,20 @@ const CSV_URL =
 
 // const LIMITE_ATUALIZACOES = 2;
 
-const CHAVES = [
-  "nomeEmpresa",
-  "cnpj",
-  "paysfree",
-];
+const CHAVES = ["nomeEmpresa", "cnpj", "paysfree"] as const;
+
+type Registro = {
+  nomeEmpresa: string | null;
+  cnpj: string | null;
+  paysfree: string | null;
+};
+
+type Resultado = {
+  processados: number;
+  atualizados: number;
+  interrompidoEm: string | null;
+  erros: Array<{ cnpj: string | null; erro: string }>;
+};
 
 export async function PATCH() {
   const response = await fetch(CSV_URL);
@@ -25,29 +34,29 @@ export async function PATCH() {
   const csv = await response.text();
   const linhas = csv.split("\n").filter(Boolean);
 
-  const registros = linhas.slice(4).map((linha) => {
+  const registros = linhas.slice(1).map((linha) => {
     const valores = linha.split(",");
-    const obj: any = {};
+    const obj: Partial<Registro> = {};
 
     CHAVES.forEach((chave, index) => {
       obj[chave] = valores[index]?.trim() || null;
     });
 
-    return obj;
+    return {
+      nomeEmpresa: obj.nomeEmpresa ?? null,
+      cnpj: obj.cnpj ?? null,
+      paysfree: obj.paysfree ?? null,
+    };
   });
 
-  const resultado = {
+  const resultado: Resultado = {
     processados: 0,
     atualizados: 0,
-    interrompidoEm: null as string | null,
-    erros: [] as any[],
+    interrompidoEm: null,
+    erros: [],
   };
 
   for (const item of registros) {
-    // if (resultado.processados >= LIMITE_ATUALIZACOES) {
-    //   resultado.interrompidoEm = item.cnpj;
-    //   break;
-    // }
 
     const cnpj = item.cnpj?.replace(/\D/g, "");
 
@@ -85,10 +94,10 @@ export async function PATCH() {
       } else {
         resultado.atualizados++;
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       resultado.erros.push({
         cnpj,
-        erro: err.message,
+        erro: err instanceof Error ? err.message : "Erro desconhecido",
       });
     }
 

@@ -7,7 +7,6 @@ type Props = {
 export function ActivitiesTab({ activities }: Props) {
   const primary = activities.filter(a => a.kind === "PRIMARY");
   const secondary = activities.filter(a => a.kind === "SECONDARY");
-  console.log(activities);
   return (
     <div className="space-y-6">
       {/* CNAE PRINCIPAL */}

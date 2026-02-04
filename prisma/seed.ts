@@ -117,7 +117,6 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("🌱 Running DB seed (TaxRegime)...");
 
   await prisma.taxRegime.createMany({
     data: [
@@ -131,7 +130,6 @@ async function main() {
     skipDuplicates: true,
   });
 
-  console.log("✔ TaxRegimes seeded");
 }
 
 main()

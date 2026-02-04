@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { CompanyEditDTO } from "../dto/company-edit.dto";
 
 type UIOwner = {
-  id?: number;
+  id?: string;
   name: string;
   tempId: string;
 };
@@ -31,23 +31,18 @@ export function useCompanyEdit(
   cnpj: string,
   initial: CompanyEditDTO
 ) {
-  const [data, setData] = useState<
-    Omit<CompanyEditDTO, "companySectors"> & {
-      companySectors: UISector[];
-    }
-  >(() => ({
+  const [data, setData] = useState<CompanyEditDTO & {
+    companySectors: UISector[];
+  }>(() => ({
     ...initial,
     companySectors: withTempIds(initial.companySectors),
   }));
 
   const [loading, setLoading] = useState(false);
 
-  // 🔧 update tipado corretamente
   function update<K extends keyof CompanyEditDTO>(
     key: K,
-    value: K extends "companySectors"
-      ? UISector[]
-      : CompanyEditDTO[K]
+    value: CompanyEditDTO[K]
   ) {
     setData((prev) => ({
       ...prev,
@@ -70,6 +65,8 @@ export function useCompanyEdit(
       taxRegime:
         data.taxRegime && typeof data.taxRegime === "object"
           ? data.taxRegime.key
+          : typeof data.taxRegime === "string"
+          ? data.taxRegime
           : undefined,
     };
 
@@ -80,17 +77,25 @@ export function useCompanyEdit(
     });
 
     if (!res.ok) {
-      let msg = "Erro ao salvar empresa";
+      let errMsg = "Erro ao salvar empresa";
+
       try {
         const err = await res.json();
-        msg = err.error ?? msg;
+        errMsg = err.error ?? errMsg;
       } catch {}
-      setLoading(false);
-      throw new Error(msg);
+
+      throw new Error(errMsg);
     }
 
     setLoading(false);
   }
 
-  return { data, update, reset, save, loading };
+
+  return {
+    data,
+    update,
+    reset,
+    save,
+    loading,
+  };
 }

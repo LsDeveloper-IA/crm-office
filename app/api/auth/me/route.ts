@@ -10,10 +10,6 @@ export async function GET(req: NextRequest) {
     const tokenFromCookie = req.cookies.get("token")?.value;
     const authHeader = req.headers.get("authorization");
 
-    // Log para console do servidor
-    console.log("tokenFromCookie:", tokenFromCookie);
-    console.log("authorization header:", authHeader);
-
     // fallback: se veio Authorization, extraia Bearer
     const token = tokenFromCookie ?? (authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : undefined);
 
