@@ -36,12 +36,8 @@ export function CompanyDrawerContent({
       } : undefined,
       
       accountant: company.accountant,
-<<<<<<< HEAD
-      paysFees: company.paysFees,
-=======
       paysFees: company.paysFees ?? false,
       group: company.group ?? undefined,
->>>>>>> origin/feature/Filter
 
       publicSpace: company.address?.publicSpace ?? "",
       number: company.address?.number ?? "",
