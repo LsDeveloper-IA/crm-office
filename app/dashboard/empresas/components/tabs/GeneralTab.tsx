@@ -159,7 +159,7 @@ export function GeneralTab({
                   className="rounded-md border px-3 py-2 text-sm"
                   value={company.feesType ?? ""}
                   onChange={(e) =>
-                    onChange("feesType", e.target.value as any)
+                    onChange("feesType", e.target.value)
                   }
                 >
                   <option value="">Tipo</option>

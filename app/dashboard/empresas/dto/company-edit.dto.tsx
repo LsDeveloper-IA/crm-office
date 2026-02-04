@@ -1,4 +1,4 @@
-// dto/company-edit.dto.ts
+
 export type CompanyEditDTO = {
   name: string;
 
@@ -8,9 +8,6 @@ export type CompanyEditDTO = {
   };
 
   accountant?: string;
-<<<<<<< HEAD
-  paysFees: boolean;
-=======
   paysFees?: boolean;
   group?: string;
   
@@ -20,7 +17,6 @@ export type CompanyEditDTO = {
   paysSystem?: boolean;
   systemName?: string;
   systemValue?: number;
->>>>>>> origin/feature/Filter
 
   publicSpace?: string;
   number?: string;
