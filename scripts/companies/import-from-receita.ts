@@ -548,9 +548,6 @@ async function withRetry<T>(
 }
 
 async function run() {
-  console.log("🚀 Iniciando importação de empresas");
-  console.log(`📦 Total de CNPJs: ${CNPJS.length}`);
-  console.log(`⏱️ Delay entre chamadas: ${DELAY_MS}ms\n`);
 
   let success = 0;
   let failed = 0;
@@ -559,7 +556,6 @@ async function run() {
     const rawCnpj = CNPJS[i];
     const cnpj = rawCnpj.replace(/\D/g, "");
 
-    console.log(`(${i + 1}/${CNPJS.length}) 🔎 ${cnpj}`);
 
     try {
       const company = await withRetry(() =>

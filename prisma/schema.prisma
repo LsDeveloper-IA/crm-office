@@ -370,6 +370,8 @@ model CompanyProfile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  thirteenthSalary Boolean @default(false)
+
   company Company @relation(fields: [companyCnpj], references: [cnpj])
 
   @@index([companyCnpj])

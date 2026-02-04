@@ -90,7 +90,6 @@ export function useCompanyEdit(
     setLoading(false);
   }
 
-  console.log("RESET COM", initial.companySectors);
 
   return {
     data,
