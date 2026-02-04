@@ -171,10 +171,6 @@ export async function PATCH(req: Request, { params }: Params) {
     );
   }
 
-<<<<<<< HEAD
-  const body = (await req.json()) as PatchBody;
-  const { taxRegime, accountant, paysFees, companySectors } = body;
-=======
   const body = await req.json();
   const {
     taxRegime,
@@ -192,24 +188,12 @@ export async function PATCH(req: Request, { params }: Params) {
 
     companySectors,
   } = body;
->>>>>>> origin/feature/Filter
 
   await prisma.$transaction(async (tx) => {
     /* ======================
         PROFILE
     ====================== */
 
-<<<<<<< HEAD
-    await tx.companyProfile.upsert({
-      where: { companyCnpj: cnpj },
-      update: { accountant, paysFees: Boolean(paysFees) },
-      create: {
-        companyCnpj: cnpj,
-        accountant,
-        paysFees: Boolean(paysFees),
-      },
-    });
-=======
   await tx.companyProfile.upsert({
     where: { companyCnpj: cnpj },
 
@@ -248,7 +232,6 @@ export async function PATCH(req: Request, { params }: Params) {
       group: group ?? null,
     },
   });
->>>>>>> origin/feature/Filter
 
     if (taxRegime) {
       const exists = await tx.taxRegime.findUnique({
