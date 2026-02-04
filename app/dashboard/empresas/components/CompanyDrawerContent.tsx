@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { GeneralTab } from "./tabs/GeneralTab";
+import { GeneralTab, validateForm } from "./tabs/GeneralTab";
 import { SectorsTab } from "./tabs/SectorsTab";
 import { QsaTab } from "./tabs/QsaTab";
 import { ActivitiesTab } from "./tabs/ActivitiesTab";
@@ -11,6 +11,7 @@ import { useSectors } from "../hooks/useSectors";
 
 const tabs = ["geral", "setores", "QSA", "atividades"] as const;
 type Tab = typeof tabs[number];
+
 
 type Props = {
   company: CompanyDrawerDTO;
@@ -24,6 +25,7 @@ export function CompanyDrawerContent({
   const availableSectors = useSectors();
   const [activeTab, setActiveTab] = useState<Tab>("geral");
   const [isEditing, setIsEditing] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const initialEditData = useMemo(
     () => ({
@@ -38,6 +40,7 @@ export function CompanyDrawerContent({
 
       accountant: company.accountant,
       paysFees: company.paysFees ?? false,
+      group: company.group ?? undefined,
 
       publicSpace: company.address?.publicSpace ?? "",
       number: company.address?.number ?? "",
@@ -69,7 +72,6 @@ export function CompanyDrawerContent({
   return (
     <div className="fixed inset-0 z-50 flex">
       <div className="flex-1 bg-black/40" onClick={onClose} />
-
       <aside className="w-[480px] bg-white flex flex-col">
         {/* HEADER */}
         <header className="border-b px-6 py-4">
@@ -106,6 +108,7 @@ export function CompanyDrawerContent({
                 { id: "1", name: "Orlando" },
                 { id: "2", name: "Augusta" },
               ]}
+              errors={errors}
             />
           )}
 
@@ -145,6 +148,17 @@ export function CompanyDrawerContent({
               </button>
               <button className="cursor-pointer" 
                 onClick={async () => {
+                  const validationErrors = validateForm({
+                    ...company,
+                    ...edit.data,
+                  });
+
+                  if (Object.keys(validationErrors).length > 0) {
+                    setErrors(validationErrors);
+                    return;
+                  }
+
+                  setErrors({});
                   await edit.save();
                   setIsEditing(false);
                 }}

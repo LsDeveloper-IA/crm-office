@@ -11,6 +11,7 @@ type Props = {
     page?: string;
     sort?: string;
     dir?: "asc" | "desc";
+    group?: string;
   }>;
 };
 
@@ -23,7 +24,7 @@ const SORT_MAP: Record<string, Prisma.CompanyOrderByWithRelationInput> = {
 
   paysFees: {
     profile: {
-      paysFees: "desc",
+      paysFees: "asc",
     },
   },
 
@@ -60,8 +61,19 @@ export default async function Company({ searchParams }: Props) {
     JSON.stringify(baseOrder).replace(/"asc"/g, `"${dir}"`)
   );
 
+  const where: Prisma.CompanyWhereInput = params.group
+    ? {
+        profile: {
+          is: {
+            group: params.group,
+          },
+        },
+      }
+    : {};
+
   const [companiesRaw, total, totalSimples, totalNaoSimples, totalPagantes] = await Promise.all([
     prisma.company.findMany({
+      where,
       orderBy,
       skip,
       take: PAGE_SIZE,
@@ -73,6 +85,7 @@ export default async function Company({ searchParams }: Props) {
             taxRegime: true,
             accountant: true,
             paysFees: true,
+            group: true,
           },
         },
       },

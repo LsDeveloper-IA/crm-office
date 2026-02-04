@@ -24,6 +24,7 @@ type PatchBody = {
   accountant?: string | null;
   paysFees?: boolean | null;
   companySectors?: CompanySectorInput[] | null;
+  group?: string | null;
 };
 
 /* =========================
@@ -56,6 +57,12 @@ export async function GET(_: Request, { params }: Params) {
             },
           },
           paysFees: true,
+          feesType: true,
+          feesValue: true,
+          group: true,
+          paysSystem: true,
+          systemName: true,
+          systemValue: true,
         },
       },
 
@@ -115,6 +122,12 @@ export async function GET(_: Request, { params }: Params) {
     taxRegime: company.profile?.taxRegime ?? undefined,
     accountant: company.profile?.accountant ?? undefined,
     paysFees: company.profile?.paysFees ?? false,
+    feesType: company.profile?.feesType ?? undefined,
+    feesValue: company.profile?.feesValue ?? undefined,
+    group: company.profile?.group ?? undefined,
+    paysSystem: company.profile?.paysSystem ?? false,
+    systemName: company.profile?.systemName ?? undefined,
+    systemValue: company.profile?.systemValue ?? undefined,
 
     address: {
       publicSpace: company.publicSpace,
@@ -171,6 +184,8 @@ export async function PATCH(req: Request, { params }: Params) {
     systemName,
     systemValue,
 
+    group,
+
     companySectors,
   } = body;
 
@@ -194,6 +209,9 @@ export async function PATCH(req: Request, { params }: Params) {
       paysSystem: Boolean(paysSystem),
       systemName: paysSystem ? systemName?.trim() || null : null,
       systemValue: paysSystem ? systemValue ?? null : null,
+
+      // GRUPO
+      group: group ?? null,
     },
 
     create: {
@@ -209,6 +227,9 @@ export async function PATCH(req: Request, { params }: Params) {
       paysSystem: Boolean(paysSystem),
       systemName: paysSystem ? systemName?.trim() || null : null,
       systemValue: paysSystem ? systemValue ?? null : null,
+
+      //GRUPO
+      group: group ?? null,
     },
   });
 

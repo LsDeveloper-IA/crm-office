@@ -8,7 +8,16 @@ export type CompanyDrawerDTO = {
   };
 
   accountant?: string;
-  paysFees: boolean;
+  group?: string;
+
+  paysFees?: boolean;
+  paysSystem?: boolean;
+
+  feesType?: string;
+  feesValue?: number;
+
+  systemName?: string;
+  systemValue?: number;
 
   address?: {
     publicSpace?: string;

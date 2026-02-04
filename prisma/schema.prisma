@@ -372,6 +372,9 @@ model CompanyProfile {
   accountant   String?
   taxRegimeId  Int?
 
+  // GRUPO
+  group String?
+
   company   Company   @relation(fields: [companyCnpj], references: [cnpj])
   taxRegime TaxRegime? @relation(fields: [taxRegimeId], references: [id])
 }

@@ -23,7 +23,7 @@ console.log(company)
       </div>
     );
   }
-  console.log(company)
+  
   return (
     <CompanyDrawerContent
       key={company.cnpj}

@@ -8,6 +8,14 @@ export type CompanyEditDTO = {
 
   accountant?: string;
   paysFees?: boolean;
+  group?: string;
+  
+  feesType?: string;
+  feesValue?: number;
+  
+  paysSystem?: boolean;
+  systemName?: string;
+  systemValue?: number;
 
   publicSpace?: string;
   number?: string;
