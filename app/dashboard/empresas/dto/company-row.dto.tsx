@@ -7,6 +7,7 @@ export type CompanyRowDTO = {
     key: string;
     name: string;
   };
+  
   accountant: string;
   paysFees: boolean;
 };
