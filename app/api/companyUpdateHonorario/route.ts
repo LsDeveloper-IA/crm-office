@@ -77,7 +77,7 @@ export async function PATCH() {
     }
 
     try {
-      const updated = await prisma.companyProfile.updateMany({
+      const updated = await prisma.companyProfile.update({
         where: {
           companyCnpj: cnpj,
         },

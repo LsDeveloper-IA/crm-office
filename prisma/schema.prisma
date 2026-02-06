@@ -369,6 +369,9 @@ model CompanyProfile {
   systemName   String?
   systemValue  Decimal? @db.Decimal(10, 2)
 
+  // DECIMO TERCEIRO
+  thirteenth Boolean @default(false)
+
   accountant   String?
   taxRegimeId  Int?
 
