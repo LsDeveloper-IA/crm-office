@@ -5,7 +5,24 @@ import { useTaxRegimes } from "../../hooks/useTaxRegimes";
 import { CompanyDrawerDTO } from "../../dto/company-drawer.dto";
 
 const GROUPS_OPTIONS = [
-  { value: "mr2", label: "MR2" },
+  { value: "andrade", label: "Andrade" },
+  { value: "anmap", label: "Anmap" },
+  { value: "danielborges", label: "Daniel Borges" },
+  { value: "empório", label: "Empório" },
+  { value: "fialho", label: "Fialho" },
+  { value: "helmut", label: "Helmut" },
+  { value: "lincoln", label: "Lincoln" },
+  { value: "marcosleal", label: "Marcos Leal" },
+  { value: "prime", label: "Prime" },
+  { value: "primefactoring", label: "Prime Factoring" },
+  { value: "raquelgrangeiro", label: "Raquel Grangeiro" },
+  { value: "rubens", label: "Rubens" },
+  { value: "tdois", label: "Tdois" },
+  { value: "thiagoautoexpress", label: "Thiago Auto Express" },
+  { value: "ximenes", label: "Ximenes" },
+  { value: "viper", label: "Viper" },
+  { value: "torquato", label: "Torquato" },
+  { value: "mr2", label: "Mr2" },
 ];
 
 type AccountantOption = {

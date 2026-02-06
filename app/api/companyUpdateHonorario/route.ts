@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 const CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTy5agvCnMhLz83s5JLOiRzrlczrQW51XkhtxwCKgYor-9r6y2I7AzwFthV_NgZUA/pub?gid=2081804269&single=true&output=csv";
 
-// const LIMITE_ATUALIZACOES = 2; ahajhbakl
+// const LIMITE_ATUALIZACOES = 2;
 
 const CHAVES = ["nomeEmpresa", "cnpj", "paysfree"] as const;
 
@@ -34,7 +34,7 @@ export async function PATCH() {
   const csv = await response.text();
   const linhas = csv.split("\n").filter(Boolean);
 
-  const registros: Registro[] = linhas.slice(3).map((linha) => {
+  const registros = linhas.slice(1).map((linha) => {
     const valores = linha.split(",");
     const obj: Partial<Registro> = {};
 

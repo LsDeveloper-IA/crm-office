@@ -24,8 +24,25 @@ type Props = {
 };
 
 const GROUPS_OPTIONS = [
-  { value: "mr2", label: "MR2" },
-  { value: "", label: "Todas as Empresas"}
+  { value: "andrade", label: "Andrade" },
+  { value: "anmap", label: "Anmap" },
+  { value: "danielborges", label: "Daniel Borges" },
+  { value: "empório", label: "Empório" },
+  { value: "fialho", label: "Fialho" },
+  { value: "helmut", label: "Helmut" },
+  { value: "lincoln", label: "Lincoln" },
+  { value: "marcosleal", label: "Marcos Leal" },
+  { value: "prime", label: "Prime" },
+  { value: "primefactoring", label: "Prime Factoring" },
+  { value: "raquelgrangeiro", label: "Raquel Grangeiro" },
+  { value: "rubens", label: "Rubens" },
+  { value: "tdois", label: "Tdois" },
+  { value: "thiagoautoexpress", label: "Thiago Auto Express" },
+  { value: "ximenes", label: "Ximenes" },
+  { value: "viper", label: "Viper" },
+  { value: "torquato", label: "Torquato" },
+  { value: "mr2", label: "Mr2" },
+  { value: "", label: "Todas as Empresas" },
 ];
 
 export function CompanyTable({ companies, page, totalPages }: Props) {
