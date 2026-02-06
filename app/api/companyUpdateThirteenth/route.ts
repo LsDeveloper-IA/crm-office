@@ -81,12 +81,30 @@ export async function POST() {
         }
 
         try {
-            const update = await prisma.companyProfile.updateMany {
-                where: { companyCnpj: cnpj },
+            const update = await prisma.companyProfile.update({
+                where: {
+                    companyCnpj: cnpj
+                },
                 data: {
-                    
-                }
+                    thirteenth: true
+                },
+            })
+
+            if(update.count === 0) {
+                resultado.erros.push({
+                    cnpj,
+                    erro: "CompanyProfile não encontrado",
+                });
+            } else {
+                resultado.atualizados++;
             }
+        } catch(err: unknown) {
+            resultado.erros.push({
+                cnpj,
+                erro: err instanceof Error ? err.message : "Erro desconhecido",
+            });
         }
     }
+
+    return NextResponse.json(resultado);
 }
