@@ -20,8 +20,8 @@ type Resultado = {
     erros: Array<{cnpj: string | null, erro: string}>,
 }
 
-// POST api/companyUpdateThirteenth
-export async function POST() {
+// PATCH api/companyUpdateThirteenth
+export async function PATCH() {
     const response = await fetch(CSV_URL);
 
     if(!response.ok) {
@@ -73,7 +73,7 @@ export async function POST() {
             continue;
         }
 
-        const decimoTerceiro = item.decimoTerceiro?.toLowerCase() === "sim";
+        const decimoTerceiro = item.decimoTerceiro?.toLowerCase() !== "sim";
 
         if(!decimoTerceiro) {
             resultado.processados++;
