@@ -10,4 +10,5 @@ export type CompanyRowDTO = {
   
   accountant: string;
   paysFees: boolean;
+  thirteenth: boolean;
 };

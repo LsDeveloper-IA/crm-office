@@ -137,6 +137,7 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
           <TableRow>
             <TableHead>#</TableHead>
             <SortableHead label="Razão Social" sortKey="name" />
+            <SortableHead label="13°" sortKey="thirteenth"/>
             <SortableHead label="Honorários" sortKey="paysFees" />
             <SortableHead label="CNPJ" sortKey="cnpj" />
             <TableHead>Regime</TableHead>
@@ -157,6 +158,18 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
 
               <TableCell className="font-medium">
                 {company.name ?? "-"}
+              </TableCell>
+
+              <TableCell>
+                {company.thirteenth ? (
+                  <Badge className="bg-green-100 text-green-700 border-green-300">
+                    Cobra
+                  </Badge>
+                ) : (
+                  <Badge className="bg-red-100 text-red-700 border-red-300">
+                    Não Cobra
+                  </Badge>
+                )}
               </TableCell>
 
               <TableCell>

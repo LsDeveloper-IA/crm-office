@@ -31,6 +31,7 @@ type PatchBody = {
   systemValue?: number | null;
   companySectors?: CompanySectorInput[] | null;
   group?: string | null;
+  thirteenth?: boolean | null;
 };
 
 const isCompanySectorInputArray = (
@@ -81,6 +82,7 @@ export async function GET(_: Request, { params }: Params) {
           paysSystem: true,
           systemName: true,
           systemValue: true,
+          thirteenth: true,
         },
       },
 
@@ -146,6 +148,7 @@ export async function GET(_: Request, { params }: Params) {
     paysSystem: company.profile?.paysSystem ?? false,
     systemName: company.profile?.systemName ?? undefined,
     systemValue: company.profile?.systemValue ?? undefined,
+    thirteenth: company.profile?.thirteenth ?? false,
 
     address: {
       publicSpace: company.publicSpace,
@@ -203,6 +206,7 @@ export async function PATCH(req: Request, { params }: Params) {
     systemValue,
 
     group,
+    thirteenth,
 
     companySectors,
   } = body;
@@ -230,6 +234,9 @@ export async function PATCH(req: Request, { params }: Params) {
 
       // GRUPO
       group: group ?? null,
+
+      // DECIMO TERCEIRO
+      thirteenth: Boolean(thirteenth),
     },
 
     create: {
@@ -248,6 +255,9 @@ export async function PATCH(req: Request, { params }: Params) {
 
       //GRUPO
       group: group ?? null,
+
+      // DECIMO TERCEIRO
+      thirteenth: Boolean(thirteenth),
     },
   });
 

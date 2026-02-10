@@ -10,6 +10,7 @@ type CompanyRowEntity = Prisma.CompanyGetPayload<{
         taxRegime: true;
         accountant: true;
         paysFees: true;
+        thirteenth: true;
       };
     };
   };
@@ -25,5 +26,6 @@ export function mapCompanyToRowDTO(
     taxRegime: company.profile?.taxRegime ?? undefined,
     accountant: company.profile?.accountant ?? "—",
     paysFees: company.profile?.paysFees === true,
+    thirteenth: company.profile?.thirteenth === true,
   };
 }

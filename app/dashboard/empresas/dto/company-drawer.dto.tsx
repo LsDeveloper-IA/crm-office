@@ -9,6 +9,7 @@ export type CompanyDrawerDTO = {
   
   accountant?: string;
   group?: string;
+  thirteenth?: boolean;
 
   paysFees?: boolean;
   paysSystem?: boolean;
