@@ -57,6 +57,10 @@ export async function PATCH() {
   };
 
   for (const item of registros) {
+    // if (resultado.processados >= LIMITE_ATUALIZACOES) {
+    //   resultado.interrompidoEm = item.cnpj;
+    //   break;
+    // }
 
     const cnpj = item.cnpj?.replace(/\D/g, "");
 

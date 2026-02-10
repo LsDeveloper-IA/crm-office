@@ -38,6 +38,8 @@ export function CompanyDrawerContent({
       accountant: company.accountant,
       paysFees: company.paysFees ?? false,
       group: company.group ?? undefined,
+      thirteenth: company.thirteenth ?? false,
+      paysSystem: company.paysSystem ?? false,
 
       publicSpace: company.address?.publicSpace ?? "",
       number: company.address?.number ?? "",

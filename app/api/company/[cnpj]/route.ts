@@ -206,6 +206,7 @@ export async function PATCH(req: Request, { params }: Params) {
     systemValue,
 
     group,
+    thirteenth,
 
     companySectors,
   } = body;
@@ -233,6 +234,9 @@ export async function PATCH(req: Request, { params }: Params) {
 
       // GRUPO
       group: group ?? null,
+
+      // DECIMO TERCEIRO
+      thirteenth: Boolean(thirteenth),
     },
 
     create: {
@@ -251,6 +255,9 @@ export async function PATCH(req: Request, { params }: Params) {
 
       //GRUPO
       group: group ?? null,
+
+      // DECIMO TERCEIRO
+      thirteenth: Boolean(thirteenth),
     },
   });
 
