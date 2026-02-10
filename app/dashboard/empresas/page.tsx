@@ -41,6 +41,12 @@ const SORT_MAP: Record<string, Prisma.CompanyOrderByWithRelationInput> = {
       accountant: "asc",
     },
   },
+
+  thirteenth: {
+    profile: {
+      thirteenth: "asc"
+    }
+  }
 };
 
 
@@ -86,6 +92,7 @@ export default async function Company({ searchParams }: Props) {
             accountant: true,
             paysFees: true,
             group: true,
+            thirteenth: true,
           },
         },
       },

@@ -10,6 +10,7 @@ export type CompanyEditDTO = {
   accountant?: string;
   paysFees?: boolean;
   group?: string;
+  thirteenth?: boolean;
   
   feesType?: string;
   feesValue?: number;

@@ -57,6 +57,10 @@ export async function PATCH() {
   };
 
   for (const item of registros) {
+    // if (resultado.processados >= LIMITE_ATUALIZACOES) {
+    //   resultado.interrompidoEm = item.cnpj;
+    //   break;
+    // }
 
     const cnpj = item.cnpj?.replace(/\D/g, "");
 
@@ -76,8 +80,10 @@ export async function PATCH() {
       continue;
     }
 
+
+    // Verificar essa parte antes de usar
     try {
-      const updated = await prisma.companyProfile.updateMany({
+      await prisma.companyProfile.update({
         where: {
           companyCnpj: cnpj,
         },
@@ -86,14 +92,7 @@ export async function PATCH() {
         },
       });
 
-      if (updated.count === 0) {
-        resultado.erros.push({
-          cnpj,
-          erro: "CompanyProfile não encontrado",
-        });
-      } else {
-        resultado.atualizados++;
-      }
+      resultado.atualizados++;
     } catch (err: unknown) {
       resultado.erros.push({
         cnpj,

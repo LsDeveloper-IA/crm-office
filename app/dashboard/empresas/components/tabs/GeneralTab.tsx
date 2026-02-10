@@ -153,6 +153,7 @@ export function GeneralTab({
           </p>
         )}
       </div>
+      
       {/* 💰 HONORÁRIOS */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Honorários</label>
@@ -205,6 +206,7 @@ export function GeneralTab({
           </p>
         )}
       </div>
+
       {/* 🖥️ SISTEMA */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Sistema</label>
@@ -267,6 +269,8 @@ export function GeneralTab({
           </p>
         )}
       </div>
+
+      {/* GRUPO */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Grupo</label>
 
@@ -291,6 +295,32 @@ export function GeneralTab({
             {GROUPS_OPTIONS.find(
               (group) => group.value === company.group
             )?.label ?? "Sem grupo definido"}
+          </p>
+        )}
+      </div>
+
+      {/* DECIMO TERCEIRO */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">13°</label>
+
+        {isEditing ? (
+          <>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={company.thirteenth ?? false}
+                onChange={(e) =>
+                  onChange("thirteenth", e.target.checked)
+                }
+              />
+              Cobra 13°
+            </label>
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {company.thirteenth
+              ? `Cobra 13°`
+              : "Não cobra 13°"}
           </p>
         )}
       </div>
