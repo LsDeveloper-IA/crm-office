@@ -80,8 +80,10 @@ export async function PATCH() {
       continue;
     }
 
+
+    // Verificar essa parte antes de usar
     try {
-      const updated = await prisma.companyProfile.update({
+      await prisma.companyProfile.update({
         where: {
           companyCnpj: cnpj,
         },
@@ -90,14 +92,7 @@ export async function PATCH() {
         },
       });
 
-      if (updated.count === 0) {
-        resultado.erros.push({
-          cnpj,
-          erro: "CompanyProfile não encontrado",
-        });
-      } else {
-        resultado.atualizados++;
-      }
+      resultado.atualizados++;
     } catch (err: unknown) {
       resultado.erros.push({
         cnpj,
