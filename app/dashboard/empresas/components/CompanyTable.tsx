@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 import {
   Table,
@@ -16,6 +17,7 @@ import type { CompanyRowDTO } from "../dto";
 import { Badge } from "@/components/ui/badge";
 import { SortableHead } from "./CompanyTable/SortableHead";
 import { useSearchParams, useRouter } from "next/navigation";
+import { CompaniesSheetsContent } from "./CompaniesSheetsContent"
 
 type Props = {
   companies: CompanyRowDTO[];
@@ -99,13 +101,27 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
     });
   }
 
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <>
       <div className="flex justify-end">
+        <button 
+          className="p-2 mb-2 mr-2 border rounded-md hover:bg-gray-200 cursor-pointer"
+          onClick={() => setIsOpen(true)} 
+        >
+          <Image src={"/icons/excel.svg"} width={28} height={28} alt="excel"></Image>
+        </button>
+
+        <CompaniesSheetsContent
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+        />
+
         <select 
           value={selectedGroup}
           onChange={(e) => handleChangeGroup(e.target.value)}
-          className="p-1 mb-2 border rounded-md hover:bg-gray-200 cursor-pointer"
+          className="p-2 mb-2 border rounded-md hover:bg-gray-200 cursor-pointer"
           >
           <option value="" disabled>Selecione um Grupo</option>
           
