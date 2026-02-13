@@ -116,6 +116,7 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
         <CompaniesSheetsContent
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
+          searchParams={searchParams}
         />
 
         <select 
