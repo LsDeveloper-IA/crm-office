@@ -100,25 +100,52 @@ export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalPr
 
                 <div className="flex-1 px-6 py-4 overflow-y-auto">
                     <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                        {fields.map((fields) => (
-                            <label
-                                key={fields.key}
-                                className="flex items-center gap-2 text-md text-gray-700 cursor-pointer"
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={filters[fields.key as keyof SheetFilters]}
-                                    className="h-4 w-4 rounded border-gray-300 cursor-pointer"
-                                    onChange={(e) =>
-                                        setFilters(prev => ({
-                                            ...prev,
-                                            [fields.key]: e.target.checked
-                                        }))
-                                    }
-                                />
-                                {fields.label}
-                            </label>
-                        ))}
+                        {fields.map((fields) => {
+                            const isActive = filters[fields.key as keyof SheetFilters];
+
+                            return (
+                                <label
+                                    key={fields.key}
+                                    className={
+                                        `relative
+                                        flex items-center 
+                                        px-4 py-2 pl-6 rounded-lg border
+                                        cursor-pointer transition-all
+                                        text-sm font-medium 
+                                        ${isActive 
+                                            ? 'bg-blue-600 text-white border-blue-600' 
+                                            : 'bg-gray-200 border-gray-300 hover:bg-gray-300'
+                                        }
+                                    `}
+                                >
+                                    <span
+                                        className={`
+                                            absolute left-0 top-0
+                                            h-full w-1.5
+                                            rounded-l-lg
+                                            transition-all duration-200
+                                            ${isActive
+                                                ? "bg-blue-800"
+                                                : "bg-gray-400"
+                                            }
+                                        `}
+                                    />
+
+                                    <input
+                                        type="checkbox"
+                                        checked={isActive}
+                                        className="hidden"
+                                        onChange={(e) =>
+                                            setFilters(prev => ({
+                                                ...prev,
+                                                [fields.key]: e.target.checked
+                                            }))
+                                        }
+                                    />
+                                    {fields.label}
+                                </label>
+                            );
+                        })}
                     </div>
                 </div>
 
