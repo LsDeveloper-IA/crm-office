@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 
 import {
   Table,
@@ -43,7 +42,7 @@ const GROUPS_OPTIONS = [
   { value: "ximenes", label: "Ximenes" },
   { value: "viper", label: "Viper" },
   { value: "torquato", label: "Torquato" },
-  { value: "mr2", label: "Mr2" },
+  { value: "mr2", label: "MR2" },
   { value: "", label: "Todas as Empresas" },
 ];
 
@@ -110,7 +109,7 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
           className="p-2 mb-2 mr-2 border rounded-md hover:bg-gray-200 cursor-pointer"
           onClick={() => setIsOpen(true)} 
         >
-          <Image src={"/icons/excel.svg"} width={28} height={28} alt="excel"></Image>
+          <img src={"/icons/excel.svg"} width={28} height={28} alt="sheets"/>
         </button>
 
         <CompaniesSheetsContent

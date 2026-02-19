@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import ExcelJS from "exceljs";
 import { NextRequest, NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 
 
 type Filters = {
@@ -17,21 +18,99 @@ type Filters = {
 }
 
 type Params = {
-    page: string | null;
+    page?: string;
+    sort?: string;
+    dir?: "asc" | "desc";
+    group?: string;
 }
 
 const PAGE_SIZE = 13
+
+// 🔒 mapa seguro de ordenação
+const SORT_MAP: Record<string, Prisma.CompanyOrderByWithRelationInput> = {
+  name: { name: "asc" },
+  cnpj: { cnpj: "asc" },
+
+  paysFees: {
+    profile: {
+      paysFees: "asc",
+    },
+  },
+
+  taxRegime: {
+    profile: {
+      taxRegime: {
+        name: "asc",
+      },
+    },
+  },
+
+  accountant: {
+    profile: {
+      accountant: "asc",
+    },
+  },
+
+  thirteenth: {
+    profile: {
+      thirteenth: "asc"
+    }
+  }
+};
+
+function buildSelect(filters: Filters) {
+    const select: any = {};
+
+    if (filters.nome) select.name = true;
+    if (filters.cnpj) select.cnpj = true;
+    
+    if (select.socios) { select.qsas = { select: { nome: true } } }
+
+    if (filters.decimoTerceiro || filters.honorario || filters.contador) {
+        select.profile = {select: {}};
+
+        if (filters.decimoTerceiro) select.profile.select.thirteenth = true;
+        if (filters.honorario) select.profile.select.paysFees = true;
+        if (filters.contador) select.profile.select.accountant = true;
+    }
+
+    if (filters.atividades) { select.activities = { select: { description: true } } }
+    if (filters.responsaveis) { select.companySectors = { select: { ownerName: true } } }
+
+    return select;
+}
 
 // POST /api/sheets
 export async function POST(req: NextRequest) {
     
     try {
-        const body = await req.json();
+        const body = await req.json();  
         const params: Params = body.paramsObject ?? null
         const filters: Filters = body.filters
 
         const page = Math.max(Number(params.page) || 1, 1)
-        const skip = (page - 1) * PAGE_SIZE;
+        const skip = (page - 1) * PAGE_SIZE;''
+
+        const sortKey = params.sort ?? "name";
+        const dir = params.dir === "desc" ? "desc" : "asc";
+        
+        // 🛡️ fallback seguro
+        const baseOrder = SORT_MAP[sortKey] ?? SORT_MAP.name;
+    
+        // 🔁 aplica direção (asc/desc) corretamente
+        const orderBy = JSON.parse(
+        JSON.stringify(baseOrder).replace(/"asc"/g, `"${dir}"`)
+        );
+    
+        const where: Prisma.CompanyWhereInput = params.group
+        ? {
+            profile: {
+                is: {
+                group: params.group,
+                },
+            },
+            }
+        : {};
 
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet("Empresas");
@@ -50,90 +129,43 @@ export async function POST(req: NextRequest) {
 
         worksheet.columns = columns;
 
+        let companies = [] as any[];
+
         if(!filters.todasAsEmpresas) {
-            const companies = await prisma.company.findMany({
+            companies = await prisma.company.findMany({
+                where,
+                orderBy,
                 skip,
                 take: PAGE_SIZE,
-                select: {
-                    name: filters.nome,
-                    cnpj: filters.cnpj,
-
-                    qsas: {
-                        select: {
-                            nome: filters.socios,
-                        }
-                    },
-
-                    profile: {
-                        select: {
-                            thirteenth: filters.decimoTerceiro,
-                            paysFees: filters.honorario,
-                            accountant: filters.contador,
-                        }
-                    },
-
-                    activities: {
-                        select: {
-                            description: filters.atividades,
-                        }
-                    },
-
-                    companySectors: {
-                        select: {
-                            ownerName: filters.responsaveis
-                        }
-                    }
-                }
+                select: buildSelect(filters),
             })
         }
-
+        
         if (filters.todasAsEmpresas) {
-            const companies = prisma.company.findMany({
-                select: {
-                    name: filters.nome,
-                    cnpj: filters.cnpj,
-
-                    qsas: {
-                        select: {
-                            nome: filters.socios,
-                        }
-                    },
-
-                    profile: {
-                        select: {
-                            thirteenth: filters.decimoTerceiro,
-                            paysFees: filters.honorario,
-                            accountant: filters.contador,
-                        }
-                    },
-
-                    activities: {
-                        select: {
-                            description: filters.atividades,
-                        }
-                    },
-
-                    companySectors: {
-                        select: {
-                            ownerName: filters.responsaveis
-                        }
-                    }
-                }
-            })
+            companies = await prisma.company.findMany({ select: buildSelect(filters) })
         }
 
-        companies.forEach((company) => {
+        companies.forEach((company: any) => {
             worksheet.addRow({
                 nome: company.name,
                 cnpj: company.cnpj,
-                decimoTerceiro: company.profile.thirteenth,
-                honorario: company.profile.paysFees,
-                contador: company.profile.accountant,
-                responsaveis: company.companySectors.ownerName,
-                socios: company.qsas.nome,
-                atividades: company.activies.description,
+                decimoTerceiro: company.profile?.thirteenth,
+                honorario: company.profile?.paysFees,
+                contador: company.profile?.accountant,
+                responsaveis: company.companySectors?.map((s: any) => s.ownerName).join(", "),
+                socios: company.qsas?.map((q: any) => q.nome).join(", "),
+                atividades: company.activities?.map((a: any) => a.description).join(", "),
             })
         })
+
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        return new NextResponse(buffer, {
+            headers: {
+                "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "Content-Disposition": "attachment; filename=empresas.xlsx",
+            },
+        });
     }
 
     catch(error) {

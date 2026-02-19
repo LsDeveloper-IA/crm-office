@@ -40,6 +40,9 @@ export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalPr
 
     const paramsObject = {
         page: params.get("page") ?? null,
+        sort: params.get("sort") ?? null,
+        dir: params.get("dir") ?? null,
+        group: params.get("group") ?? null,
     }
     
     const [filters, setFilters] = useState<SheetFilters>({
@@ -67,7 +70,17 @@ export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalPr
                 paramsObject,
             })
         })
+
+        const blob = await response.blob();
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "empresas.xlsx";
+        a.click();
     }
+
+    const hasSelectedFields = Object.values(filters).some(Boolean);
 
     if (!isOpen) return null;
 
@@ -114,7 +127,8 @@ export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalPr
                 <div className="px-6 pb-5 mx-auto">
 
                     <button
-                        className="w-80 h-10 border rounded-md font-medium hover:bg-gray-200 transition-colors cursor-pointer"
+                        className={`w-80 h-10 border rounded-md font-medium ${!hasSelectedFields ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'hover:bg-gray-200 transition-colors cursor-pointer'}`}
+                        disabled={!hasSelectedFields}
                         onClick={handleGenerate}
                     >
                         Gerar planilha
