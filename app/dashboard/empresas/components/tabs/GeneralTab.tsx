@@ -22,7 +22,7 @@ const GROUPS_OPTIONS = [
   { value: "ximenes", label: "Ximenes" },
   { value: "viper", label: "Viper" },
   { value: "torquato", label: "Torquato" },
-  { value: "mr2", label: "Mr2" },
+  { value: "mr2", label: "MR2" },
 ];
 
 type AccountantOption = {
