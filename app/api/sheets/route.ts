@@ -64,14 +64,15 @@ function buildSelect(filters: Filters) {
     if (filters.nome) select.name = true;
     if (filters.cnpj) select.cnpj = true;
     
-    if (select.socios) { select.qsas = { select: { nome: true } } }
+    if (filters.socios) select.qsas = true;
 
-    if (filters.decimoTerceiro || filters.honorario || filters.contador) {
+    if (filters.decimoTerceiro || filters.honorario || filters.contador || filters.regime) {
         select.profile = {select: {}};
 
         if (filters.decimoTerceiro) select.profile.select.thirteenth = true;
         if (filters.honorario) select.profile.select.paysFees = true;
         if (filters.contador) select.profile.select.accountant = true;
+        if (filters.regime) select.profile.select.taxRegime = { select: { key: true, name: true } };
     }
 
     if (filters.atividades) { select.activities = { select: { description: true } } }
@@ -121,11 +122,11 @@ export async function POST(req: NextRequest) {
         if (filters.cnpj) columns.push({ header: "CNPJ", key: "cnpj", width: 32 });
         if (filters.decimoTerceiro) columns.push({ header: "13°", key: "decimoTerceiro", width: 8 });
         if (filters.honorario) columns.push({ header: "Honorário", key: "honorario", width: 8 });
-        if (filters.regime) columns.push({ header: "Regime Tributário", key: "regime", width: 16 });
+        if (filters.regime) columns.push({ header: "Regime Tributário", key: "regime", width: 24 });
         if (filters.contador) columns.push({ header: "Contador", key: "contador", width: 16 });
-        if (filters.responsaveis) columns.push({ header: "Responsável", key: "responsaveis", width: 128 });
+        if (filters.responsaveis) columns.push({ header: "Responsável", key: "responsaveis", width: 64 });
         if (filters.socios) columns.push({ header: "Sócios", key: "socios", width: 128 });
-        if (filters.atividades) columns.push({ header: "Atividades", key: "atividades", width: 128 });
+        if (filters.atividades) columns.push({ header: "Atividades", key: "atividades", width: 512 });
 
         worksheet.columns = columns;
 
@@ -152,6 +153,7 @@ export async function POST(req: NextRequest) {
                 decimoTerceiro: company.profile?.thirteenth,
                 honorario: company.profile?.paysFees,
                 contador: company.profile?.accountant,
+                regime: company.profile?.taxRegime?.name,
                 responsaveis: company.companySectors?.map((s: any) => s.ownerName).join(", "),
                 socios: company.qsas?.map((q: any) => q.nome).join(", "),
                 atividades: company.activities?.map((a: any) => a.description).join(", "),

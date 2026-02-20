@@ -153,7 +153,7 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
               className="cursor-pointer hover:bg-muted/50"
             >
               <TableCell>
-                {(page - 1) * 10 + index + 1}
+                {(page - 1) * 13 + index + 1}
               </TableCell>
 
               <TableCell className="font-medium">

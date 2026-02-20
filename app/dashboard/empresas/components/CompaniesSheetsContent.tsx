@@ -71,6 +71,11 @@ export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalPr
             })
         })
 
+        if(!response.ok) {
+            console.error("Erro ao gerar planilha");
+            return;
+        }
+        
         const blob = await response.blob();
 
         const url = window.URL.createObjectURL(blob);
@@ -106,15 +111,16 @@ export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalPr
                             return (
                                 <label
                                     key={fields.key}
-                                    className={
-                                        `relative
+                                    className={`
+                                        group
+                                        relative
                                         flex items-center 
                                         px-4 py-2 pl-6 rounded-lg border
                                         cursor-pointer transition-all
                                         text-sm font-medium 
                                         ${isActive 
                                             ? 'bg-blue-600 text-white border-blue-600' 
-                                            : 'bg-gray-200 border-gray-300 hover:bg-gray-300'
+                                            : 'bg-gray-200 border-gray-300 hover:bg-blue-400'
                                         }
                                     `}
                                 >
@@ -126,7 +132,7 @@ export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalPr
                                             transition-all duration-200
                                             ${isActive
                                                 ? "bg-blue-800"
-                                                : "bg-gray-400"
+                                                : "bg-gray-400 group-hover:bg-blue-600"
                                             }
                                         `}
                                     />
