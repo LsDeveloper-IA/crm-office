@@ -1,0 +1,37 @@
+[2026-03-13T11:13:59.877Z] 00000103000151 - Cannot read properties of undefined (reading 'deleteMany')
+[2026-03-13T11:14:10.707Z] 00000204000122 - Cannot read properties of undefined (reading 'deleteMany')
+[2026-03-13T11:14:21.525Z] 00148722000198 - Cannot read properties of undefined (reading 'deleteMany')
+[2026-03-13T11:14:38.134Z] 00169671000180 - HTTP 429
+[2026-03-13T11:15:20.059Z] 00275851000147 - Cannot read properties of undefined (reading 'deleteMany')
+[2026-03-13T11:15:40.784Z] 00275851000228 - Cannot read properties of undefined (reading 'deleteMany')
+[2026-03-13T11:18:20.141Z] 00000204000122 - Cannot read properties of undefined (reading 'deleteMany')
+[2026-03-13T11:18:40.802Z] 00148722000198 - Cannot read properties of undefined (reading 'deleteMany')
+[2026-03-13T11:23:59.040Z] 00169671000180 - Cannot read properties of undefined (reading 'deleteMany')
+[2026-03-13T11:24:19.804Z] 00275851000147 - Cannot read properties of undefined (reading 'deleteMany')
+[2026-03-13T11:26:33.346Z] 00000103000151 - Cannot read properties of undefined (reading 'deleteMany')
+[2026-03-13T11:26:54.070Z] 00000204000122 - Cannot read properties of undefined (reading 'deleteMany')
+[2026-03-13T11:32:25.651Z] 00148722000198 - 
+Invalid `prisma.companyActivity.createMany()` invocation in
+/Users/lucasserafim/Desktop/Office/Projects/crm-office/scripts/companies/updateCompaniesReceita.ts:179:38
+
+  176   where: { companyCnpj: rawCnpj },
+  177 });
+  178 
+→ 179 await prisma.companyActivity.createMany({
+        data: [
+          {
+            companyCnpj: "00148722000198",
+            cnaeCode: "56.11-2-01",
+            description: "Restaurantes e similares",
+            kind: "principal"
+          },
+          {
+            companyCnpj: "00148722000198",
+            cnaeCode: "00.00-0-00",
+            description: "Não informada",
+            kind: "secundaria"
+          }
+        ]
+      })
+
+Invalid value for argument `kind`. Expected ActivityKind.
