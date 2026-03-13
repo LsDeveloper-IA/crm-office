@@ -1,6 +1,5 @@
-import { fetchCompanyFromReceita } from "@/lib/1receita";
 import prisma from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import {NextResponse } from "next/server";
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTy5agvCnMhLz83s5JLOiRzrlczrQW51XkhtxwCKgYor-9r6y2I7AzwFthV_NgZUA/pub?gid=2081804269&single=true&output=csv";
 
@@ -39,7 +38,7 @@ export async function PATCH() {
         const obj: Partial<Registro> = {};
 
         CHAVES.forEach((chave, index) => {
-            (obj as any)[chave] = valores[index]?.trim() || null;
+            obj[chave] = valores[index]?.trim() || null;
         })
 
         return {

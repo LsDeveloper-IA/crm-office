@@ -24,6 +24,33 @@ type Params = {
     group?: string;
 }
 
+type SheetRequestBody = {
+    paramsObject?: Params;
+    filters: Filters;
+}
+
+type SheetCompany = {
+    name?: string | null;
+    cnpj?: string;
+    profile?: {
+        thirteenth?: boolean;
+        paysFees?: boolean;
+        accountant?: string | null;
+        taxRegime?: {
+            name: string;
+        } | null;
+    } | null;
+    companySectors?: Array<{
+        ownerName: string | null;
+    }>;
+    qsas?: Array<{
+        nome: string;
+    }>;
+    activities?: Array<{
+        description: string | null;
+    }>;
+}
+
 const PAGE_SIZE = 13
 
 // 🔒 mapa seguro de ordenação
@@ -59,7 +86,7 @@ const SORT_MAP: Record<string, Prisma.CompanyOrderByWithRelationInput> = {
 };
 
 function buildSelect(filters: Filters) {
-    const select: any = {};
+    const select: Prisma.CompanySelect = {};
 
     if (filters.nome) select.name = true;
     if (filters.cnpj) select.cnpj = true;
@@ -67,12 +94,14 @@ function buildSelect(filters: Filters) {
     if (filters.socios) select.qsas = true;
 
     if (filters.decimoTerceiro || filters.honorario || filters.contador || filters.regime) {
-        select.profile = {select: {}};
+        const profileSelect: Prisma.CompanyProfileSelect = {};
 
-        if (filters.decimoTerceiro) select.profile.select.thirteenth = true;
-        if (filters.honorario) select.profile.select.paysFees = true;
-        if (filters.contador) select.profile.select.accountant = true;
-        if (filters.regime) select.profile.select.taxRegime = { select: { key: true, name: true } };
+        if (filters.decimoTerceiro) profileSelect.thirteenth = true;
+        if (filters.honorario) profileSelect.paysFees = true;
+        if (filters.contador) profileSelect.accountant = true;
+        if (filters.regime) profileSelect.taxRegime = { select: { key: true, name: true } };
+
+        select.profile = { select: profileSelect };
     }
 
     if (filters.atividades) { select.activities = { select: { description: true } } }
@@ -85,12 +114,12 @@ function buildSelect(filters: Filters) {
 export async function POST(req: NextRequest) {
     
     try {
-        const body = await req.json();  
-        const params: Params = body.paramsObject ?? null
+        const body: SheetRequestBody = await req.json();  
+        const params: Params = body.paramsObject ?? {};
         const filters: Filters = body.filters
 
         const page = Math.max(Number(params.page) || 1, 1)
-        const skip = (page - 1) * PAGE_SIZE;''
+        const skip = (page - 1) * PAGE_SIZE;
 
         const sortKey = params.sort ?? "name";
         const dir = params.dir === "desc" ? "desc" : "asc";
@@ -130,7 +159,7 @@ export async function POST(req: NextRequest) {
 
         worksheet.columns = columns;
 
-        let companies = [] as any[];
+        let companies: SheetCompany[] = [];
 
         if(!filters.todasAsEmpresas) {
             companies = await prisma.company.findMany({
@@ -146,7 +175,7 @@ export async function POST(req: NextRequest) {
             companies = await prisma.company.findMany({ select: buildSelect(filters) })
         }
 
-        companies.forEach((company: any) => {
+        companies.forEach((company) => {
             worksheet.addRow({
                 nome: company.name,
                 cnpj: company.cnpj,
@@ -154,9 +183,9 @@ export async function POST(req: NextRequest) {
                 honorario: company.profile?.paysFees,
                 contador: company.profile?.accountant,
                 regime: company.profile?.taxRegime?.name,
-                responsaveis: company.companySectors?.map((s: any) => s.ownerName).join(", "),
-                socios: company.qsas?.map((q: any) => q.nome).join(", "),
-                atividades: company.activities?.map((a: any) => a.description).join(", "),
+                responsaveis: company.companySectors?.map((sector) => sector.ownerName).join(", "),
+                socios: company.qsas?.map((qsa) => qsa.nome).join(", "),
+                atividades: company.activities?.map((activity) => activity.description).join(", "),
             })
         })
 
@@ -170,7 +199,7 @@ export async function POST(req: NextRequest) {
         });
     }
 
-    catch(error) {
+    catch {
         return NextResponse.json(
             { error: "Erro ao buscar empresas" },
             { status: 500 }
