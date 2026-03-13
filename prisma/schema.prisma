@@ -133,6 +133,7 @@ model Company {
   certificates   Certificate[]
   notes          Note[]
   profile        CompanyProfile?
+  profitDistributions ProfitDistribution[]
 }
 
 /**
@@ -410,4 +411,24 @@ model CompanySectorOwner {
   companySector CompanySector @relation(fields: [companySectorId], references: [id])
 
   @@index([companySectorId])
+}
+
+enum ProfitDistributionStatus {
+  NAO_ENCERRADO
+  ENCERRADO_COM_LUCRO
+  ENCERRADO_COM_PREJUIZO
+}
+
+model ProfitDistribution {
+  id                      Int                      @id @default(autoincrement())
+  companyCnpj             String                   @db.VarChar(14)
+  partnerName             String
+  participationPercentage Decimal                  @db.Decimal(5, 2)
+  amount                  Decimal                  @db.Decimal(15, 2)
+  status                  ProfitDistributionStatus @default(NAO_ENCERRADO)
+  observation             String?                  @db.Text
+
+  company Company @relation(fields: [companyCnpj], references: [cnpj])
+
+  @@index([companyCnpj])
 }
