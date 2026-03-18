@@ -1,7 +1,8 @@
 import "dotenv/config";
-import prisma from "../../lib/prisma";
+import { ActivityKind, type Prisma } from "@prisma/client";
 import fs from "fs";
 import cliProgress from "cli-progress";
+import prisma from "../../lib/prisma";
 
 const DELAY = 20000;
 const MAX_RETRIES = 3;
@@ -10,55 +11,175 @@ const MAX_CONSECUTIVE_ERRORS = 5;
 const CHECKPOINT = "./scripts/receita-checkpoint.json";
 const ERROR_LOG = "./scripts/receita-errors.log";
 
-function sleep(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
+type ReceitaActivity = {
+  code: string;
+  text: string;
+};
+
+type ReceitaQsa = {
+  nome: string;
+  qual: string;
+};
+
+type ReceitaResponse = {
+  status?: string;
+  message?: string;
+  nome?: string;
+  logradouro?: string;
+  numero?: string;
+  bairro?: string;
+  municipio?: string;
+  uf?: string;
+  qsa?: ReceitaQsa[];
+  atividade_principal?: ReceitaActivity[];
+  atividades_secundarias?: ReceitaActivity[];
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
 }
 
-function getCheckpoint() {
+function getOptionalString(
+  source: Record<string, unknown>,
+  key: string
+): string | undefined {
+  const value = source[key];
+  return typeof value === "string" ? value : undefined;
+}
+
+function parseReceitaActivities(
+  value: unknown,
+  fieldName: string
+): ReceitaActivity[] | undefined {
+  if (value == null) return undefined;
+
+  if (!Array.isArray(value)) {
+    throw new Error(`Campo ${fieldName} invalido na resposta da API.`);
+  }
+
+  return value.map((item, index) => {
+    if (
+      !isRecord(item) ||
+      typeof item.code !== "string" ||
+      typeof item.text !== "string"
+    ) {
+      throw new Error(
+        `Item ${index} de ${fieldName} invalido na resposta da API.`
+      );
+    }
+
+    return {
+      code: item.code,
+      text: item.text,
+    };
+  });
+}
+
+function parseReceitaQsa(value: unknown): ReceitaQsa[] | undefined {
+  if (value == null) return undefined;
+
+  if (!Array.isArray(value)) {
+    throw new Error("Campo qsa invalido na resposta da API.");
+  }
+
+  return value.map((item, index) => {
+    if (
+      !isRecord(item) ||
+      typeof item.nome !== "string" ||
+      typeof item.qual !== "string"
+    ) {
+      throw new Error(`Item ${index} de qsa invalido na resposta da API.`);
+    }
+
+    return {
+      nome: item.nome,
+      qual: item.qual,
+    };
+  });
+}
+
+function parseReceitaResponse(value: unknown): ReceitaResponse {
+  if (!isRecord(value)) {
+    throw new Error("Resposta invalida da API: JSON nao e um objeto.");
+  }
+
+  return {
+    status: getOptionalString(value, "status"),
+    message: getOptionalString(value, "message"),
+    nome: getOptionalString(value, "nome"),
+    logradouro: getOptionalString(value, "logradouro"),
+    numero: getOptionalString(value, "numero"),
+    bairro: getOptionalString(value, "bairro"),
+    municipio: getOptionalString(value, "municipio"),
+    uf: getOptionalString(value, "uf"),
+    qsa: parseReceitaQsa(value.qsa),
+    atividade_principal: parseReceitaActivities(
+      value.atividade_principal,
+      "atividade_principal"
+    ),
+    atividades_secundarias: parseReceitaActivities(
+      value.atividades_secundarias,
+      "atividades_secundarias"
+    ),
+  };
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "Erro desconhecido";
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function getCheckpoint(): number {
   if (!fs.existsSync(CHECKPOINT)) return 0;
-  return JSON.parse(fs.readFileSync(CHECKPOINT, "utf8")).index ?? 0;
+
+  const rawData: unknown = JSON.parse(fs.readFileSync(CHECKPOINT, "utf8"));
+
+  if (!isRecord(rawData) || typeof rawData.index !== "number") {
+    return 0;
+  }
+
+  return rawData.index;
 }
 
-function saveCheckpoint(index: number) {
+function saveCheckpoint(index: number): void {
   fs.writeFileSync(CHECKPOINT, JSON.stringify({ index }));
 }
 
-function logError(message: string) {
-  fs.appendFileSync(
-    ERROR_LOG,
-    `[${new Date().toISOString()}] ${message}\n`
-  );
+function logError(message: string): void {
+  fs.appendFileSync(ERROR_LOG, `[${new Date().toISOString()}] ${message}\n`);
 }
 
-function sanitizeCnpj(cnpj: string) {
+function sanitizeCnpj(cnpj: string): string {
   return cnpj.replace(/\D/g, "");
 }
 
-function isValidCnpj(cnpj: string) {
+function isValidCnpj(cnpj: string): boolean {
   return /^\d{14}$/.test(cnpj);
 }
 
-async function fetchReceita(cnpj: string) {
+async function fetchReceita(cnpj: string): Promise<ReceitaResponse> {
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const res = await fetch(
-        `https://receitaws.com.br/v1/cnpj/${cnpj}`,
-        {
-          headers: {
-            "User-Agent": "Mozilla/5.0",
-            Accept: "application/json",
-          },
-        }
-      );
+      const res = await fetch(`https://receitaws.com.br/v1/cnpj/${cnpj}`, {
+        headers: {
+          "User-Agent": "Mozilla/5.0",
+          Accept: "application/json",
+        },
+      });
 
       const text = await res.text();
-
-      let data;
+      let data: ReceitaResponse;
 
       try {
-        data = JSON.parse(text);
+        const parsed: unknown = JSON.parse(text);
+        data = parseReceitaResponse(parsed);
       } catch {
-        throw new Error(`Resposta inválida da API: ${text}`);
+        throw new Error(`Resposta invalida da API: ${text}`);
       }
 
       if (!res.ok) {
@@ -66,24 +187,25 @@ async function fetchReceita(cnpj: string) {
       }
 
       if (data.status === "ERROR") {
-        throw new Error(data.message);
+        throw new Error(data.message ?? "Erro retornado pela API.");
       }
 
       return data;
-    } catch (err) {
-      if (attempt === MAX_RETRIES) throw err;
+    } catch (error) {
+      if (attempt === MAX_RETRIES) throw error;
 
       console.log(`Retry ${attempt}/${MAX_RETRIES}...`);
       await sleep(3000);
     }
   }
+  
+  throw new Error(`Falha ao consultar a Receita para o CNPJ ${cnpj}.`);
 }
 
-async function run() {
+async function run(): Promise<void> {
   const companies = await prisma.company.findMany({
     select: {
       cnpj: true,
-      name: true,
     },
     orderBy: { cnpj: "asc" },
   });
@@ -91,7 +213,7 @@ async function run() {
   const start = getCheckpoint();
 
   console.log(`Empresas encontradas: ${companies.length}`);
-  console.log(`Retomando do índice: ${start}`);
+  console.log(`Retomando do indice: ${start}`);
 
   const progress = new cliProgress.SingleBar(
     {
@@ -111,16 +233,12 @@ async function run() {
 
     try {
       if (!isValidCnpj(cnpj)) {
-        throw new Error(`CNPJ inválido após sanitização: ${rawCnpj}`);
+        throw new Error(`CNPJ invalido apos sanitizacao: ${rawCnpj}`);
       }
 
       console.log(`\nConsultando ${cnpj}`);
 
       const data = await fetchReceita(cnpj);
-
-      /* =====================
-         EMPRESA
-      ===================== */
 
       await prisma.company.update({
         where: { cnpj: rawCnpj },
@@ -134,83 +252,83 @@ async function run() {
         },
       });
 
-      /* =====================
-         QSA
-      ===================== */
-
-      if (Array.isArray(data.qsa)) {
+      if (data.qsa !== undefined) {
         await prisma.companyQsa.deleteMany({
           where: { companyCnpj: rawCnpj },
         });
 
-        await prisma.companyQsa.createMany({
-          data: data.qsa.map((s: any) => ({
+        const qsaData: Prisma.CompanyQsaCreateManyInput[] = data.qsa.map(
+          (partner) => ({
             companyCnpj: rawCnpj,
-            nome: s.nome,
-            qualificacao: s.qual,
-          })),
-        });
+            nome: partner.nome,
+            qualificacao: partner.qual,
+          })
+        );
+
+        if (qsaData.length > 0) {
+          await prisma.companyQsa.createMany({
+            data: qsaData,
+          });
+        }
       }
 
-      /* =====================
-         CNAES
-      ===================== */
-
-      const activities = [
-        ...(data.atividade_principal ?? []).map((a: any) => ({
+      const activities: Prisma.CompanyActivityCreateManyInput[] = [
+        ...(data.atividade_principal ?? []).map((activity) => ({
           companyCnpj: rawCnpj,
-          cnaeCode: a.code,
-          description: a.text,
-          kind: "PRIMARY",
+          cnaeCode: activity.code,
+          description: activity.text,
+          kind: ActivityKind.PRIMARY,
         })),
-        ...(data.atividades_secundarias ?? []).map((a: any) => ({
+        ...(data.atividades_secundarias ?? []).map((activity) => ({
           companyCnpj: rawCnpj,
-          cnaeCode: a.code,
-          description: a.text,
-          kind: "SECONDARY",
+          cnaeCode: activity.code,
+          description: activity.text,
+          kind: ActivityKind.SECONDARY,
         })),
       ];
 
-      if (activities.length > 0) {
+      const hasActivitiesPayload =
+        data.atividade_principal !== undefined ||
+        data.atividades_secundarias !== undefined;
+
+      if (hasActivitiesPayload) {
         await prisma.companyActivity.deleteMany({
           where: { companyCnpj: rawCnpj },
         });
 
-        await prisma.companyActivity.createMany({
-          data: activities,
-        });
+        if (activities.length > 0) {
+          await prisma.companyActivity.createMany({
+            data: activities,
+          });
+        }
       }
 
       saveCheckpoint(i + 1);
       progress.update(i + 1);
-
       consecutiveErrors = 0;
 
-      console.log("✔ Atualizado com sucesso");
+      console.log("Atualizado com sucesso");
 
       await sleep(DELAY);
-    } catch (err: any) {
+    } catch (error: unknown) {
       consecutiveErrors++;
 
-      console.error(`❌ Erro no CNPJ ${rawCnpj}`);
-      console.error(err.message);
+      const errorMessage = getErrorMessage(error);
 
-      logError(`${rawCnpj} - ${err.message}`);
+      console.error(`Erro no CNPJ ${rawCnpj}`);
+      console.error(errorMessage);
+
+      logError(`${rawCnpj} - ${errorMessage}`);
 
       if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
         progress.stop();
-
-        console.error(
-          "\nMuitos erros consecutivos. Script interrompido."
-        );
-
+        console.error("\nMuitos erros consecutivos. Script interrompido.");
         process.exit(1);
       }
 
       console.log("Pulando empresa...");
 
       progress.update(i + 1);
-
       saveCheckpoint(i + 1);
 
       await sleep(DELAY);
@@ -219,7 +337,7 @@ async function run() {
 
   progress.stop();
 
-  console.log("\n🎉 Atualização finalizada!");
+  console.log("\nAtualizacao finalizada!");
 
   if (fs.existsSync(CHECKPOINT)) {
     fs.unlinkSync(CHECKPOINT);
