@@ -6,6 +6,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { HomeIcon } from "../icons/HomeIcon";
 import { CompanyIcon } from "../icons/CompanyIncon";
+import { CashIcon } from "../icons/CashIcon";
 
 const menuItems = [
   {
@@ -17,6 +18,11 @@ const menuItems = [
     href: "/dashboard/empresas",
     icon: CompanyIcon,
     label: "Empresas",
+  },
+  {
+    href: "/dashboard/distribuicao-lucros",
+    icon: CashIcon,
+    label: "Distribuição de Lucros",
   }
 ];
 
