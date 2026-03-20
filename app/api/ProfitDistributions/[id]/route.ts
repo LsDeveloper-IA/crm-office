@@ -13,7 +13,7 @@ export async function GET(_: NextRequest, { params }: Params) {
 
   if (Number.isNaN(numericId)) {
     return NextResponse.json(
-      { error: "Id inválido" },
+      { error: "Id invÃ¡lido" },
       { status: 400 }
     );
   }
@@ -35,7 +35,7 @@ export async function GET(_: NextRequest, { params }: Params) {
 
     if (!profitDistribution) {
       return NextResponse.json(
-        { error: "Registro não encontrado" },
+        { error: "Registro nÃ£o encontrado" },
         { status: 404 }
       );
     }
@@ -60,7 +60,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
   if (Number.isNaN(numericId)) {
     return NextResponse.json(
-      { error: "Id inválido" },
+      { error: "Id invÃ¡lido" },
       { status: 400 }
     );
   }
@@ -84,7 +84,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
       if (!partnerName) {
         return NextResponse.json(
-          { error: "Nome do sócio inválido" },
+          { error: "Nome do sÃ³cio invÃ¡lido" },
           { status: 400 }
         );
       }
@@ -95,7 +95,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     if (body.participationPercentage !== undefined) {
       if (Number.isNaN(Number(body.participationPercentage))) {
         return NextResponse.json(
-          { error: "Percentual de participação inválido" },
+          { error: "Percentual de participaÃ§Ã£o invÃ¡lido" },
           { status: 400 }
         );
       }
@@ -106,7 +106,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     if (body.amount !== undefined) {
       if (Number.isNaN(Number(body.amount))) {
         return NextResponse.json(
-          { error: "Valor inválido" },
+          { error: "Valor invÃ¡lido" },
           { status: 400 }
         );
       }
@@ -123,7 +123,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
       if (!allowedStatus.includes(body.status)) {
         return NextResponse.json(
-          { error: "Status inválido" },
+          { error: "Status invÃ¡lido" },
           { status: 400 }
         );
       }
@@ -173,7 +173,7 @@ export async function DELETE(_: NextRequest, { params }: Params) {
 
   if (Number.isNaN(numericId)) {
     return NextResponse.json(
-      { error: "Id inválido" },
+      { error: "Id invÃ¡lido" },
       { status: 400 }
     );
   }
