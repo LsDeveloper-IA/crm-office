@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   if (companyCnpj.length !== 14) {
     return NextResponse.json(
       { error: "CNPJ inválido" },
-      { status: 400 }
+      { status: 400 } 
     );
   }
 
