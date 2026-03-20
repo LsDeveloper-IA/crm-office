@@ -6,6 +6,7 @@ import { useState } from "react";
 import { NewCompanyModal } from "./NewCompanyModal";
 import { useSectors } from "@/app/dashboard/empresas/hooks/useSectors";
 import { HeaderSearchCommand } from "./HeaderSearchCommand"; // ✅ novo
+import Link from "next/link";
 
 type HeaderProps = {
   onToggleSidebar: () => void;
@@ -15,7 +16,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/dashboard/empresas": "Empresas",
   "/dashboard/distribuicao-lucros": "Distribuição de Lucros",
-  "/dashboard/configuracoes": "Configurações",
+  "/dashboard/settings": "Configurações",
 };
 
 export function Header({ onToggleSidebar }: HeaderProps) {
@@ -64,6 +65,11 @@ export function Header({ onToggleSidebar }: HeaderProps) {
               >
                 <Image src="/icons/plus.svg" width={36} height={36} alt="Add" />
               </button>
+            </li>
+            <li>
+              <Link href="/dashboard/settings" className="cursor-pointer">
+                <Image src="/icons/settings.svg" width={36} height={36} alt="Settings" />
+              </Link>
             </li>
           </ul>
         </nav>
