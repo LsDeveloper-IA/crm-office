@@ -309,13 +309,37 @@ export function DistribuicaoTable({ rows }: Props) {
                   </TableCell>
 
                   <TableCell className="text-center">
-                    <span className={`px-2 py-1 text-xs rounded border ${status.className}`}>
-                      {status.label}
-                    </span>
+                    {isEditing ? (
+                      <select
+                        className="w-full border rounded px-2 py-1 text-sm"
+                        value={row.status ?? "NAO_ENCERRADO"}
+                        onChange={(e) =>
+                          updateRow(row, { status: e.target.value })
+                        }
+                      >
+                        <option value="NAO_ENCERRADO">Não encerrado</option>
+                        <option value="ENCERRADO_COM_LUCRO">Enc. lucro</option>
+                        <option value="ENCERRADO_COM_PREJUIZO">Enc. prejuízo</option>
+                      </select>
+                    ) : (
+                      <span className={`px-2 py-1 text-xs rounded border ${status.className}`}>
+                        {status.label}
+                      </span>
+                    )}
                   </TableCell>
 
                   <TableCell className="truncate">
-                    {row.observation ?? "-"}
+                    {isEditing ? (
+                      <input
+                        className="w-full border rounded px-2 py-1 text-sm"
+                        value={row.observation ?? ""}
+                        onChange={(e) =>
+                          updateRow(row, { observation: e.target.value })
+                        }
+                      />
+                    ) : (
+                      row.observation ?? "-"
+                    )}
                   </TableCell>
 
                   <TableCell className="text-center">
@@ -344,8 +368,10 @@ export function DistribuicaoTable({ rows }: Props) {
 
       {/* MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40">
-          <div className="bg-white p-6 rounded-lg w-[400px] space-y-3">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white p-6 rounded-lg w-[420px] space-y-4 shadow-xl">
+
+            <h2 className="text-lg font-semibold">Novo Sócio</h2>
 
             <input
               placeholder="CNPJ"
@@ -365,33 +391,69 @@ export function DistribuicaoTable({ rows }: Props) {
               }
             />
 
-            <input
-              placeholder="%"
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                placeholder="%"
+                className="border rounded px-3 py-2"
+                value={newPartner.participationPercentage}
+                onChange={(e) =>
+                  setNewPartner((p) => ({
+                    ...p,
+                    participationPercentage: e.target.value,
+                  }))
+                }
+              />
+
+              <input
+                placeholder="Valor"
+                className="border rounded px-3 py-2"
+                value={newPartner.amount}
+                onChange={(e) =>
+                  setNewPartner((p) => ({
+                    ...p,
+                    amount: formatCurrencyInput(e.target.value),
+                  }))
+                }
+              />
+            </div>
+
+            {/* 🔥 STATUS */}
+            <select
               className="w-full border rounded px-3 py-2"
-              value={newPartner.participationPercentage}
+              value={newPartner.status}
               onChange={(e) =>
-                setNewPartner((p) => ({
-                  ...p,
-                  participationPercentage: e.target.value,
-                }))
+                setNewPartner((p) => ({ ...p, status: e.target.value }))
+              }
+            >
+              <option value="NAO_ENCERRADO">Não encerrado</option>
+              <option value="ENCERRADO_COM_LUCRO">Enc. lucro</option>
+              <option value="ENCERRADO_COM_PREJUIZO">Enc. prejuízo</option>
+            </select>
+
+            {/* 🔥 OBS */}
+            <input
+              placeholder="Observação"
+              className="w-full border rounded px-3 py-2"
+              value={newPartner.observation}
+              onChange={(e) =>
+                setNewPartner((p) => ({ ...p, observation: e.target.value }))
               }
             />
 
-            <input
-              placeholder="Valor"
-              className="w-full border rounded px-3 py-2"
-              value={newPartner.amount}
-              onChange={(e) =>
-                setNewPartner((p) => ({
-                  ...p,
-                  amount: formatCurrencyInput(e.target.value),
-                }))
-              }
-            />
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                className="px-3 py-2 border rounded hover:bg-gray-100"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Cancelar
+              </button>
 
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setIsModalOpen(false)}>Cancelar</button>
-              <button onClick={handleCreatePartner}>Salvar</button>
+              <button
+                className="px-3 py-2 border rounded bg-green-100 hover:bg-green-200"
+                onClick={handleCreatePartner}
+              >
+                Salvar
+              </button>
             </div>
 
           </div>
