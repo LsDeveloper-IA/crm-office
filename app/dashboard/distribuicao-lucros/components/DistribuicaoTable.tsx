@@ -84,6 +84,8 @@ const statusConfig: Record<
 
 export function DistribuicaoTable({ rows }: Props) {
   const [data, setData] = useState(rows);
+  const [search, setSearch] = useState("");
+
   const [editingRows, setEditingRows] = useState<Record<string, boolean>>({});
   const [originalRows, setOriginalRows] = useState<Record<string, Row>>({});
   const [loadingRow, setLoadingRow] = useState<string | null>(null);
@@ -103,7 +105,17 @@ export function DistribuicaoTable({ rows }: Props) {
     return `${row.companyCnpj}-${row.partnerId}`;
   }
 
-  // ✏️ inicia edição salvando snapshot
+  // 🔍 FILTRO
+  const filteredData = data.filter((row) => {
+    const term = search.toLowerCase();
+
+    return (
+      row.companyName.toLowerCase().includes(term) ||
+      row.partnerName.toLowerCase().includes(term) ||
+      row.companyCnpj.includes(term)
+    );
+  });
+
   function toggleEdit(row: Row, value: boolean) {
     const key = getRowKey(row);
 
@@ -120,7 +132,6 @@ export function DistribuicaoTable({ rows }: Props) {
     }));
   }
 
-  // ❌ cancelar edição
   function cancelEdit(row: Row) {
     const key = getRowKey(row);
     const original = originalRows[key];
@@ -195,7 +206,9 @@ export function DistribuicaoTable({ rows }: Props) {
     try {
       const partnerRes = await fetch("/api/profit-distributions/partners", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           companyCnpj: newPartner.companyCnpj,
           name: newPartner.partnerName,
@@ -204,18 +217,47 @@ export function DistribuicaoTable({ rows }: Props) {
 
       const partner = await partnerRes.json();
 
+      const referenceDate = normalizeDate(new Date());
+
       await fetch("/api/profit-distributions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           companyCnpj: newPartner.companyCnpj,
           partnerId: partner.id,
-          referenceDate: normalizeDate(new Date()),
+          referenceDate,
           participationPercentage: Number(newPartner.participationPercentage),
           amount: parseCurrency(newPartner.amount),
           status: newPartner.status,
           observation: newPartner.observation,
         }),
+      });
+
+      // 🔥 ATUALIZA A TABELA SEM RELOAD
+      setData((prev) => [
+        ...prev,
+        {
+          companyCnpj: newPartner.companyCnpj,
+          companyName: newPartner.companyCnpj, // pode melhorar depois
+          partnerId: partner.id,
+          partnerName: newPartner.partnerName,
+          participationPercentage: Number(newPartner.participationPercentage),
+          amount: parseCurrency(newPartner.amount),
+          status: newPartner.status,
+          observation: newPartner.observation,
+        },
+      ]);
+
+      // 🔥 LIMPA FORM
+      setNewPartner({
+        companyCnpj: "",
+        partnerName: "",
+        participationPercentage: "",
+        amount: "",
+        status: "NAO_ENCERRADO",
+        observation: "",
       });
 
       setIsModalOpen(false);
@@ -229,9 +271,19 @@ export function DistribuicaoTable({ rows }: Props) {
   return (
     <>
       {/* HEADER */}
-      <div className="flex justify-end mb-3">
+      <div className="flex items-center justify-between mb-3 gap-3">
+
+        {/* 🔍 BUSCA */}
+        <input
+          placeholder="Buscar empresa, sócio ou CNPJ..."
+          className="w-full max-w-md border rounded px-3 py-2 text-sm"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        {/* ➕ BOTÃO */}
         <button
-          className="px-3 py-2 text-sm border rounded-md hover:bg-muted"
+          className="px-3 py-2 text-sm border rounded-md hover:bg-muted whitespace-nowrap"
           onClick={() => setIsModalOpen(true)}
         >
           + Sócio
@@ -244,11 +296,11 @@ export function DistribuicaoTable({ rows }: Props) {
 
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px]">#</TableHead>
+              <TableHead className="w-[30px]">#</TableHead>
               <TableHead className="w-[260px]">Empresa</TableHead>
               <TableHead className="w-[200px]">Sócio</TableHead>
-              <TableHead className="w-[80px] text-center">%</TableHead>
-              <TableHead className="w-[140px] text-right">Valor</TableHead>
+              <TableHead className="w-[60px] text-center">%</TableHead>
+              <TableHead className="w-[120px] text-right">Valor</TableHead>
               <TableHead className="w-[180px] text-center">Status</TableHead>
               <TableHead className="w-[220px]">Observação</TableHead>
               <TableHead className="w-[90px] text-center">Ações</TableHead>
@@ -256,7 +308,7 @@ export function DistribuicaoTable({ rows }: Props) {
           </TableHeader>
 
           <TableBody>
-            {data.map((row, index) => {
+            {filteredData.map((row, index) => {
               const key = getRowKey(row);
               const isEditing = editingRows[key];
               const isLoading = loadingRow === key;
@@ -311,7 +363,7 @@ export function DistribuicaoTable({ rows }: Props) {
                   <TableCell className="text-center">
                     {isEditing ? (
                       <select
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border rounded px-2 py-1"
                         value={row.status ?? "NAO_ENCERRADO"}
                         onChange={(e) =>
                           updateRow(row, { status: e.target.value })
@@ -331,7 +383,7 @@ export function DistribuicaoTable({ rows }: Props) {
                   <TableCell className="truncate">
                     {isEditing ? (
                       <input
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border rounded px-2 py-1"
                         value={row.observation ?? ""}
                         onChange={(e) =>
                           updateRow(row, { observation: e.target.value })
@@ -344,17 +396,13 @@ export function DistribuicaoTable({ rows }: Props) {
 
                   <TableCell className="text-center">
                     {!isEditing ? (
-                      <button onClick={() => toggleEdit(row, true)}>
-                        ✏️
-                      </button>
+                      <button onClick={() => toggleEdit(row, true)}>✏️</button>
                     ) : (
                       <div className="flex gap-1 justify-center">
                         <button onClick={() => saveRow(row)}>
                           {isLoading ? "..." : "💾"}
                         </button>
-                        <button onClick={() => cancelEdit(row)}>
-                          ❌
-                        </button>
+                        <button onClick={() => cancelEdit(row)}>❌</button>
                       </div>
                     )}
                   </TableCell>
@@ -366,11 +414,10 @@ export function DistribuicaoTable({ rows }: Props) {
         </Table>
       </div>
 
-      {/* MODAL */}
+      {/* MODAL (mantido igual ao seu) */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
           <div className="bg-white p-6 rounded-lg w-[420px] space-y-4 shadow-xl">
-
             <h2 className="text-lg font-semibold">Novo Sócio</h2>
 
             <input
@@ -417,7 +464,6 @@ export function DistribuicaoTable({ rows }: Props) {
               />
             </div>
 
-            {/* 🔥 STATUS */}
             <select
               className="w-full border rounded px-3 py-2"
               value={newPartner.status}
@@ -430,7 +476,6 @@ export function DistribuicaoTable({ rows }: Props) {
               <option value="ENCERRADO_COM_PREJUIZO">Enc. prejuízo</option>
             </select>
 
-            {/* 🔥 OBS */}
             <input
               placeholder="Observação"
               className="w-full border rounded px-3 py-2"
@@ -440,22 +485,10 @@ export function DistribuicaoTable({ rows }: Props) {
               }
             />
 
-            <div className="flex justify-end gap-2 pt-2">
-              <button
-                className="px-3 py-2 border rounded hover:bg-gray-100"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Cancelar
-              </button>
-
-              <button
-                className="px-3 py-2 border rounded bg-green-100 hover:bg-green-200"
-                onClick={handleCreatePartner}
-              >
-                Salvar
-              </button>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setIsModalOpen(false)}>Cancelar</button>
+              <button onClick={handleCreatePartner}>Salvar</button>
             </div>
-
           </div>
         </div>
       )}
