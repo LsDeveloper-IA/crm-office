@@ -1,17 +1,11 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-type Params = {
-  params: {
-    id: string;
-  };
-};
-
 export async function GET(
   _: NextRequest,
-  { params }: { params: { id: string } }
+  context: any
 ) {
-  const { id } = params;
+  const { id } = context.params;
   const numericId = Number(id);
 
   if (Number.isNaN(numericId)) {
@@ -63,9 +57,9 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: any
 ) {
-  const { id } = params;
+  const { id } = context.params;
   const numericId = Number(id);
 
   if (Number.isNaN(numericId)) {
@@ -165,8 +159,11 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function DELETE(
+  _: NextRequest,
+  context: any
+) {
+  const { id } = context.params;
   const numericId = Number(id);
 
   if (Number.isNaN(numericId)) {
