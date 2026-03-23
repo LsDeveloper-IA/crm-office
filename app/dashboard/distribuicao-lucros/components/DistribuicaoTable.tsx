@@ -32,9 +32,9 @@ function normalizeDate(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
 
-// 💰 formatadores
+// 💰 FORMAT
 function formatCurrency(value?: number | null) {
-  if (value === null || value === undefined) return "-";
+  if (value == null) return "-";
 
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -43,8 +43,24 @@ function formatCurrency(value?: number | null) {
 }
 
 function formatPercentage(value?: number | null) {
-  if (value === null || value === undefined) return "-";
+  if (value == null) return "-";
   return `${value}%`;
+}
+
+// 💰 INPUT MASK
+function parseCurrency(value: string) {
+  return Number(
+    value.replace(/\./g, "").replace(",", ".").replace(/[^\d.-]/g, "")
+  );
+}
+
+function formatCurrencyInput(value: string) {
+  const numbers = value.replace(/\D/g, "");
+  const number = Number(numbers) / 100;
+
+  return number.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+  });
 }
 
 // 🎨 STATUS
@@ -69,9 +85,9 @@ const statusConfig: Record<
 export function DistribuicaoTable({ rows }: Props) {
   const [data, setData] = useState(rows);
   const [editingRows, setEditingRows] = useState<Record<string, boolean>>({});
+  const [originalRows, setOriginalRows] = useState<Record<string, Row>>({});
   const [loadingRow, setLoadingRow] = useState<string | null>(null);
 
-  // 🔥 MODAL
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [newPartner, setNewPartner] = useState({
@@ -87,8 +103,16 @@ export function DistribuicaoTable({ rows }: Props) {
     return `${row.companyCnpj}-${row.partnerId}`;
   }
 
+  // ✏️ inicia edição salvando snapshot
   function toggleEdit(row: Row, value: boolean) {
     const key = getRowKey(row);
+
+    if (value) {
+      setOriginalRows((prev) => ({
+        ...prev,
+        [key]: row,
+      }));
+    }
 
     setEditingRows((prev) => ({
       ...prev,
@@ -96,11 +120,26 @@ export function DistribuicaoTable({ rows }: Props) {
     }));
   }
 
+  // ❌ cancelar edição
+  function cancelEdit(row: Row) {
+    const key = getRowKey(row);
+    const original = originalRows[key];
+
+    if (original) {
+      setData((prev) =>
+        prev.map((r) =>
+          getRowKey(r) === key ? original : r
+        )
+      );
+    }
+
+    toggleEdit(row, false);
+  }
+
   function updateRow(row: Row, changes: Partial<Row>) {
     setData((prev) =>
       prev.map((r) =>
-        r.companyCnpj === row.companyCnpj &&
-        r.partnerId === row.partnerId
+        getRowKey(r) === getRowKey(row)
           ? { ...r, ...changes }
           : r
       )
@@ -135,7 +174,6 @@ export function DistribuicaoTable({ rows }: Props) {
           companyCnpj: row.companyCnpj,
           partnerId,
           referenceDate: normalizeDate(new Date()),
-
           participationPercentage: Number(row.participationPercentage ?? 0),
           amount: Number(row.amount ?? 0),
           status: row.status ?? "NAO_ENCERRADO",
@@ -147,7 +185,7 @@ export function DistribuicaoTable({ rows }: Props) {
 
     } catch (err) {
       console.error(err);
-      alert("Erro ao salvar linha");
+      alert("Erro ao salvar");
     } finally {
       setLoadingRow(null);
     }
@@ -157,9 +195,7 @@ export function DistribuicaoTable({ rows }: Props) {
     try {
       const partnerRes = await fetch("/api/profit-distributions/partners", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           companyCnpj: newPartner.companyCnpj,
           name: newPartner.partnerName,
@@ -170,34 +206,17 @@ export function DistribuicaoTable({ rows }: Props) {
 
       await fetch("/api/profit-distributions", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           companyCnpj: newPartner.companyCnpj,
           partnerId: partner.id,
           referenceDate: normalizeDate(new Date()),
-
           participationPercentage: Number(newPartner.participationPercentage),
-          amount: Number(newPartner.amount),
+          amount: parseCurrency(newPartner.amount),
           status: newPartner.status,
           observation: newPartner.observation,
         }),
       });
-
-      setData((prev) => [
-        ...prev,
-        {
-          companyCnpj: newPartner.companyCnpj,
-          companyName: "Nova empresa",
-          partnerId: partner.id,
-          partnerName: newPartner.partnerName,
-          participationPercentage: Number(newPartner.participationPercentage),
-          amount: Number(newPartner.amount),
-          status: newPartner.status,
-          observation: newPartner.observation,
-        },
-      ]);
 
       setIsModalOpen(false);
 
@@ -209,8 +228,8 @@ export function DistribuicaoTable({ rows }: Props) {
 
   return (
     <>
-      {/* 🔥 AÇÕES */}
-      <div className="flex justify-end gap-2 mb-3">
+      {/* HEADER */}
+      <div className="flex justify-end mb-3">
         <button
           className="px-3 py-2 text-sm border rounded-md hover:bg-muted"
           onClick={() => setIsModalOpen(true)}
@@ -219,152 +238,118 @@ export function DistribuicaoTable({ rows }: Props) {
         </button>
       </div>
 
-      <Table className="table-fixed w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[50px]">#</TableHead>
-            <TableHead className="w-[260px]">Empresa</TableHead>
-            <TableHead className="w-[180px]">Sócio</TableHead>
-            <TableHead className="w-[90px]">%</TableHead>
-            <TableHead className="w-[130px]">Valor</TableHead>
-            <TableHead className="w-[200px]">Status</TableHead>
-            <TableHead className="w-[280px]">Observação</TableHead>
-            <TableHead className="w-[110px]">Ações</TableHead>
-          </TableRow>
-        </TableHeader>
+      {/* TABELA */}
+      <div className="w-full overflow-x-auto">
+        <Table className="table-fixed w-full text-sm">
 
-        <TableBody>
-          {data.map((row, index) => {
-            const key = getRowKey(row);
-            const isEditing = editingRows[key];
-            const isLoading = loadingRow === key;
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">#</TableHead>
+              <TableHead className="w-[260px]">Empresa</TableHead>
+              <TableHead className="w-[200px]">Sócio</TableHead>
+              <TableHead className="w-[80px] text-center">%</TableHead>
+              <TableHead className="w-[140px] text-right">Valor</TableHead>
+              <TableHead className="w-[180px] text-center">Status</TableHead>
+              <TableHead className="w-[220px]">Observação</TableHead>
+              <TableHead className="w-[90px] text-center">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
 
-            const status = statusConfig[row.status ?? "NAO_ENCERRADO"];
+          <TableBody>
+            {data.map((row, index) => {
+              const key = getRowKey(row);
+              const isEditing = editingRows[key];
+              const isLoading = loadingRow === key;
+              const status = statusConfig[row.status ?? "NAO_ENCERRADO"];
 
-            return (
-              <TableRow key={key}>
-                <TableCell>{index + 1}</TableCell>
+              return (
+                <TableRow key={key}>
+                  <TableCell>{index + 1}</TableCell>
 
-                <TableCell className="truncate" title={row.companyName}>
-                  {row.companyName}
-                </TableCell>
+                  <TableCell className="truncate">{row.companyName}</TableCell>
+                  <TableCell className="truncate">{row.partnerName}</TableCell>
 
-                <TableCell className="truncate" title={row.partnerName}>
-                  {row.partnerName}
-                </TableCell>
+                  <TableCell className="text-center">
+                    {isEditing ? (
+                      <input
+                        className="w-full border rounded px-2 py-1"
+                        value={row.participationPercentage ?? ""}
+                        onChange={(e) =>
+                          updateRow(row, {
+                            participationPercentage: Number(e.target.value),
+                          })
+                        }
+                      />
+                    ) : (
+                      formatPercentage(row.participationPercentage)
+                    )}
+                  </TableCell>
 
-                <TableCell>
-                  {isEditing ? (
-                    <input
-                      className="w-full border rounded px-2 py-1 text-sm"
-                      value={row.participationPercentage ?? ""}
-                      onChange={(e) =>
-                        updateRow(row, {
-                          participationPercentage: Number(e.target.value),
-                        })
-                      }
-                    />
-                  ) : (
-                    formatPercentage(row.participationPercentage)
-                  )}
-                </TableCell>
+                  <TableCell className="text-right">
+                    {isEditing ? (
+                      <input
+                        className="w-full border rounded px-2 py-1"
+                        defaultValue={
+                          row.amount != null
+                            ? formatCurrency(row.amount).replace("R$ ", "")
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const masked = formatCurrencyInput(e.target.value);
+                          e.target.value = masked;
 
-                <TableCell>
-                  {isEditing ? (
-                    <input
-                      className="w-full border rounded px-2 py-1 text-sm"
-                      value={row.amount ?? ""}
-                      onChange={(e) =>
-                        updateRow(row, {
-                          amount: Number(e.target.value),
-                        })
-                      }
-                    />
-                  ) : (
-                    formatCurrency(row.amount)
-                  )}
-                </TableCell>
+                          updateRow(row, {
+                            amount: parseCurrency(masked),
+                          });
+                        }}
+                      />
+                    ) : (
+                      formatCurrency(row.amount)
+                    )}
+                  </TableCell>
 
-                <TableCell>
-                  {isEditing ? (
-                    <select
-                      className="w-full border rounded px-2 py-1 text-sm"
-                      value={row.status ?? "NAO_ENCERRADO"}
-                      onChange={(e) =>
-                        updateRow(row, { status: e.target.value })
-                      }
-                    >
-                      <option value="NAO_ENCERRADO">Não encerrado</option>
-                      <option value="ENCERRADO_COM_LUCRO">Enc. lucro</option>
-                      <option value="ENCERRADO_COM_PREJUIZO">Enc. prejuízo</option>
-                    </select>
-                  ) : (
+                  <TableCell className="text-center">
                     <span className={`px-2 py-1 text-xs rounded border ${status.className}`}>
                       {status.label}
                     </span>
-                  )}
-                </TableCell>
+                  </TableCell>
 
-                <TableCell className="truncate">
-                  {isEditing ? (
-                    <input
-                      className="w-full border rounded px-2 py-1 text-sm"
-                      value={row.observation ?? ""}
-                      onChange={(e) =>
-                        updateRow(row, {
-                          observation: e.target.value,
-                        })
-                      }
-                    />
-                  ) : (
-                    row.observation ?? "-"
-                  )}
-                </TableCell>
+                  <TableCell className="truncate">
+                    {row.observation ?? "-"}
+                  </TableCell>
 
-                <TableCell>
-                  {!isEditing ? (
-                    <button
-                      className="w-full px-2 py-1 border rounded hover:bg-blue-100"
-                      onClick={() => toggleEdit(row, true)}
-                    >
-                      ✏️
-                    </button>
-                  ) : (
-                    <div className="flex gap-1">
-                      <button
-                        className="flex-1 px-2 py-1 border rounded hover:bg-green-100"
-                        onClick={() => saveRow(row)}
-                        disabled={isLoading}
-                      >
-                        {isLoading ? "..." : "💾"}
+                  <TableCell className="text-center">
+                    {!isEditing ? (
+                      <button onClick={() => toggleEdit(row, true)}>
+                        ✏️
                       </button>
+                    ) : (
+                      <div className="flex gap-1 justify-center">
+                        <button onClick={() => saveRow(row)}>
+                          {isLoading ? "..." : "💾"}
+                        </button>
+                        <button onClick={() => cancelEdit(row)}>
+                          ❌
+                        </button>
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
 
-                      <button
-                        className="flex-1 px-2 py-1 border rounded hover:bg-red-100"
-                        onClick={() => toggleEdit(row, false)}
-                      >
-                        ❌
-                      </button>
-                    </div>
-                  )}
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+        </Table>
+      </div>
 
-      {/* 🔥 MODAL */}
+      {/* MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-
-          <div className="bg-white w-[500px] rounded-lg p-6 shadow-xl space-y-4">
-
-            <h2 className="text-lg font-bold">Novo Sócio</h2>
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40">
+          <div className="bg-white p-6 rounded-lg w-[400px] space-y-3">
 
             <input
-              className="w-full border rounded px-3 py-2 text-sm"
               placeholder="CNPJ"
+              className="w-full border rounded px-3 py-2"
               value={newPartner.companyCnpj}
               onChange={(e) =>
                 setNewPartner((p) => ({ ...p, companyCnpj: e.target.value }))
@@ -372,69 +357,41 @@ export function DistribuicaoTable({ rows }: Props) {
             />
 
             <input
-              className="w-full border rounded px-3 py-2 text-sm"
               placeholder="Nome do sócio"
+              className="w-full border rounded px-3 py-2"
               value={newPartner.partnerName}
               onChange={(e) =>
                 setNewPartner((p) => ({ ...p, partnerName: e.target.value }))
               }
             />
 
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                className="border rounded px-3 py-2 text-sm"
-                placeholder="%"
-                value={newPartner.participationPercentage}
-                onChange={(e) =>
-                  setNewPartner((p) => ({ ...p, participationPercentage: e.target.value }))
-                }
-              />
-
-              <input
-                className="border rounded px-3 py-2 text-sm"
-                placeholder="Valor"
-                value={newPartner.amount}
-                onChange={(e) =>
-                  setNewPartner((p) => ({ ...p, amount: e.target.value }))
-                }
-              />
-            </div>
-
-            <select
-              className="w-full border rounded px-3 py-2 text-sm"
-              value={newPartner.status}
+            <input
+              placeholder="%"
+              className="w-full border rounded px-3 py-2"
+              value={newPartner.participationPercentage}
               onChange={(e) =>
-                setNewPartner((p) => ({ ...p, status: e.target.value }))
+                setNewPartner((p) => ({
+                  ...p,
+                  participationPercentage: e.target.value,
+                }))
               }
-            >
-              <option value="NAO_ENCERRADO">Não encerrado</option>
-              <option value="ENCERRADO_COM_LUCRO">Enc. lucro</option>
-              <option value="ENCERRADO_COM_PREJUIZO">Enc. prejuízo</option>
-            </select>
+            />
 
             <input
-              className="w-full border rounded px-3 py-2 text-sm"
-              placeholder="Observação"
-              value={newPartner.observation}
+              placeholder="Valor"
+              className="w-full border rounded px-3 py-2"
+              value={newPartner.amount}
               onChange={(e) =>
-                setNewPartner((p) => ({ ...p, observation: e.target.value }))
+                setNewPartner((p) => ({
+                  ...p,
+                  amount: formatCurrencyInput(e.target.value),
+                }))
               }
             />
 
             <div className="flex justify-end gap-2">
-              <button
-                className="px-3 py-2 border rounded"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Cancelar
-              </button>
-
-              <button
-                className="px-3 py-2 border rounded bg-green-100"
-                onClick={handleCreatePartner}
-              >
-                Salvar
-              </button>
+              <button onClick={() => setIsModalOpen(false)}>Cancelar</button>
+              <button onClick={handleCreatePartner}>Salvar</button>
             </div>
 
           </div>
