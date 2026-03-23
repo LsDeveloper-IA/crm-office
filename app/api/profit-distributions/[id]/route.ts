@@ -7,7 +7,10 @@ type Params = {
   };
 };
 
-export async function GET(_: NextRequest, { params }: Params) {
+export async function GET(
+  _: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const { id } = params;
   const numericId = Number(id);
 
@@ -58,7 +61,10 @@ export async function GET(_: NextRequest, { params }: Params) {
   }
 }
 
-export async function PATCH(request: NextRequest, { params }: Params) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const { id } = params;
   const numericId = Number(id);
 
@@ -159,7 +165,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   }
 }
 
-export async function DELETE(_: NextRequest, { params }: Params) {
+export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
   const numericId = Number(id);
 
