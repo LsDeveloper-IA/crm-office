@@ -1,32 +1,33 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-type Params = {
-  params: Promise<{
-    id: string;
-  }>;
-};
-
-export async function GET(_: NextRequest, { params }: Params) {
-  const { id } = await params;
+export async function GET(
+  _: NextRequest,
+  context: any
+) {
+  const { id } = context.params;
   const numericId = Number(id);
 
   if (Number.isNaN(numericId)) {
     return NextResponse.json(
-      { error: "Id invÃ¡lido" },
+      { error: "Id inválido" },
       { status: 400 }
     );
   }
 
   try {
     const profitDistribution = await prisma.profitDistribution.findUnique({
-      where: {
-        id: numericId,
-      },
+      where: { id: numericId },
       include: {
         company: {
           select: {
             cnpj: true,
+            name: true,
+          },
+        },
+        partner: {
+          select: {
+            id: true,
             name: true,
           },
         },
@@ -35,7 +36,7 @@ export async function GET(_: NextRequest, { params }: Params) {
 
     if (!profitDistribution) {
       return NextResponse.json(
-        { error: "Registro nÃ£o encontrado" },
+        { error: "Registro não encontrado" },
         { status: 404 }
       );
     }
@@ -54,13 +55,16 @@ export async function GET(_: NextRequest, { params }: Params) {
   }
 }
 
-export async function PATCH(request: NextRequest, { params }: Params) {
-  const { id } = await params;
+export async function PATCH(
+  request: NextRequest,
+  context: any
+) {
+  const { id } = context.params;
   const numericId = Number(id);
 
   if (Number.isNaN(numericId)) {
     return NextResponse.json(
-      { error: "Id invÃ¡lido" },
+      { error: "Id inválido" },
       { status: 400 }
     );
   }
@@ -69,33 +73,16 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     const body = await request.json();
 
     const data: {
-      partnerName?: string;
       participationPercentage?: number;
       amount?: number;
-      status?:
-        | "NAO_ENCERRADO"
-        | "ENCERRADO_COM_LUCRO"
-        | "ENCERRADO_COM_PREJUIZO";
+      status?: "NAO_ENCERRADO" | "ENCERRADO_COM_LUCRO" | "ENCERRADO_COM_PREJUIZO";
       observation?: string | null;
     } = {};
-
-    if (body.partnerName !== undefined) {
-      const partnerName = String(body.partnerName).trim();
-
-      if (!partnerName) {
-        return NextResponse.json(
-          { error: "Nome do sÃ³cio invÃ¡lido" },
-          { status: 400 }
-        );
-      }
-
-      data.partnerName = partnerName;
-    }
 
     if (body.participationPercentage !== undefined) {
       if (Number.isNaN(Number(body.participationPercentage))) {
         return NextResponse.json(
-          { error: "Percentual de participaÃ§Ã£o invÃ¡lido" },
+          { error: "Percentual inválido" },
           { status: 400 }
         );
       }
@@ -106,7 +93,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     if (body.amount !== undefined) {
       if (Number.isNaN(Number(body.amount))) {
         return NextResponse.json(
-          { error: "Valor invÃ¡lido" },
+          { error: "Valor inválido" },
           { status: 400 }
         );
       }
@@ -123,7 +110,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
       if (!allowedStatus.includes(body.status)) {
         return NextResponse.json(
-          { error: "Status invÃ¡lido" },
+          { error: "Status inválido" },
           { status: 400 }
         );
       }
@@ -139,9 +126,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     }
 
     const updated = await prisma.profitDistribution.update({
-      where: {
-        id: numericId,
-      },
+      where: { id: numericId },
       data,
       include: {
         company: {
@@ -150,10 +135,17 @@ export async function PATCH(request: NextRequest, { params }: Params) {
             name: true,
           },
         },
+        partner: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
     return NextResponse.json(updated);
+
   } catch (error: unknown) {
     return NextResponse.json(
       {
@@ -167,25 +159,27 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   }
 }
 
-export async function DELETE(_: NextRequest, { params }: Params) {
-  const { id } = await params;
+export async function DELETE(
+  _: NextRequest,
+  context: any
+) {
+  const { id } = context.params;
   const numericId = Number(id);
 
   if (Number.isNaN(numericId)) {
     return NextResponse.json(
-      { error: "Id invÃ¡lido" },
+      { error: "Id inválido" },
       { status: 400 }
     );
   }
 
   try {
     await prisma.profitDistribution.delete({
-      where: {
-        id: numericId,
-      },
+      where: { id: numericId },
     });
 
     return NextResponse.json({ success: true });
+
   } catch (error: unknown) {
     return NextResponse.json(
       {

@@ -15,7 +15,7 @@ type HeaderProps = {
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/dashboard/empresas": "Empresas",
-  "/dashboard/usuarios": "Usuários",
+  "/dashboard/distribuicao-lucros": "Distribuição de Lucros",
   "/dashboard/settings": "Configurações",
 };
 
