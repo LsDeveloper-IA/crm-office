@@ -24,13 +24,14 @@ export async function GET(_: NextRequest, { params }: Params) {
         id: numericId,
       },
       include: {
-        company: {
+        company: {...},
+        partner: {
           select: {
-            cnpj: true,
+            id: true,
             name: true,
           },
         },
-      },
+      }
     });
 
     if (!profitDistribution) {
@@ -69,13 +70,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     const body = await request.json();
 
     const data: {
-      partnerName?: string;
       participationPercentage?: number;
       amount?: number;
-      status?:
-        | "NAO_ENCERRADO"
-        | "ENCERRADO_COM_LUCRO"
-        | "ENCERRADO_COM_PREJUIZO";
+      status?: "NAO_ENCERRADO" | "ENCERRADO_COM_LUCRO" | "ENCERRADO_COM_PREJUIZO";
       observation?: string | null;
     } = {};
 
@@ -139,14 +136,18 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     }
 
     const updated = await prisma.profitDistribution.update({
-      where: {
-        id: numericId,
-      },
+      where: { id: numericId },
       data,
       include: {
         company: {
           select: {
             cnpj: true,
+            name: true,
+          },
+        },
+        partner: {
+          select: {
+            id: true,
             name: true,
           },
         },

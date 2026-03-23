@@ -6,18 +6,22 @@ import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { DistribuicaoTable } from "./components/DistribuicaoTable";
 
+function normalizeDate(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
 export default async function Dashboard() {
   const user = await getCurrentUser();
   if (!user) return redirect("/");
 
-  const selectedDate = new Date(); // depois vamos colocar filtro por mês
+  // 🔥 AGORA CORRETO
+  const selectedDate = normalizeDate(new Date());
 
   const companies = await prisma.company.findMany({
     select: {
       cnpj: true,
       name: true,
 
-      // 🔥 seus sócios novos
       profitPartners: {
         select: {
           id: true,
@@ -30,7 +34,6 @@ export default async function Dashboard() {
         },
       },
 
-      // 🔥 fallback (Receita)
       qsas: {
         select: {
           nome: true,
@@ -41,7 +44,7 @@ export default async function Dashboard() {
   });
 
   const rows = companies.flatMap((c) => {
-    // ✅ se já tem parceiros cadastrados → usa eles
+    // ✅ parceiros cadastrados
     if (c.profitPartners.length > 0) {
       return c.profitPartners.map((p) => {
         const dist = p.distributions[0];
@@ -53,21 +56,27 @@ export default async function Dashboard() {
           partnerId: p.id,
           partnerName: p.name,
 
-          participationPercentage: dist?.participationPercentage ?? null,
-          amount: dist?.amount ?? null,
+          participationPercentage: dist
+            ? Number(dist.participationPercentage)
+            : null,
+
+          amount: dist
+            ? Number(dist.amount)
+            : null,
+
           status: dist?.status ?? "NAO_ENCERRADO",
           observation: dist?.observation ?? "",
         };
       });
     }
 
-    // ⚠️ fallback → usa QSA da Receita
+    // ⚠️ fallback Receita
     if (c.qsas.length > 0) {
       return c.qsas.map((qsa, index) => ({
         companyCnpj: c.cnpj,
         companyName: c.name,
 
-        partnerId: -index, // ⚠️ fake id temporário
+        partnerId: -(index + 1), // 🔥 evita 0 duplicado
         partnerName: qsa.nome,
 
         participationPercentage: null,
@@ -77,13 +86,13 @@ export default async function Dashboard() {
       }));
     }
 
-    // 🧱 fallback final → empresa sem sócio
+    // 🧱 fallback final
     return [
       {
         companyCnpj: c.cnpj,
         companyName: c.name,
 
-        partnerId: 0,
+        partnerId: -999999, // 🔥 evita conflito
         partnerName: "Sem sócios",
 
         participationPercentage: null,
