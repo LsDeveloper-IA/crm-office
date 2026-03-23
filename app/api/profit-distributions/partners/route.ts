@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   if (companyCnpj.length !== 14) {
     return NextResponse.json(
       { error: "CNPJ inválido" },
-      { status: 400 } 
+      { status: 400 }
     );
   }
 
@@ -41,28 +41,36 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    const partners = Array.from(
-      new Set([
-        ...qsas.map((item) => item.nome.trim()),
-        ...oldPartners.map((item) => item.partnerName.trim()),
-      ].filter(Boolean))
+    // 🔥 evita duplicados entre Receita e banco
+    const dbNames = new Set(
+      partnersDb.map((p) => p.name.trim().toLowerCase())
     );
+
+    const partners = [
+      // ✅ parceiros do banco
+      ...partnersDb.map((p) => ({
+        id: p.id,
+        name: p.name,
+        source: "db" as const,
+      })),
+
+      // ⚠️ fallback Receita (somente se não existir no DB)
+      ...qsas
+        .filter(
+          (q) => !dbNames.has(q.nome.trim().toLowerCase())
+        )
+        .map((q, index) => ({
+          id: -(index + 1), // evita id 0
+          name: q.nome,
+          source: "receita" as const,
+        })),
+    ];
 
     return NextResponse.json({
       companyCnpj,
-      partners: [
-        ...partnersDb.map((p) => ({
-          id: p.id,
-          name: p.name,
-          source: "db",
-        })),
-        ...qsas.map((q, index) => ({
-          id: -index, // fallback
-          name: q.nome,
-          source: "receita",
-        })),
-      ],
+      partners,
     });
+
   } catch (error: unknown) {
     return NextResponse.json(
       {
@@ -76,6 +84,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/profit-distributions/partners
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -97,7 +106,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // evita duplicado
+    // 🔥 evita duplicado
     const existing = await prisma.profitPartner.findFirst({
       where: {
         companyCnpj,
