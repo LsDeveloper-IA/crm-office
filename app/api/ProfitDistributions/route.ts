@@ -8,23 +8,34 @@ function normalizeCnpj(value: string) {
 // GET /api/profit-distributions?companyCnpj=...
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
+
   const companyCnpjParam = searchParams.get("companyCnpj");
+  const referenceDateParam = searchParams.get("referenceDate");
 
   const companyCnpj = companyCnpjParam
     ? normalizeCnpj(companyCnpjParam)
     : undefined;
 
+  const referenceDate = referenceDateParam
+    ? new Date(referenceDateParam)
+    : undefined;
+
   try {
     const profitDistributions = await prisma.profitDistribution.findMany({
-      where: companyCnpj
-        ? {
-            companyCnpj,
-          }
-        : undefined,
+      where: {
+        ...(companyCnpj ? { companyCnpj } : {}),
+        ...(referenceDate ? { referenceDate } : {}),
+      },
       include: {
         company: {
           select: {
             cnpj: true,
+            name: true,
+          },
+        },
+        partner: {
+          select: {
+            id: true,
             name: true,
           },
         },
@@ -38,11 +49,15 @@ export async function GET(request: NextRequest) {
       id: item.id,
       companyCnpj: item.companyCnpj,
       companyName: item.company?.name ?? null,
-      partnerName: item.partnerName,
+
+      partnerId: item.partnerId,
+      partnerName: item.partner.name, // 🔥 vem da relation
+
       participationPercentage: item.participationPercentage,
       amount: item.amount,
       status: item.status,
       observation: item.observation,
+      referenceDate: item.referenceDate,
     }));
 
     return NextResponse.json(resultado);
@@ -65,9 +80,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     const companyCnpj = normalizeCnpj(body.companyCnpj ?? "");
-    const partnerName = String(body.partnerName ?? "").trim();
+    const partnerId = Number(body.partnerId);
+    const referenceDate = body.referenceDate
+      ? new Date(body.referenceDate)
+      : null;
+
     const participationPercentage = body.participationPercentage;
     const amount = body.amount;
+
     const observation =
       body.observation && String(body.observation).trim() !== ""
         ? String(body.observation).trim()
@@ -80,59 +100,54 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!partnerName) {
+    if (!partnerId || Number.isNaN(partnerId)) {
       return NextResponse.json(
-        { error: "Nome do sócio é obrigatório" },
+        { error: "Sócio inválido" },
         { status: 400 }
       );
     }
 
-    if (
-      participationPercentage === undefined ||
-      participationPercentage === null ||
-      Number.isNaN(Number(participationPercentage))
-    ) {
+    if (!referenceDate) {
       return NextResponse.json(
-        { error: "Percentual de participação inválido" },
-        { status: 400 } 
+        { error: "Data de referência é obrigatória" },
+        { status: 400 }
       );
     }
 
-    if (
-      amount === undefined ||
-      amount === null ||
-      Number.isNaN(Number(amount))
-    ) {
+    if (Number.isNaN(Number(participationPercentage))) {
+      return NextResponse.json(
+        { error: "Percentual inválido" },
+        { status: 400 }
+      );
+    }
+
+    if (Number.isNaN(Number(amount))) {
       return NextResponse.json(
         { error: "Valor inválido" },
         { status: 400 }
       );
     }
 
-    const company = await prisma.company.findUnique({
+    const result = await prisma.profitDistribution.upsert({
       where: {
-        cnpj: companyCnpj,
+        companyCnpj_partnerId_referenceDate: {
+          companyCnpj,
+          partnerId,
+          referenceDate,
+        },
       },
-      select: {
-        cnpj: true,
-      },
-    });
-
-    if (!company) {
-      return NextResponse.json(
-        { error: "Empresa não encontrada" },
-        { status: 404 }
-      );
-    }
-
-    const created = await prisma.profitDistribution.create({    
-      data: {
-        companyCnpj,
-        partnerName,
+      update: {
         participationPercentage: Number(participationPercentage),
         amount: Number(amount),
         observation,
-        // status entra no default do Prisma: NAO_ENCERRADO
+      },
+      create: {
+        companyCnpj,
+        partnerId,
+        referenceDate,
+        participationPercentage: Number(participationPercentage),
+        amount: Number(amount),
+        observation,
       },
       include: {
         company: {
@@ -141,17 +156,23 @@ export async function POST(request: NextRequest) {
             name: true,
           },
         },
+        partner: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
-    return NextResponse.json(created, { status: 201 });
+    return NextResponse.json(result);
   } catch (error: unknown) {
     return NextResponse.json(
       {
         error:
           error instanceof Error
             ? error.message
-            : "Erro ao criar distribuição de lucro",
+            : "Erro ao salvar distribuição de lucro",
       },
       { status: 500 }
     );

@@ -134,6 +134,7 @@ model Company {
   notes          Note[]
   profile        CompanyProfile?
   profitDistributions ProfitDistribution[]
+  profitPartners      ProfitPartner[]
 }
 
 /**
@@ -422,13 +423,31 @@ enum ProfitDistributionStatus {
 model ProfitDistribution {
   id                      Int                      @id @default(autoincrement())
   companyCnpj             String                   @db.VarChar(14)
-  partnerName             String
-  participationPercentage Decimal                  @db.Decimal(5, 2)
-  amount                  Decimal                  @db.Decimal(15, 2)
+
+  partnerId               Int
+  referenceDate           DateTime
+
+  participationPercentage Decimal?                 @db.Decimal(5, 2)
+  amount                  Decimal?                 @db.Decimal(15, 2)
+
   status                  ProfitDistributionStatus @default(NAO_ENCERRADO)
   observation             String?                  @db.Text
 
   company Company @relation(fields: [companyCnpj], references: [cnpj])
+  partner ProfitPartner @relation(fields: [partnerId], references: [id])
+
+  @@unique([companyCnpj, partnerId, referenceDate])
+  @@index([companyCnpj])
+}
+
+model ProfitPartner {
+  id            Int    @id @default(autoincrement())
+  companyCnpj   String @db.VarChar(14)
+  name          String
+
+  company Company @relation(fields: [companyCnpj], references: [cnpj])
+
+  distributions ProfitDistribution[]
 
   @@index([companyCnpj])
 }

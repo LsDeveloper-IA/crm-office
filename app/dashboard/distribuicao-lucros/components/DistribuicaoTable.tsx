@@ -9,61 +9,73 @@ import {
   TableRow
 } from "@/components/ui/table";
 
-type Company = {
-  cnpj: string;
-  name: string;
-  accountant?: string;
-  taxRegime?: string;
+type Row = {
+  companyCnpj: string;
+  companyName: string;
+
+  partnerId: number;
+  partnerName: string;
+
+  participationPercentage?: number | null;
+  amount?: number | null;
+  status?: string;
+  observation?: string;
 };
 
 type Props = {
-  companies: Company[];
+  rows: Row[];
 };
- 
-export function DistribuicaoTable({ companies }: Props) {
+
+export function DistribuicaoTable({ rows }: Props) {
   return (
     <Table>
-
       <TableHeader>
         <TableRow>
           <TableHead>#</TableHead>
           <TableHead>Empresa</TableHead>
-          <TableHead>Sócios</TableHead>
-          <TableHead>Percentual de Participação</TableHead>
-          <TableHead>Participação de Lucros</TableHead>
+          <TableHead>Sócio</TableHead>
+          <TableHead>%</TableHead>
+          <TableHead>Valor</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead>Observações</TableHead>
+          <TableHead>Observação</TableHead>
         </TableRow>
       </TableHeader>
 
       <TableBody>
-        {companies.map((company, index) => (
-          <TableRow key={company.cnpj}>
-
+        {rows.map((row, index) => (
+          <TableRow key={`${row.companyCnpj}-${row.partnerId}`}>
+            
             <TableCell>
               {index + 1}
             </TableCell>
 
             <TableCell className="font-medium">
-              {company.name}
-            </TableCell>
-
-            <TableCell className="font-mono text-sm">
-              {company.cnpj}
+              {row.companyName}
             </TableCell>
 
             <TableCell>
-              {company.taxRegime ?? "-"}
+              {row.partnerName}
             </TableCell>
 
             <TableCell>
-              {company.accountant ?? "-"}
+              {row.participationPercentage ?? "-"}
+            </TableCell>
+
+            <TableCell>
+              {row.amount ?? "-"}
+            </TableCell>
+
+            <TableCell>
+              {row.status ?? "-"}
+            </TableCell>
+
+            <TableCell>
+              {row.observation ?? "-"}
             </TableCell>
 
           </TableRow>
         ))}
       </TableBody>
-
     </Table>
   );
 }
