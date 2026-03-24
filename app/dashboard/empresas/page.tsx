@@ -2,6 +2,8 @@ export const dynamic = "force-dynamic";
 
 import Card from "./components/card";
 import { CompanyTable } from "./components/CompanyTable";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { mapCompanyToRowDTO } from "./dto/mapper";
 import type { Prisma } from "@prisma/client";
@@ -51,6 +53,16 @@ const SORT_MAP: Record<string, Prisma.CompanyOrderByWithRelationInput> = {
 
 
 export default async function Company({ searchParams }: Props) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return redirect("/");
+  }
+
+  if (user.role === "USER") {
+    return redirect("/dashboard");
+  }
+
   const params = await searchParams;
 
   const page = Math.max(Number(params.page) || 1, 1);
@@ -77,7 +89,7 @@ export default async function Company({ searchParams }: Props) {
       }
     : {};
 
-  const [companiesRaw, total, totalSimples, totalNaoSimples, totalPagantes] = await Promise.all([
+  const [companiesRaw, total, totalSimples, totalNaoSimples, totalPagantes, totalThirteenth] = await Promise.all([
     prisma.company.findMany({
       where,
       orderBy,
@@ -123,6 +135,16 @@ export default async function Company({ searchParams }: Props) {
         },
       },
     }),
+
+    prisma.company.count({
+      where: {
+        profile: {
+          is: {
+            thirteenth: true,
+          },
+        },
+      },
+    }),
   ]);
 
   const companies = companiesRaw.map(mapCompanyToRowDTO);
@@ -134,7 +156,7 @@ export default async function Company({ searchParams }: Props) {
       <div className="w-full h-24 flex items-center gap-4 justify-between">
         <Card title="Total de empresas" value={total} />
         <Card title="Total Honorários" value={totalPagantes} />
-        <Card title="Card 3" value="-" />
+        <Card title="Total 13°" value={totalThirteenth} />
         <Card title="Simples Nacional"
           valueLeft={totalSimples}
           subtitleLeft="Optantes"

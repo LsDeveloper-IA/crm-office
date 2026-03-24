@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { normalizeCNPJ, isValidCNPJ } from "@/lib/cnpj";
 import type { Prisma } from "@prisma/client";
@@ -20,6 +21,16 @@ type CompanyPayload = {
 // GET /api/companies?q=...&limit=12
 export async function GET(req: NextRequest) {
   try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Nao autenticado" }, { status: 401 });
+    }
+
+    if (user.role === "USER") {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(req.url);
 
     const q = (searchParams.get("q") ?? "").trim();
@@ -63,6 +74,16 @@ export async function GET(req: NextRequest) {
 // POST /api/companies
 export async function POST(req: NextRequest) {
   try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Nao autenticado" }, { status: 401 });
+    }
+
+    if (user.role === "USER") {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const body = (await req.json()) as CompanyPayload;
     const cnpj = normalizeCNPJ(body.cnpj);
 

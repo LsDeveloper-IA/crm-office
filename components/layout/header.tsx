@@ -10,6 +10,7 @@ import Link from "next/link";
 
 type HeaderProps = {
   onToggleSidebar: () => void;
+  canAccessCompanies: boolean;
 };
 
 const PAGE_TITLES: Record<string, string> = {
@@ -19,12 +20,12 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard/settings": "Configurações",
 };
 
-export function Header({ onToggleSidebar }: HeaderProps) {
+export function Header({ onToggleSidebar, canAccessCompanies }: HeaderProps) {
   const pathname = usePathname();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false); // ✅ novo
 
-  const sectors = useSectors();
+  const sectors = useSectors(canAccessCompanies);
 
   const title =
     PAGE_TITLES[pathname] ??
@@ -47,25 +48,29 @@ export function Header({ onToggleSidebar }: HeaderProps) {
         {/* ACTIONS */}
         <nav>
           <ul className="flex space-x-1.5">
-            <li>
-              <button
-                type="button"
-                onClick={() => setIsSearchOpen(true)}
-                className="cursor-pointer"
-                aria-label="Pesquisar"
-              >
-                <Image src="/icons/search.svg" width={36} height={36} alt="Search" />
-              </button>
-            </li>
+            {canAccessCompanies ? (
+              <li>
+                <button
+                  type="button"
+                  onClick={() => setIsSearchOpen(true)}
+                  className="cursor-pointer"
+                  aria-label="Pesquisar"
+                >
+                  <Image src="/icons/search.svg" width={36} height={36} alt="Search" />
+                </button>
+              </li>
+            ) : null}
 
-            <li>
-              <button
-                onClick={() => setIsAddOpen(true)}
-                className="cursor-pointer"
-              >
-                <Image src="/icons/plus.svg" width={36} height={36} alt="Add" />
-              </button>
-            </li>
+            {canAccessCompanies ? (
+              <li>
+                <button
+                  onClick={() => setIsAddOpen(true)}
+                  className="cursor-pointer"
+                >
+                  <Image src="/icons/plus.svg" width={36} height={36} alt="Add" />
+                </button>
+              </li>
+            ) : null}
             <li>
               <Link href="/dashboard/settings" className="cursor-pointer">
                 <Image src="/icons/settings.svg" width={36} height={36} alt="Settings" />
@@ -76,17 +81,21 @@ export function Header({ onToggleSidebar }: HeaderProps) {
       </header>
 
       {/* ✅ Command Palette */}
-      <HeaderSearchCommand open={isSearchOpen} onOpenChange={setIsSearchOpen} />
+      {canAccessCompanies ? (
+        <HeaderSearchCommand open={isSearchOpen} onOpenChange={setIsSearchOpen} />
+      ) : null}
 
       {/* MODAL */}
-      <NewCompanyModal
-        open={isAddOpen}
-        onClose={() => setIsAddOpen(false)}
-        onCreated={() => {
-          setIsAddOpen(false);
-        }}
-        sectors={sectors}
-      />
+      {canAccessCompanies ? (
+        <NewCompanyModal
+          open={isAddOpen}
+          onClose={() => setIsAddOpen(false)}
+          onCreated={() => {
+            setIsAddOpen(false);
+          }}
+          sectors={sectors}
+        />
+      ) : null}
     </>
   );
 }

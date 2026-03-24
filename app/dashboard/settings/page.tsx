@@ -3,10 +3,10 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { revalidatePath } from "next/cache";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth"; // caminho conforme seu projeto
 import prisma from "@/lib/prisma";
+import { SettingsNav } from "@/components/settings/SettingsNav";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -87,34 +87,7 @@ export default async function SettingsPage() {
 
   return (
     <main className="flex flex-1 min-h-0 gap-6">
-      {/* SIDEBAR */}
-      <aside className="w-64 bg-white rounded-lg shadow-2xl p-5">
-        <h2 className="text-lg font-semibold mb-4">Configuracoes</h2>
-
-        <nav className="flex flex-col gap-2">
-          <Link
-            href="/dashboard/settings"
-            className="text-left px-3 py-2 rounded-md bg-muted"
-          >
-            Minha conta
-          </Link>
-
-          <Link
-            href="/dashboard/settings/seguranca"
-            className="text-left px-3 py-2 rounded-md hover:bg-muted"
-          >
-            Seguranca
-          </Link>
-
-          <button className="text-left px-3 py-2 rounded-md hover:bg-muted">
-            Notificacoes
-          </button>
-
-          <button className="text-left px-3 py-2 rounded-md hover:bg-muted">
-            Dispositivos
-          </button>
-        </nav>
-      </aside>
+      <SettingsNav activeItem="conta" isAdmin={user.role === "ADMIN"} />
 
       {/* CONTEUDO */}
       <section className="flex-1 bg-white rounded-lg shadow-2xl p-7 overflow-auto">

@@ -2,10 +2,10 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import bcrypt from "bcryptjs";
-import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { SettingsNav } from "@/components/settings/SettingsNav";
 import prisma from "@/lib/prisma";
 
 type SecurityPageProps = {
@@ -116,33 +116,7 @@ export default async function SecurityPage({
 
   return (
     <main className="flex flex-1 min-h-0 gap-6">
-      <aside className="w-64 bg-white rounded-lg shadow-2xl p-5">
-        <h2 className="text-lg font-semibold mb-4">Configuracoes</h2>
-
-        <nav className="flex flex-col gap-2">
-          <Link
-            href="/dashboard/settings"
-            className="text-left px-3 py-2 rounded-md hover:bg-muted"
-          >
-            Minha conta
-          </Link>
-
-          <Link
-            href="/dashboard/settings/seguranca"
-            className="text-left px-3 py-2 rounded-md bg-muted"
-          >
-            Seguranca
-          </Link>
-
-          <button className="text-left px-3 py-2 rounded-md hover:bg-muted">
-            Notificacoes
-          </button>
-
-          <button className="text-left px-3 py-2 rounded-md hover:bg-muted">
-            Dispositivos
-          </button>
-        </nav>
-      </aside>
+      <SettingsNav activeItem="seguranca" isAdmin={user.role === "ADMIN"} />
 
       <section className="flex-1 overflow-auto rounded-lg bg-white p-7 shadow-2xl">
         <h1 className="text-2xl font-bold mb-6">Seguranca</h1>

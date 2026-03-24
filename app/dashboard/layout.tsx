@@ -11,7 +11,10 @@ export default async function DashboardLayout({ children }: React.PropsWithChild
   if (!user) return redirect("/");
 
   return (
-    <DashboardShell userName={user.name}>
+    <DashboardShell
+      userName={user.name}
+      userRole={user.role}
+    >
       {children}
     </DashboardShell>
   );

@@ -23,7 +23,7 @@
 // // -----------------------------
 
 // const adminPasswordPlain = process.env.SEED_ADMIN_PASSWORD ?? "Office@123";
-// const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@office.local";
+// const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "henri@office-ce.com.br";
 
 // const sectors: Prisma.SectorCreateInput[] = [
 //   { key: "CONTABIL", name: "Contábil" },
@@ -106,6 +106,7 @@
 // prisma/seed.ts
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import bcrypt from "bcryptjs";
 import "dotenv/config";
 
 // Adapter do Postgres (Neon)
@@ -116,7 +117,29 @@ const adapter = new PrismaPg({
 // Prisma client COM adapter
 const prisma = new PrismaClient({ adapter });
 
+const userEmail = "henri@office-ce.com.br";
+const userPasswordPlain = "2026@Office";
+
 async function main() {
+  const hashedPassword = await bcrypt.hash(userPasswordPlain, 10);
+
+  await prisma.user.upsert({
+    where: { username: userEmail },
+    update: {
+      name: "Henri",
+      password: hashedPassword,
+      role: "USER",
+      active: true,
+      updatedAt: new Date(),
+    },
+    create: {
+      username: userEmail,
+      name: "Henri",
+      password: hashedPassword,
+      role: "USER",
+      active: true,
+    },
+  });
 
   await prisma.taxRegime.createMany({
     data: [
@@ -129,6 +152,8 @@ async function main() {
     ],
     skipDuplicates: true,
   });
+
+  console.log(`Usuario seedado: ${userEmail}`);
 
 }
 

@@ -8,17 +8,19 @@ import { Sidebar } from "@/components/layout/sidebar";
 type Props = {
   children: React.ReactNode;
   userName: string;
+  userRole: string;
 };
 
-export default function DashboardShell({ children, userName }: Props) {
+export default function DashboardShell({ children, userName, userRole }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const canAccessCompanies = userRole !== "USER";
 
   return (
     <div className="flex min-h-screen">
       
       {/* MENU */}
       <aside className="w-20 border-r shrink-0">
-        <MenuBar />
+        <MenuBar canAccessCompanies={canAccessCompanies} />
       </aside>
 
       {/* SIDEBAR */}
@@ -32,7 +34,10 @@ export default function DashboardShell({ children, userName }: Props) {
 
       {/* CONTEÚDO */}
       <main className="flex flex-col flex-1 min-w-0 min-h-0 bg-[#F5F5FA]">
-        <Header onToggleSidebar={() => setSidebarOpen(v => !v)} />
+        <Header
+          onToggleSidebar={() => setSidebarOpen(v => !v)}
+          canAccessCompanies={canAccessCompanies}
+        />
 
         <section className="p-7 h-full w-full flex flex-col">
           {children}

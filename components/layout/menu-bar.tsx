@@ -13,21 +13,31 @@ const menuItems = [
     href: "/dashboard",
     icon: HomeIcon,
     label: "Dashboard",
+    requiresCompanyAccess: false,
   },
   {
     href: "/dashboard/empresas",
     icon: CompanyIcon,
     label: "Empresas",
+    requiresCompanyAccess: true,
   },
   {
     href: "/dashboard/distribuicao-lucros",
     icon: CashIcon,
     label: "Distribuição de Lucros",
+    requiresCompanyAccess: false,
   }
 ];
 
-export function MenuBar() {
+type MenuBarProps = {
+  canAccessCompanies: boolean;
+};
+
+export function MenuBar({ canAccessCompanies }: MenuBarProps) {
   const pathname = usePathname();
+  const visibleItems = menuItems.filter(
+    (item) => canAccessCompanies || !item.requiresCompanyAccess
+  );
 
   return (
     <aside className="h-full w-20 flex flex-col items-center pt-6 border-r bg-white">
@@ -40,7 +50,7 @@ export function MenuBar() {
         className="mb-6"
       />
 
-      {menuItems.map((item) => {
+      {visibleItems.map((item) => {
         const isActive = pathname === item.href;
         const Icon = item.icon;
 

@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 const PAGE_SIZE = 13; 
 
 export async function GET(req: NextRequest) {
   try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Nao autenticado" }, { status: 401 });
+    }
+
+    if (user.role === "USER") {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(req.url);
     const cnpj = (searchParams.get("cnpj") ?? "").trim();
 
