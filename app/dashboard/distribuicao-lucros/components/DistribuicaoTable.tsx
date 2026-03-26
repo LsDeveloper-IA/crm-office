@@ -14,10 +14,8 @@ import { useState } from "react";
 type Row = {
   companyCnpj: string;
   companyName: string;
-
   partnerId: number;
   partnerName: string;
-
   participationPercentage?: number | null;
   amount?: number | null;
   status?: string;
@@ -85,6 +83,7 @@ const statusConfig: Record<
 export function DistribuicaoTable({ rows }: Props) {
   const [data, setData] = useState(rows);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
 
   const [editingRows, setEditingRows] = useState<Record<string, boolean>>({});
   const [originalRows, setOriginalRows] = useState<Record<string, Row>>({});
@@ -105,15 +104,19 @@ export function DistribuicaoTable({ rows }: Props) {
     return `${row.companyCnpj}-${row.partnerId}`;
   }
 
-  // 🔍 FILTRO
+  // ✅ FILTRO FINAL (único e correto)
   const filteredData = data.filter((row) => {
     const term = search.toLowerCase();
 
-    return (
+    const matchSearch =
       row.companyName.toLowerCase().includes(term) ||
       row.partnerName.toLowerCase().includes(term) ||
-      row.companyCnpj.includes(term)
-    );
+      row.companyCnpj.includes(term);
+
+    const matchStatus =
+      !statusFilter || row.status === statusFilter;
+
+    return matchSearch && matchStatus;
   });
 
   function toggleEdit(row: Row, value: boolean) {
@@ -235,12 +238,11 @@ export function DistribuicaoTable({ rows }: Props) {
         }),
       });
 
-      // 🔥 ATUALIZA A TABELA SEM RELOAD
       setData((prev) => [
         ...prev,
         {
           companyCnpj: newPartner.companyCnpj,
-          companyName: newPartner.companyCnpj, // pode melhorar depois
+          companyName: newPartner.companyCnpj,
           partnerId: partner.id,
           partnerName: newPartner.partnerName,
           participationPercentage: Number(newPartner.participationPercentage),
@@ -250,7 +252,6 @@ export function DistribuicaoTable({ rows }: Props) {
         },
       ]);
 
-      // 🔥 LIMPA FORM
       setNewPartner({
         companyCnpj: "",
         partnerName: "",
@@ -273,7 +274,6 @@ export function DistribuicaoTable({ rows }: Props) {
       {/* HEADER */}
       <div className="flex items-center justify-between mb-3 gap-3">
 
-        {/* 🔍 BUSCA */}
         <input
           placeholder="Buscar empresa, sócio ou CNPJ..."
           className="w-full max-w-md border rounded px-3 py-2 text-sm"
@@ -281,13 +281,25 @@ export function DistribuicaoTable({ rows }: Props) {
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        {/* ➕ BOTÃO */}
-        <button
-          className="px-3 py-2 text-sm border rounded-md hover:bg-muted whitespace-nowrap"
-          onClick={() => setIsModalOpen(true)}
-        >
-          + Sócio
-        </button>
+        <div className="flex items-center gap-2">
+          <select
+            className="border rounded px-3 py-2 text-sm"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">Todos status</option>
+            <option value="NAO_ENCERRADO">Não encerrado</option>
+            <option value="ENCERRADO_COM_LUCRO">Enc. lucro</option>
+            <option value="ENCERRADO_COM_PREJUIZO">Enc. prejuízo</option>
+          </select>
+
+          <button
+            className="px-3 py-2 text-sm border rounded-md hover:bg-muted whitespace-nowrap"
+            onClick={() => setIsModalOpen(true)}
+          >
+            + Sócio
+          </button>
+        </div>
       </div>
 
       {/* TABELA */}
