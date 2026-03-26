@@ -519,5 +519,3 @@ async function run() {
 }
 
 run();
-
-ERIKA RIBEIRO ALBUQUERQUE
