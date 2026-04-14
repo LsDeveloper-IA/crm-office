@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+import { sendProfitDistributionEmail } from "@/lib/email";
 
 function normalizeCnpj(value: string) {
   return value.replace(/\D/g, "");
@@ -96,8 +97,8 @@ export async function POST(request: NextRequest) {
       ? normalizeDate(new Date(body.referenceDate))
       : null;
 
-    const participationPercentage = body.participationPercentage;
-    const amount = body.amount;
+    const participationPercentage = Number(body.participationPercentage);
+    const amount = Number(body.amount);
 
     const status = body.status ?? "NAO_ENCERRADO";
 
@@ -107,21 +108,15 @@ export async function POST(request: NextRequest) {
         : null;
 
     /* =====================
-       VALIDAÇÕES
+       ✅ VALIDAÇÕES ANTES
     ===================== */
 
     if (!companyCnpj || companyCnpj.length !== 14) {
-      return NextResponse.json(
-        { error: "CNPJ inválido" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "CNPJ inválido" }, { status: 400 });
     }
 
     if (!partnerId || Number.isNaN(partnerId)) {
-      return NextResponse.json(
-        { error: "Sócio inválido" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Sócio inválido" }, { status: 400 });
     }
 
     if (!referenceDate) {
@@ -131,18 +126,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (Number.isNaN(Number(participationPercentage))) {
-      return NextResponse.json(
-        { error: "Percentual inválido" },
-        { status: 400 }
-      );
+    if (Number.isNaN(participationPercentage)) {
+      return NextResponse.json({ error: "Percentual inválido" }, { status: 400 });
     }
 
-    if (Number.isNaN(Number(amount))) {
-      return NextResponse.json(
-        { error: "Valor inválido" },
-        { status: 400 }
-      );
+    if (Number.isNaN(amount)) {
+      return NextResponse.json({ error: "Valor inválido" }, { status: 400 });
     }
 
     const allowedStatus = [
@@ -152,29 +141,25 @@ export async function POST(request: NextRequest) {
     ];
 
     if (!allowedStatus.includes(status)) {
-      return NextResponse.json(
-        { error: "Status inválido" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Status inválido" }, { status: 400 });
     }
 
     /* =====================
-       VALIDA EXISTÊNCIA
+       🔍 BUSCA REGISTRO ANTIGO
     ===================== */
 
-    const partner = await prisma.profitPartner.findUnique({
-      where: { id: partnerId },
+    const existing = await prisma.profitDistribution.findUnique({
+      where: {
+        companyCnpj_partnerId_referenceDate: {
+          companyCnpj,
+          partnerId,
+          referenceDate,
+        },
+      },
     });
 
-    if (!partner) {
-      return NextResponse.json(
-        { error: "Sócio não encontrado" },
-        { status: 404 }
-      );
-    }
-
     /* =====================
-       UPSERT
+       💾 UPSERT
     ===================== */
 
     const result = await prisma.profitDistribution.upsert({
@@ -201,20 +186,32 @@ export async function POST(request: NextRequest) {
         status,
       },
       include: {
-        company: {
-          select: {
-            cnpj: true,
-            name: true,
-          },
-        },
-        partner: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        company: true,
+        partner: true,
       },
     });
+
+    /* =====================
+       📩 EMAIL INTELIGENTE
+    ===================== */
+
+    const oldStatus = existing?.status;
+
+    const virouEncerrado =
+      status === "ENCERRADO_COM_LUCRO" ||
+      status === "ENCERRADO_COM_PREJUIZO";
+
+    const mudouStatus = oldStatus !== status;
+
+    if (virouEncerrado && mudouStatus) {
+      await sendProfitDistributionEmail({
+        companyName: result.company.name ?? "-",
+        companyCnpj: result.companyCnpj,
+        partnerName: result.partner.name,
+        status: result.status,
+        amount: Number(result.amount),
+      });
+    }
 
     return NextResponse.json(result);
 
