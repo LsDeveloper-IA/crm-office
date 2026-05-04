@@ -6,11 +6,6 @@ import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { DistribuicaoTable } from "./components/DistribuicaoTable";
 import { ProfitDistributionStatus } from "@prisma/client";
-import { normalizeProfitDistributionStatus } from "@/lib/profit-distribution-status";
-
-function normalizeDate(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), 1);
-}
 
 function safeString(value?: string | null) {
   return value?.trim() || "-";
@@ -19,8 +14,6 @@ function safeString(value?: string | null) {
 export default async function Dashboard() {
   const user = await getCurrentUser();
   if (!user) return redirect("/");
-
-  const selectedDate = normalizeDate(new Date());
 
   const companies = await prisma.company.findMany({
     select: {
@@ -32,9 +25,12 @@ export default async function Dashboard() {
           id: true,
           name: true,
 
-          // 🔥 BUSCA DIRETA E SEGURA
+          // 🔥 PEGA O MAIS RECENTE SEM DATA
           distributions: {
-            take: 1, // 🔥 GARANTE 1 SÓ
+            orderBy: {
+              id: "desc", // ou createdAt se tiver
+            },
+            take: 1,
           },
         },
       },
