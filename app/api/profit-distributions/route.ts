@@ -1,9 +1,9 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
+import { Prisma, ProfitDistributionStatus } from "@prisma/client";
 import { sendProfitDistributionEmail } from "@/lib/email";
 import { getProfitDistributionStatusOrNull } from "@/lib/profit-distribution-status";
-import { ProfitDistributionStatus } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 function normalizeCnpj(value: string) {
   return value.replace(/\D/g, "");
@@ -71,7 +71,6 @@ export async function GET(request: NextRequest) {
     }));
 
     return NextResponse.json(resultado);
-
   } catch (error: unknown) {
     return NextResponse.json(
       {
@@ -113,7 +112,7 @@ export async function POST(request: NextRequest) {
         : null;
 
     /* =====================
-       ✅ VALIDAÇÕES ANTES
+       ✅ VALIDAÇÕES
     ===================== */
 
     if (!companyCnpj || companyCnpj.length !== 14) {
@@ -132,7 +131,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (Number.isNaN(participationPercentage)) {
-      return NextResponse.json({ error: "Percentual inválido" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Percentual inválido" },
+        { status: 400 }
+      );
     }
 
     if (Number.isNaN(amount)) {
@@ -191,7 +193,7 @@ export async function POST(request: NextRequest) {
     });
 
     /* =====================
-       📩 EMAIL INTELIGENTE
+       📩 EMAIL (SÓ SE MUDOU)
     ===================== */
 
     const oldStatus = existing?.status;
@@ -212,8 +214,13 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json(result);
+    /* =====================
+       🔥 REVALIDA CACHE (ESSENCIAL)
+    ===================== */
 
+    revalidatePath("/dashboard/distribuicao-lucros");
+
+    return NextResponse.json(result);
   } catch (error: unknown) {
     return NextResponse.json(
       {
