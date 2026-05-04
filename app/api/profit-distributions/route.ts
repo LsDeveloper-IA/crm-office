@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { sendProfitDistributionEmail } from "@/lib/email";
+import { getProfitDistributionStatusOrNull } from "@/lib/profit-distribution-status";
+import { ProfitDistributionStatus } from "@prisma/client";
 
 function normalizeCnpj(value: string) {
   return value.replace(/\D/g, "");
@@ -100,7 +102,10 @@ export async function POST(request: NextRequest) {
     const participationPercentage = Number(body.participationPercentage);
     const amount = Number(body.amount);
 
-    const status = body.status ?? "NAO_ENCERRADO";
+    const status =
+      body.status == null
+        ? ProfitDistributionStatus.NAO_ENCERRADO
+        : getProfitDistributionStatusOrNull(body.status);
 
     const observation =
       body.observation && String(body.observation).trim() !== ""
@@ -134,13 +139,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Valor inválido" }, { status: 400 });
     }
 
-    const allowedStatus = [
-      "NAO_ENCERRADO",
-      "ENCERRADO_COM_LUCRO",
-      "ENCERRADO_COM_PREJUIZO",
-    ];
-
-    if (!allowedStatus.includes(status)) {
+    if (!status) {
       return NextResponse.json({ error: "Status inválido" }, { status: 400 });
     }
 
@@ -198,8 +197,8 @@ export async function POST(request: NextRequest) {
     const oldStatus = existing?.status;
 
     const virouEncerrado =
-      status === "ENCERRADO_COM_LUCRO" ||
-      status === "ENCERRADO_COM_PREJUIZO";
+      status === ProfitDistributionStatus.ENCERRADO_COM_LUCRO ||
+      status === ProfitDistributionStatus.ENCERRADO_COM_PREJUIZO;
 
     const mudouStatus = oldStatus !== status;
 

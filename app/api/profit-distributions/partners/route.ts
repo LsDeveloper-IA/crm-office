@@ -125,9 +125,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(partner, { status: 201 });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: error.message ?? "Erro ao criar sócio" },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Erro ao criar sócio",
+      },
       { status: 500 }
     );
   }

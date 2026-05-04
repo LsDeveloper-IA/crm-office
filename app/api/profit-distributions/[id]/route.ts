@@ -1,11 +1,19 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { getProfitDistributionStatusOrNull } from "@/lib/profit-distribution-status";
+import { ProfitDistributionStatus } from "@prisma/client";
+
+type Params = {
+  params: Promise<{
+    id: string;
+  }>;
+};
 
 export async function GET(
   _: NextRequest,
-  context: any
+  { params }: Params
 ) {
-  const { id } = context.params;
+  const { id } = await params;
   const numericId = Number(id);
 
   if (Number.isNaN(numericId)) {
@@ -57,9 +65,9 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  context: any
+  { params }: Params
 ) {
-  const { id } = context.params;
+  const { id } = await params;
   const numericId = Number(id);
 
   if (Number.isNaN(numericId)) {
@@ -75,7 +83,7 @@ export async function PATCH(
     const data: {
       participationPercentage?: number;
       amount?: number;
-      status?: "NAO_ENCERRADO" | "ENCERRADO_COM_LUCRO" | "ENCERRADO_COM_PREJUIZO";
+      status?: ProfitDistributionStatus;
       observation?: string | null;
     } = {};
 
@@ -102,20 +110,16 @@ export async function PATCH(
     }
 
     if (body.status !== undefined) {
-      const allowedStatus = [
-        "NAO_ENCERRADO",
-        "ENCERRADO_COM_LUCRO",
-        "ENCERRADO_COM_PREJUIZO",
-      ];
+      const normalizedStatus = getProfitDistributionStatusOrNull(body.status);
 
-      if (!allowedStatus.includes(body.status)) {
+      if (!normalizedStatus) {
         return NextResponse.json(
           { error: "Status inválido" },
           { status: 400 }
         );
       }
 
-      data.status = body.status;
+      data.status = normalizedStatus;
     }
 
     if (body.observation !== undefined) {
@@ -161,9 +165,9 @@ export async function PATCH(
 
 export async function DELETE(
   _: NextRequest,
-  context: any
+  { params }: Params
 ) {
-  const { id } = context.params;
+  const { id } = await params;
   const numericId = Number(id);
 
   if (Number.isNaN(numericId)) {

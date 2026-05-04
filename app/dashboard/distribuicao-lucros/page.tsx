@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { DistribuicaoTable } from "./components/DistribuicaoTable";
 import { ProfitDistributionStatus } from "@prisma/client";
+import { normalizeProfitDistributionStatus } from "@/lib/profit-distribution-status";
 
 function normalizeDate(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
@@ -30,10 +31,10 @@ export default async function Dashboard() {
         select: {
           id: true,
           name: true,
+
+          // 🔥 BUSCA DIRETA E SEGURA
           distributions: {
-            where: {
-              referenceDate: selectedDate,
-            },
+            take: 1, // 🔥 GARANTE 1 SÓ
           },
         },
       },
@@ -55,7 +56,7 @@ export default async function Dashboard() {
     // =========================
     if (c.profitPartners.length > 0) {
       return c.profitPartners.map((p) => {
-        const dist = p.distributions?.[0];
+        const dist = p.distributions[0];
 
         return {
           companyCnpj: c.cnpj,
@@ -64,17 +65,17 @@ export default async function Dashboard() {
           partnerId: p.id,
           partnerName: safeString(p.name),
 
-          participationPercentage: dist?.participationPercentage != null
-            ? Number(dist.participationPercentage)
-            : null,
+          participationPercentage:
+            dist?.participationPercentage != null
+              ? Number(dist.participationPercentage)
+              : null,
 
-          amount: dist?.amount != null
-            ? Number(dist.amount)
-            : null,
+          amount:
+            dist?.amount != null
+              ? Number(dist.amount)
+              : null,
 
-          status:
-            dist?.status ??
-            ProfitDistributionStatus.NAO_ENCERRADO,
+          status: dist?.status ?? ProfitDistributionStatus.NAO_ENCERRADO,
 
           observation: safeString(dist?.observation ?? ""),
         };
@@ -82,14 +83,14 @@ export default async function Dashboard() {
     }
 
     // =========================
-    // ⚠️ FALLBACK RECEITA (QSA)
+    // ⚠️ FALLBACK RECEITA
     // =========================
     if (c.qsas.length > 0) {
       return c.qsas.map((qsa, index) => ({
         companyCnpj: c.cnpj,
         companyName,
 
-        partnerId: -(index + 1), // evita conflito com DB
+        partnerId: -(index + 1),
         partnerName: safeString(qsa.nome),
 
         participationPercentage: null,
