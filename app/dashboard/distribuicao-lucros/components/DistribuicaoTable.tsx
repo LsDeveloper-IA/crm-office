@@ -372,13 +372,43 @@ export function DistribuicaoTable({ rows }: Props) {
                   </TableCell>
 
                   <TableCell className="text-center">
-                    <span className={`px-2 py-1 text-xs rounded border ${status.className}`}>
-                      {status.label}
-                    </span>
+                    {isEditing ? (
+                      <select
+                        className="w-full border rounded px-2 py-1"
+                        value={row.status}
+                        onChange={(e) =>
+                          updateRow(row, {
+                            status: e.target.value as ProfitDistributionStatus,
+                          })
+                        }
+                      >
+                        {PROFIT_DISTRIBUTION_STATUS_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.shortLabel}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className={`px-2 py-1 text-xs rounded border ${status.className}`}>
+                        {status.label}
+                      </span>
+                    )}
                   </TableCell>
 
                   <TableCell className="truncate">
-                    {row.observation ?? "-"}
+                    {isEditing ? (
+                      <input
+                        className="w-full border rounded px-2 py-1"
+                        value={row.observation ?? ""}
+                        onChange={(e) =>
+                          updateRow(row, {
+                            observation: e.target.value,
+                          })
+                        }
+                      />
+                    ) : (
+                      row.observation ?? "-"
+                    )}
                   </TableCell>
 
                   <TableCell className="text-center">
