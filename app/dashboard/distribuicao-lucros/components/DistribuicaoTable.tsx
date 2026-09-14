@@ -518,9 +518,9 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
                     {row.month == null ? (
                       <span title="Opção mais selecionada nos meses">
                         {DIVIDEND_TAXATION_OPTIONS.find((option) => option.value === majorityTaxation)?.label
-                          ?? (majorityTaxation === "EMPATE" ? "Empate" : "Sem seleção")}
+                          ?? (majorityTaxation === "EMPATE" ? "Empate" : "--")}
                       </span>
-                    ) : (
+                    ) : isMonthlyEditing ? (
                       <select
                         disabled={isLoading}
                         className="w-full border rounded px-2 py-1 disabled:opacity-100"
@@ -528,19 +528,17 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
                         value={row.dividendTaxation ?? ""}
                         onChange={(event) => {
                           const value = event.target.value;
-                          if (row.month == null || (value !== "" && !isDividendTaxation(value))) return;
-                          if (!isEditing) {
-                            const parent = summaries.find((item) => groupKey(item) === groupKey(row));
-                            if (parent) toggleEdit(parent, true);
-                          }
+                          if (!isMonthlyEditing || (value !== "" && !isDividendTaxation(value))) return;
                           updateRow(row, { dividendTaxation: value === "" ? null : value as DividendTaxationValue });
                         }}
                       >
-                        <option value="">Selecione</option>
+                        <option value="">--</option>
                         {DIVIDEND_TAXATION_OPTIONS.map((option) => (
                           <option key={option.value} value={option.value}>{option.label}</option>
                         ))}
                       </select>
+                    ) : (
+                      DIVIDEND_TAXATION_OPTIONS.find((option) => option.value === row.dividendTaxation)?.label ?? "--"
                     )}
                   </TableCell>
 
