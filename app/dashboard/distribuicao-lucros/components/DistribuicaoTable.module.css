@@ -2,62 +2,75 @@
   container-type: inline-size;
   min-width: 0;
   width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
 }
-
-.table th,
-.table td {
+.table { color: #334155; }
+.table th, .table td {
   white-space: normal;
   overflow-wrap: anywhere;
-  padding: 0.5rem 0.375rem;
+  padding: 0.75rem 0.625rem;
 }
-
-.table input:not([type="radio"]),
-.table select {
-  min-width: 0;
-  max-width: 100%;
+.table th {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 600;
+  height: 3.25rem;
 }
-
+.table tbody tr { border-color: #edf1f5; }
+.table .summaryRow { background: #fff; }
+.table .summaryRow:hover { background: #f8faff; }
+.table .summaryRow td { padding-top: 1rem; padding-bottom: 1rem; }
+.companyName { display: block; color: #1e293b; font-weight: 600; line-height: 1.5; }
+.summaryCaption { display: block; margin-top: 0.2rem; color: #64748b; font-size: 0.6875rem; font-weight: 400; }
+.table .monthRow { background: #f8fafc; }
+.table .monthRow:hover { background: #f1f5f9; }
+.table .monthRow td { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+.table .monthCell { border-left: 3px solid #cbd5e1; padding-left: 7rem; }
+.monthLabel { display: flex; align-items: center; gap: 0.75rem; text-align: left; }
+.monthNumber { color: #64748b; font-size: 0.6875rem; font-variant-numeric: tabular-nums; }
+.annualAmount { color: #0f172a; font-weight: 700; white-space: nowrap !important; }
+.monthAmount { font-weight: 500; white-space: nowrap !important; }
+.observation { color: #64748b; font-size: 0.75rem; }
+.statusBadge { display: inline-block; max-width: 100%; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.6875rem; font-weight: 500; line-height: 1.5; background: #f1f5f9; color: #475569; }
+.statusBadge[data-status="ENCERRADO_COM_LUCRO"] { background: #e7f5ee; color: #166534; }
+.statusBadge[data-status="ENCERRADO_COM_PREJUIZO"] { background: #fff1f2; color: #9f1239; }
+.statusBadge[data-status="NAO_ENCERRADO"] { background: #fff5df; color: #92400e; }
+.expandButton, .actionButton, .saveButton { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; flex-shrink: 0; border-radius: 7px; border: 1px solid #dbe3ee; color: #475569; background: #fff; cursor: pointer; }
+.expandButton { width: 1.625rem; height: 1.625rem; }
+.actionButton:hover, .expandButton:hover { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+.saveButton { background: #2563eb; border-color: #2563eb; color: white; }
+.saveButton:hover { background: #1d4ed8; }
+.monthSaveButton { border-radius: 6px; padding: 0.3rem 0.45rem; color: #1d4ed8; background: #eff6ff; font-size: 0.75rem; cursor: pointer; }
+.table button:focus-visible, .table input:focus-visible, .table select:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+.table button:disabled { opacity: 0.45; cursor: not-allowed; }
+.table input:not([type="radio"]), .table select { min-width: 0; max-width: 100%; background: white; border-color: #cbd5e1; border-radius: 6px; }
+.table tr[data-editing="true"] { background: #f5f9ff; }
+.table tr[data-dirty="true"] .monthCell { border-left-color: #d97706; }
+.unsaved { border-radius: 4px; background: #fef3c7; color: #92400e; padding: 0.15rem 0.4rem; font-size: 0.625rem; white-space: nowrap; }
 @container (max-width: 900px) {
-  .table,
-  .table tbody {
-    display: block;
-    width: 100%;
-  }
+  .table, .table tbody { display: block; width: 100%; }
+  .table thead { display: none; }
+  .table tr { display: block; margin: 0.5rem; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.5rem; }
+  .table td { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; width: 100%; text-align: right; }
+  .table td[data-label]::before { content: attr(data-label); flex: 0 0 36%; text-align: left; font-weight: 500; color: #64748b; font-size: 0.75rem; }
+  .table td[data-empty="true"] { display: none; }
+  .table td > * { min-width: 0; max-width: 60%; }
+  .table .monthCell { padding-left: 0.625rem; }
+  .monthLabel { flex-wrap: wrap; justify-content: flex-end; gap: 0.4rem; }
+  .table .summaryRow td { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+}
 
-  .table thead {
-    display: none;
-  }
-
-  .table tr {
-    display: block;
-    margin-bottom: 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    padding: 0.5rem;
-  }
-
-  .table td {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    width: 100%;
-    text-align: right;
-  }
-
-  .table td[data-label]::before {
-    content: attr(data-label);
-    flex: 0 0 36%;
-    text-align: left;
-    font-weight: 500;
-  }
-
-  .table td[data-empty="true"] {
-    display: none;
-  }
-
-  .table td > * {
-    min-width: 0;
-    max-width: 60%;
-  }
+.table .percentageInput {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.375rem;
+  border: 1px solid #94a3b8;
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: #0f172a;
 }

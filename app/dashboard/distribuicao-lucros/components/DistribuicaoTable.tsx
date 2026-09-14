@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ChevronDown, ChevronRight, Pencil, Check, X, LoaderCircle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Dialog, DialogPopup, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -420,13 +421,13 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
           <TableHeader>
             <TableRow>
               <TableHead className="w-[3%]">#</TableHead>
-              <TableHead className="w-[19%]">Empresa</TableHead>
+              <TableHead className="w-[17%]">Empresa</TableHead>
               <TableHead className="w-[14%]">Sócio</TableHead>
-              <TableHead className="w-[5%] text-center">%</TableHead>
+              <TableHead className="w-[8%] text-center">%</TableHead>
               <TableHead className="w-[13%] text-center">Tributação de Dividendos</TableHead>
               <TableHead className="w-[12%] text-right">Valor</TableHead>
               <TableHead className="w-[13%] text-center">Status</TableHead>
-              <TableHead className="w-[14%]">Observação</TableHead>
+              <TableHead className="w-[13%]">Observação</TableHead>
               <TableHead className="w-[7%] text-center">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -455,9 +456,9 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
                 PROFIT_DISTRIBUTION_STATUS_CONFIG[row.status!];
 
               return (
-                <TableRow key={key} className={row.month != null ? "bg-muted/20" : undefined}>
+                <TableRow key={key} className={row.month != null ? styles.monthRow : styles.summaryRow} data-editing={isEditing || undefined} data-dirty={dirtyKeys.has(key) || undefined}>
                   {row.month != null ? (
-                    <TableCell data-label="Mês" colSpan={3} className="pl-12">{MONTHS[row.month]}{dirtyKeys.has(key) && <span className="ml-2 text-xs text-amber-800">Pendente</span>}</TableCell>
+                    <TableCell data-label="Mês" colSpan={3} className={styles.monthCell}><div className={styles.monthLabel}><span className={styles.monthNumber}>{String(row.month + 1).padStart(2, "0")}</span><span>{MONTHS[row.month]}</span>{dirtyKeys.has(key) && <span className={styles.unsaved}>Não salvo</span>}</div></TableCell>
                   ) : (
                     <>
                       <TableCell data-label="#">{pageStart + index + 1}</TableCell>
@@ -465,14 +466,14 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
                         <div className="flex min-w-0 items-center gap-2">
                           <button
                             type="button"
-                            className="flex size-6 shrink-0 items-center justify-center rounded border hover:bg-muted focus-visible:outline-2"
+                            className={styles.expandButton}
                             aria-expanded={!!expandedRows[key]}
                             aria-label={`${expandedRows[key] ? "Recolher" : "Expandir"} meses de ${row.companyName}, ${row.partnerName}`}
                             onClick={() => setExpandedRows((prev) => ({ ...prev, [key]: !prev[key] }))}
                           >
-                            {expandedRows[key] ? "−" : "+"}
+                            {expandedRows[key] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                           </button>
-                          <span className="min-w-0" title={row.companyName}>{row.companyName}</span>
+                          <div className="min-w-0"><span className={styles.companyName} title={row.companyName}>{row.companyName}</span><span className={styles.summaryCaption}>Resumo anual · {year}</span></div>
                         </div>
                       </TableCell>
                       <TableCell data-label="Sócio">{row.partnerName}</TableCell>
@@ -482,30 +483,30 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
                   <TableCell data-label={row.month == null ? "%" : undefined} data-empty={row.month != null ? "true" : undefined} className="text-center">
                     {row.month != null ? null : isEditing ? (
                       <input
-                        type="number"
-                        inputMode="decimal"
-                        step="0.01"
-                        min="0"
-                        max="100"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={3}
                         aria-label={`Porcentagem de ${row.partnerName} em ${year}`}
-                        title="Aplicada a todos os meses deste sócio no ano selecionado"
+                        title="Digite um numero inteiro de 0 a 100. Aplicado a todos os meses deste socio."
                         disabled={isLoading}
-                        className="w-full border rounded px-2 py-1"
+                        className={styles.percentageInput}
                         value={row.participationPercentage ?? ""}
                         onKeyDown={(event) => {
-                          if (["e", "E", "+", "-"].includes(event.key)
+                          if (event.key.length === 1 && !/^[0-9]$/.test(event.key)
                             && !event.ctrlKey && !event.metaKey) event.preventDefault();
                         }}
                         onPaste={(event) => {
-                          if (!/^\d+(?:[.,]\d+)?$/.test(event.clipboardData.getData("text").trim())) {
+                          const pasted = event.clipboardData.getData("text");
+                          if (!/^[0-9]+$/.test(pasted) || Number(pasted) > 100) {
                             event.preventDefault();
                           }
                         }}
                         onChange={(event) => {
                           const value = event.target.value;
-                          if (value !== "" && !/^\d*(?:[.,]\d*)?$/.test(value)) return;
+                          if (!/^[0-9]*$/.test(value) || Number(value) > 100) return;
                           updateRow(row, {
-                            participationPercentage: value === "" ? null : Number(value.replace(",", ".")),
+                            participationPercentage: value === "" ? null : Number(value),
                           });
                         }}
                       />
@@ -542,7 +543,7 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
                     )}
                   </TableCell>
 
-                  <TableCell data-label="Valor" className="text-right tabular-nums">
+                  <TableCell data-label="Valor" className={`text-right tabular-nums ${row.month == null ? styles.annualAmount : styles.monthAmount}`}>
                     {isMonthlyEditing ? (
                       <input
                         disabled={isLoading}
@@ -586,7 +587,7 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
                         ))}
                       </select>
                     ) : (
-                      <span className={`inline-block max-w-full px-2 py-1 text-xs rounded border ${status.className}`}>
+                      <span className={styles.statusBadge} data-status={row.status}>
                         {status.label}
                       </span>
                     )}
@@ -605,21 +606,21 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
                         }
                       />
                     ) : (
-                      row.observation ?? "-"
+                      <span className={styles.observation}>{row.observation?.trim() || "--"}</span>
                     )}
                   </TableCell>
 
                   <TableCell data-label="Ações" className="text-center">
                     {row.month != null ? (isEditing && (
-                      <button type="button" title={`Salvar ${MONTHS[row.month]}`} aria-label={`Salvar ${MONTHS[row.month]}`} disabled={loadingRow !== null || isCreatingPartner} onClick={() => saveRow(row)}>Salvar</button>
+                      <button type="button" className={styles.monthSaveButton} title={`Salvar ${MONTHS[row.month]}`} aria-label={`Salvar ${MONTHS[row.month]}`} disabled={loadingRow !== null || isCreatingPartner} onClick={() => saveRow(row)}>Salvar</button>
                     )) : !isEditing ? (
-                      <button type="button" title="Editar" aria-label="Editar" onClick={() => toggleEdit(row, true)}>✏️</button>
+                      <button type="button" className={styles.actionButton} title="Editar" aria-label="Editar" onClick={() => toggleEdit(row, true)}><Pencil size={15} /></button>
                     ) : (
                       <div className="flex flex-wrap gap-1 justify-center">
-                        <button type="button" title="Salvar meses alterados" aria-label="Salvar meses alterados" disabled={loadingRow !== null || isCreatingPartner} onClick={() => saveRow(row)}>
-                          {isLoading ? "..." : "💾"}
+                        <button type="button" className={styles.saveButton} title="Salvar meses alterados" aria-label="Salvar meses alterados" disabled={loadingRow !== null || isCreatingPartner} onClick={() => saveRow(row)}>
+                          {isLoading ? <LoaderCircle size={15} className="animate-spin" /> : <Check size={15} />}
                         </button>
-                        <button type="button" aria-label="Cancelar todas as alterações" disabled={isLoading} onClick={() => cancelEdit(row)}>❌</button>
+                        <button type="button" className={styles.actionButton} aria-label="Cancelar todas as alterações" disabled={isLoading} onClick={() => cancelEdit(row)}><X size={15} /></button>
                       </div>
                     )}
                   </TableCell>
