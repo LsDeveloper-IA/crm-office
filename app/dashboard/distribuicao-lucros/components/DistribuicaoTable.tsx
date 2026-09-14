@@ -492,6 +492,12 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
                         disabled={isLoading}
                         className={styles.percentageInput}
                         value={row.participationPercentage ?? ""}
+                        onFocus={(event) => {
+                          const input = event.currentTarget;
+                          requestAnimationFrame(() => {
+                            if (document.activeElement === input) input.select();
+                          });
+                        }}
                         onKeyDown={(event) => {
                           if (event.key.length === 1 && !/^[0-9]$/.test(event.key)
                             && !event.ctrlKey && !event.metaKey) event.preventDefault();
