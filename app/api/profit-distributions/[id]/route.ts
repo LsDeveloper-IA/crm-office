@@ -1,3 +1,6 @@
+import { requireDistributionUser } from "@/lib/profit-distribution-auth";
+import { isValidDistributionNumber } from "@/lib/profit-distribution-input";
+import { isDividendTaxation, type DividendTaxationValue } from "@/lib/dividend-taxation";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { getProfitDistributionStatusOrNull } from "@/lib/profit-distribution-status";
@@ -13,10 +16,13 @@ export async function GET(
   _: NextRequest,
   { params }: Params
 ) {
+  const denied = await requireDistributionUser();
+  if (denied) return denied;
+
   const { id } = await params;
   const numericId = Number(id);
 
-  if (Number.isNaN(numericId)) {
+  if ((!Number.isSafeInteger(numericId) || numericId <= 0)) {
     return NextResponse.json(
       { error: "Id inválido" },
       { status: 400 }
@@ -67,10 +73,13 @@ export async function PATCH(
   request: NextRequest,
   { params }: Params
 ) {
+  const denied = await requireDistributionUser();
+  if (denied) return denied;
+
   const { id } = await params;
   const numericId = Number(id);
 
-  if (Number.isNaN(numericId)) {
+  if ((!Number.isSafeInteger(numericId) || numericId <= 0)) {
     return NextResponse.json(
       { error: "Id inválido" },
       { status: 400 }
@@ -78,35 +87,46 @@ export async function PATCH(
   }
 
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "Corpo da requisicao invalido" }, { status: 400 });
+    }
 
     const data: {
-      participationPercentage?: number;
-      amount?: number;
+      participationPercentage?: number | null;
+      amount?: number | null;
+      dividendTaxation?: DividendTaxationValue | null;
       status?: ProfitDistributionStatus;
       observation?: string | null;
     } = {};
 
+    if (body.dividendTaxation !== undefined) {
+      if (body.dividendTaxation !== null && !isDividendTaxation(body.dividendTaxation)) {
+        return NextResponse.json({ error: "Tributação de dividendos inválida" }, { status: 400 });
+      }
+      data.dividendTaxation = body.dividendTaxation;
+    }
+
     if (body.participationPercentage !== undefined) {
-      if (Number.isNaN(Number(body.participationPercentage))) {
+      if (!isValidDistributionNumber(body.participationPercentage, 0, 100)) {
         return NextResponse.json(
           { error: "Percentual inválido" },
           { status: 400 }
         );
       }
 
-      data.participationPercentage = Number(body.participationPercentage);
+      data.participationPercentage = body.participationPercentage == null || body.participationPercentage === "" ? null : Number(body.participationPercentage);
     }
 
     if (body.amount !== undefined) {
-      if (Number.isNaN(Number(body.amount))) {
+      if (!isValidDistributionNumber(body.amount, -9999999999999.99, 9999999999999.99)) {
         return NextResponse.json(
           { error: "Valor inválido" },
           { status: 400 }
         );
       }
 
-      data.amount = Number(body.amount);
+      data.amount = body.amount == null || body.amount === "" ? null : Number(body.amount);
     }
 
     if (body.status !== undefined) {
@@ -167,10 +187,13 @@ export async function DELETE(
   _: NextRequest,
   { params }: Params
 ) {
+  const denied = await requireDistributionUser();
+  if (denied) return denied;
+
   const { id } = await params;
   const numericId = Number(id);
 
-  if (Number.isNaN(numericId)) {
+  if ((!Number.isSafeInteger(numericId) || numericId <= 0)) {
     return NextResponse.json(
       { error: "Id inválido" },
       { status: 400 }

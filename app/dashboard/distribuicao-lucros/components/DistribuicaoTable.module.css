@@ -1,0 +1,63 @@
+.container {
+  container-type: inline-size;
+  min-width: 0;
+  width: 100%;
+}
+
+.table th,
+.table td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  padding: 0.5rem 0.375rem;
+}
+
+.table input:not([type="radio"]),
+.table select {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@container (max-width: 900px) {
+  .table,
+  .table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    text-align: right;
+  }
+
+  .table td[data-label]::before {
+    content: attr(data-label);
+    flex: 0 0 36%;
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .table td[data-empty="true"] {
+    display: none;
+  }
+
+  .table td > * {
+    min-width: 0;
+    max-width: 60%;
+  }
+}

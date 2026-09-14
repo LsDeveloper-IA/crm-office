@@ -1,7 +1,5 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function sendProfitDistributionEmail(data: {
   companyName: string;
   companyCnpj: string;
@@ -9,9 +7,17 @@ export async function sendProfitDistributionEmail(data: {
   status: string;
   amount?: number | null;
 }) {
-  await resend.emails.send({
+  const apiKey = process.env.RESEND_API_KEY;
+  const recipients = process.env.EMAIL_TO?.split(",").map((email) => email.trim()).filter(Boolean);
+  if (!apiKey || !recipients?.length) {
+    console.warn("Profit distribution email skipped: missing email configuration.");
+    return;
+  }
+
+  const resend = new Resend(apiKey);
+  const { error } = await resend.emails.send({
     from: "CRM-OFFICE <tecnologia@office-ce.com.br>",
-    to: process.env.EMAIL_TO!.split(","),
+    to: recipients,
     subject: "🚨 Distribuição de lucro encerrada",
     html: `
       <h2>Distribuição de lucro atualizada</h2>
@@ -23,4 +29,5 @@ export async function sendProfitDistributionEmail(data: {
       <p><strong>Valor:</strong> ${data.amount ?? "-"}</p>
     `,
   });
+  if (error) throw new Error(error.message);
 }

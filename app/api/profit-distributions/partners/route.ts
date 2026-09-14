@@ -1,12 +1,17 @@
+import { requireDistributionUser } from "@/lib/profit-distribution-auth";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
-function normalizeCnpj(value: string) {
-  return value.replace(/\D/g, "");
+function normalizeCnpj(value: unknown) {
+  return typeof value === "string" ? value.replace(/\D/g, "") : "";
 }
 
 // GET /api/profit-distributions/partners?companyCnpj=...
 export async function GET(request: NextRequest) {
+  const denied = await requireDistributionUser();
+  if (denied) return denied;
+
   const { searchParams } = new URL(request.url);
   const companyCnpjParam = searchParams.get("companyCnpj");
 
@@ -86,8 +91,14 @@ export async function GET(request: NextRequest) {
 
 // POST /api/profit-distributions/partners
 export async function POST(req: NextRequest) {
+  const denied = await requireDistributionUser();
+  if (denied) return denied;
+
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "Corpo da requisicao invalido" }, { status: 400 });
+    }
 
     const companyCnpj = normalizeCnpj(body.companyCnpj ?? "");
     const name = String(body.name ?? "").trim();
@@ -104,6 +115,14 @@ export async function POST(req: NextRequest) {
         { error: "Nome do sócio é obrigatório" },
         { status: 400 }
       );
+    }
+
+    const company = await prisma.company.findUnique({
+      where: { cnpj: companyCnpj },
+      select: { cnpj: true, name: true },
+    });
+    if (!company) {
+      return NextResponse.json({ error: "Empresa não encontrada para o CNPJ informado" }, { status: 400 });
     }
 
     // 🔥 evita duplicado
@@ -123,6 +142,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    revalidatePath("/dashboard/distribuicao-lucros");
     return NextResponse.json(partner, { status: 201 });
 
   } catch (error: unknown) {
