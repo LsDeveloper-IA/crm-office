@@ -1,0 +1,37 @@
+
+> crm-office@0.1.0 predev
+> prisma generate
+
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v7.1.0) to .\node_modules\.pnpm\@prisma+client@7.1.0_prisma_a0886acc89372f6f581245297505cbe3\node_modules\@prisma\client in 277ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+
+> crm-office@0.1.0 dev
+> next dev
+
+   ▲ Next.js 16.0.7 (Turbopack)
+   - Local:         http://localhost:3000
+   - Network:       http://192.168.25.90:3000
+   - Environments: .env
+
+ ✓ Starting...
+Creating turbopack project { dir: 'C:\\Users\\Gabriel\\Documents\\crm-office', testMode: true }
+ ✓ Ready in 1596ms
+ ○ Compiling /dashboard/distribuicao-lucros ...
+ GET /dashboard/distribuicao-lucros 200 in 6.8s (compile: 4.4s, proxy.ts: 80ms, render: 2.3s)
+ GET /api/tax-regimes 200 in 832ms (compile: 722ms, render: 110ms)
+ GET /api/sectors 200 in 878ms (compile: 808ms, render: 70ms)
+ GET /dashboard/distribuicao-lucros 200 in 1908ms (compile: 10ms, proxy.ts: 11ms, render: 1888ms)
+ GET /api/tax-regimes 200 in 69ms (compile: 3ms, render: 66ms)
+ GET /api/sectors 200 in 71ms (compile: 9ms, render: 63ms)
+ ✓ Compiled in 29ms
+ ✓ Compiled in 29ms
+ GET /dashboard/distribuicao-lucros 200 in 1889ms (compile: 14ms, proxy.ts: 6ms, render: 1869ms)
+ GET /api/tax-regimes 200 in 66ms (compile: 4ms, render: 63ms)
+ GET /api/sectors 200 in 74ms (compile: 13ms, render: 60ms)
+[?25h

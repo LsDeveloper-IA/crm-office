@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { GeneralTab, validateForm } from "./tabs/GeneralTab";
 import { SectorsTab } from "./tabs/SectorsTab";
 import { QsaTab } from "./tabs/QsaTab";
@@ -19,9 +19,13 @@ type Props = {
 };
 
 export function CompanyDrawerContent({
-  company,
+  company: initialCompany,
   onClose,
 }: Props) {
+  const [company, setCompany] = useState(initialCompany);
+  const [refreshing, setRefreshing] = useState(false);
+  const refreshLock = useRef(false);
+  const [refreshMessage, setRefreshMessage] = useState("");
   const availableSectors = useSectors();
   const [activeTab, setActiveTab] = useState<Tab>("geral");
   const [isEditing, setIsEditing] = useState(false);
@@ -53,7 +57,35 @@ export function CompanyDrawerContent({
   );
 
   const edit = useCompanyEdit(company.cnpj, initialEditData);
-  
+
+  async function refreshReceita() {
+    if (refreshLock.current || isEditing) return;
+    refreshLock.current = true;
+    setRefreshing(true);
+    setRefreshMessage("");
+    try {
+      const url = `/api/company/${encodeURIComponent(company.cnpj)}`;
+      const response = await fetch(`${url}/receita`, { method: "POST" });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error ?? "Erro ao atualizar dados.");
+      }
+      const details = await fetch(url, { cache: "no-store" });
+      if (!details.ok) throw new Error("Dados salvos. Reabra a empresa para visualizar a atualização.");
+      const updated: CompanyDrawerDTO = await details.json();
+      setCompany(updated);
+      edit.update("name", updated.name);
+      for (const field of ["publicSpace", "number", "district", "city", "state"] as const) {
+        edit.update(field, updated.address?.[field] ?? "");
+      }
+      setRefreshMessage("Dados atualizados com sucesso.");
+    } catch (error) {
+      setRefreshMessage(error instanceof Error ? error.message : "Erro ao atualizar dados.");
+    } finally {
+      refreshLock.current = false;
+      setRefreshing(false);
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex">
@@ -65,6 +97,16 @@ export function CompanyDrawerContent({
           <p className="text-sm text-muted-foreground">
             CNPJ: {company.cnpj}
           </p>
+
+          <button
+            type="button"
+            onClick={refreshReceita}
+            disabled={refreshing || isEditing}
+            className="mt-3 rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground disabled:opacity-50"
+          >
+            {refreshing ? "Atualizando..." : "Atualizar Dados (Receita)"}
+          </button>
+          <p role="status" aria-live="polite" className="mt-2 text-sm">{refreshMessage}</p>
 
           <nav className="mt-4 flex gap-2">
             {tabs.map((tab) => (
@@ -119,7 +161,7 @@ export function CompanyDrawerContent({
         {/* FOOTER */}
         <footer className="border-t p-4 flex justify-between">
           {!isEditing ? (
-            <button className="cursor-pointer" onClick={() => setIsEditing(true)}>
+            <button disabled={refreshing} className="cursor-pointer disabled:opacity-50" onClick={() => setIsEditing(true)}>
               Editar
             </button>
           ) : (

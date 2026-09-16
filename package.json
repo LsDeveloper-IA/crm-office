@@ -10,7 +10,12 @@
     "lint": "eslint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
-    "prisma:seed": "ts-node --transpile-only prisma/seed.ts"
+    "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
+    "odbc:sync": "tsx scripts/companies/syncCompaniesFromOdbc.ts",
+    "odbc:sync:watch": "tsx scripts/companies/syncCompaniesFromOdbc.ts --watch",
+    "gmail:sync": "node scripts/gmail/sync.mjs --apply",
+    "gmail:sync:preview": "node scripts/gmail/sync.mjs",
+    "gmail:sync:watch": "node scripts/gmail/sync.mjs --apply --watch --every-days=7"
   },
   "dependencies": {
     "@base-ui-components/react": "1.0.0-rc.0",
@@ -19,6 +24,7 @@
     "@radix-ui/react-dialog": "^1.1.15",
     "@tanstack/angular-table": "^8.21.3",
     "bcryptjs": "^3.0.3",
+    "cheerio": "1.2.0",
     "class-variance-authority": "^0.7.1",
     "cli-progress": "^3.12.0",
     "clsx": "^2.1.1",

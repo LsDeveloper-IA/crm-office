@@ -1,0 +1,6 @@
+Loaded Prisma config from prisma.config.ts.
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+ ⚠ Fast Refresh had to perform a full reload when ./node_modules/.pnpm/@prisma+client@7.1.0_prisma_a0886acc89372f6f581245297505cbe3/node_modules/.prisma/client/index-browser.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`

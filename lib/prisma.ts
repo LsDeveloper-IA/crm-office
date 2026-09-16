@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from '@prisma/adapter-pg';
 
@@ -14,7 +15,7 @@ const adapter = new PrismaPg({
   connectionString,
 });
 
-const prisma = globalThis.__prisma || new PrismaClient({adapter});
+const prisma = globalThis.__prisma || new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== 'production') {
   globalThis.__prisma = prisma;

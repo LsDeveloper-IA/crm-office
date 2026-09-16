@@ -79,6 +79,8 @@ model Company {
   notes               Note[]
   profitDistributions ProfitDistribution[]
   profitPartners      ProfitPartner[]
+  profitSettings      ProfitCompanySettings[]
+  gmailQsaImports     GmailQsaImport[]
 }
 
 /// *
@@ -328,8 +330,22 @@ model ProfitDistribution {
 model ReferenceYear {
   year          Int                  @id
   distributions ProfitDistribution[]
+  companySettings ProfitCompanySettings[]
 
   @@map("AnoReferencia")
+}
+
+model ProfitCompanySettings {
+  companyCnpj             String                   @db.VarChar(14)
+  referenceYear           Int
+  participationPercentage Decimal?                 @db.Decimal(5, 2)
+  dividendTaxation         DividendTaxation?
+  status                  ProfitDistributionStatus @default(NAO_ENCERRADO)
+  observation             String?
+  company                 Company                  @relation(fields: [companyCnpj], references: [cnpj])
+  year                    ReferenceYear            @relation(fields: [referenceYear], references: [year])
+
+  @@id([companyCnpj, referenceYear])
 }
 
 enum DividendTaxation {
@@ -341,9 +357,25 @@ model ProfitPartner {
   id            Int                  @id @default(autoincrement())
   companyCnpj   String               @db.VarChar(14)
   name          String
+  qsaPeriods    Json?
+  knownBeforeGmail Boolean @default(true)
   distributions ProfitDistribution[]
   company       Company              @relation(fields: [companyCnpj], references: [cnpj])
 
+  @@index([companyCnpj])
+}
+
+model GmailQsaImport {
+  id          Int      @id @default(autoincrement())
+  mailbox     String
+  messageId   String
+  companyCnpj String   @db.VarChar(14)
+  sentAt      DateTime
+  payload     Json
+  createdAt   DateTime @default(now())
+  company     Company  @relation(fields: [companyCnpj], references: [cnpj])
+
+  @@unique([mailbox, messageId])
   @@index([companyCnpj])
 }
 

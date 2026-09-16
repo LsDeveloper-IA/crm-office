@@ -98,7 +98,7 @@ test('distribution authorization rejects missing and disabled accounts', async (
 
 test('every distribution endpoint rejects unauthenticated requests before side effects', async () => {
   const denied = { status: 401 };
-  for (const file of ['route.ts', 'partners/route.ts', '[id]/route.ts']) {
+  for (const file of ['route.ts', 'partners/route.ts', '[id]/route.ts', 'company/route.ts']) {
     const api = load(`app/api/profit-distributions/${file}`, {
       '@/lib/profit-distribution-auth': { requireDistributionUser: async () => denied },
       '@/lib/profit-distribution-input': input,
@@ -114,4 +114,49 @@ test('every distribution endpoint rejects unauthenticated requests before side e
       assert.equal(await handler({}, { params: Promise.resolve({ id: '1' }) }), denied);
     }
   }
+});
+
+test('company settings are isolated by company and year and never overwrite partner months', async () => {
+  const records = new Map();
+  let companyExists = true;
+  let yearExists = true;
+  const api = load('app/api/profit-distributions/company/route.ts', {
+    '@/lib/profit-distribution-auth': { requireDistributionUser: async () => null },
+    '@/lib/profit-distribution-input': input,
+    '@/lib/dividend-taxation': { isDividendTaxation: value => ['ISENTO', 'TRIBUTADO'].includes(value) },
+    '@/lib/profit-distribution-status': { isProfitDistributionStatus: value => ['NAO_ENCERRADO', 'ENCERRADO_COM_LUCRO'].includes(value) },
+    '@/lib/prisma': { __esModule: true, default: {
+      company: { findFirst: async () => companyExists ? { cnpj: '12345678000199' } : null },
+      referenceYear: { findUnique: async () => yearExists ? { year: 2025 } : null },
+      profitCompanySettings: { upsert: async ({ where, create, update }) => {
+        const key = JSON.stringify(where.companyCnpj_referenceYear);
+        const saved = records.has(key) ? { ...records.get(key), ...update } : create;
+        assert.equal('amount' in saved, false);
+        assert.equal('partnerId' in saved, false);
+        records.set(key, saved);
+        return saved;
+      } },
+    } },
+    'next/server': { NextResponse: { json: (body, options) => ({ body, status: options?.status ?? 200 }) } },
+    'next/cache': { revalidatePath: () => {} },
+  });
+  const save = changes => api.PUT({ json: async () => ({ companyCnpj: '12345678000199', year: 2025,
+    participationPercentage: null, dividendTaxation: null, status: 'NAO_ENCERRADO', observation: '', ...changes }) });
+  assert.equal((await save({ participationPercentage: 0 })).body.participationPercentage, 0);
+  assert.equal((await save({ participationPercentage: 25.5, dividendTaxation: 'ISENTO', status: 'ENCERRADO_COM_LUCRO', observation: ' Annual ' })).body.observation, 'Annual');
+  assert.equal((await save({ year: 2026 })).status, 200);
+  assert.equal((await save({ companyCnpj: '98765432000199' })).status, 200);
+  assert.equal(records.size, 3);
+  for (const changes of [{ participationPercentage: -1 }, { participationPercentage: 101 }, { participationPercentage: 1.234 },
+    { participationPercentage: undefined }, { status: 'INVALID' }, { dividendTaxation: 'INVALID' },
+    { observation: [] }, { year: '2025' }, { companyCnpj: {} }]) {
+    assert.equal((await save(changes)).status, 400);
+  }
+  assert.equal((await api.PUT({ json: async () => null })).status, 400);
+  companyExists = false;
+  assert.equal((await save({})).status, 404);
+  companyExists = true;
+  yearExists = false;
+  assert.equal((await save({})).status, 400);
+  assert.equal(records.size, 3);
 });

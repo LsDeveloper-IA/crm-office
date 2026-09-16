@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
       take: limit,
       orderBy: { name: "asc" },
       where: {
+        deletedAt: null,
         OR: [
           { name: { contains: q, mode: "insensitive" } },
           ...(qDigits

@@ -23,6 +23,7 @@ test('page reload restores all saved monthly fields and the annual total', async
   }));
   const jsx = (type, props) => ({ type, props });
   const mocks = {
+    '@/lib/partner-periods.mjs': { partnerVisibility: () => ({ visibleMonths: Array.from({ length: 12 }, (_, i) => i), caption: 'Resumo anual' }) },
     '@/lib/profit-distribution-input': { normalizeDistributionSearch: (value) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase() },
     'react/jsx-runtime': { jsx, jsxs: jsx },
     'next/navigation': { redirect: () => assert.fail('Unexpected redirect') },
@@ -36,7 +37,9 @@ test('page reload restores all saved monthly fields and the annual total', async
       assert.equal(selection.take, undefined, 'Must not load only the most recent month');
       assert.equal(selection.where.referenceYear, year);
       assert.equal(selection.where.referenceDate, undefined, 'Modification date must not filter the accounting year');
+      assert.equal(query.select.profitSettings.where.referenceYear, year);
       return [{ cnpj: '12345678000199', name: 'Company', qsas: [{ nome: 'Partner' }, { nome: 'Second partner' }],
+        profitSettings: [{ participationPercentage: '25.50', dividendTaxation: 'ISENTO', status: 'NAO_ENCERRADO', observation: `Company ${year}` }],
         profitPartners: [{ id: 7, name: 'Partner', distributions: [...savedMonths, { ...savedMonths[0], id: 0, amount: "999.00" }] }] }];
     } } } },
   };
@@ -54,6 +57,9 @@ test('page reload restores all saved monthly fields and the annual total', async
     const page = await context.exports.default({ searchParams: Promise.resolve({ year: requestedYear }) });
     const props = page.props.children.props.children.find((child) => child.type === 'MonthlyTable').props;
     assert.equal(props.year, year);
+    assert.equal(props.companySettings['12345678000199'].participationPercentage, 25.5);
+    assert.equal(props.companySettings['12345678000199'].dividendTaxation, 'ISENTO');
+    assert.equal(props.companySettings['12345678000199'].observation, `Company ${year}`);
     assert.equal(props.canCreatePartner, year === new Date().getFullYear(), 'Partner button is only available in the current year');
     assert.equal(props.rows.length, 2, 'Unregistered QSA partners remain visible, without duplicating the registered partner');
     assert.equal(props.rows[1].partnerName, 'Second partner');

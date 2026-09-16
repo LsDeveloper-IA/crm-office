@@ -1,12 +1,14 @@
 "use client";
 
+import type { ReadonlyURLSearchParams } from "next/navigation";
+
 import ClipboardIcon from "@/components/icons/ClipboardIcon";
 import { useState } from "react";
 
 type ModalProps = {
     isOpen: boolean;
     onClose: () => void;
-    searchParams: any;
+    searchParams: ReadonlyURLSearchParams;
 }
 
 type SheetFilters = {
@@ -35,7 +37,7 @@ const fields = [
     { label: "Todas as Empresas", key: "todasAsEmpresas" },
 ]
 
-export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalProps) {
+export function CompaniesSheetsContent({ isOpen, onClose, searchParams }: ModalProps) {
     const params = searchParams;
 
     const paramsObject = {
@@ -44,14 +46,14 @@ export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalPr
         dir: params.get("dir") ?? null,
         group: params.get("group") ?? null,
     }
-    
+
     const [filters, setFilters] = useState<SheetFilters>({
         nome: false,
         cnpj: false,
         decimoTerceiro: false,
         honorario: false,
         regime: false,
-        contador:  false,
+        contador: false,
         responsaveis: false,
         socios: false,
         atividades: false,
@@ -71,11 +73,11 @@ export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalPr
             })
         })
 
-        if(!response.ok) {
+        if (!response.ok) {
             console.error("Erro ao gerar planilha");
             return;
         }
-        
+
         const blob = await response.blob();
 
         const url = window.URL.createObjectURL(blob);
@@ -98,7 +100,7 @@ export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalPr
                     <h2 className="flex-1 text-lg font-semibold text-gray-800">
                         Configurar Dados para a Planilha
                     </h2>
-                    <ClipboardIcon className={"text-[#8181A5] rounded-md p-0.5"}/>
+                    <ClipboardIcon className={"text-[#8181A5] rounded-md p-0.5"} />
                 </div>
 
                 <div className="mx-auto my-2 mx h-px w-[95%] bg-gray-200" />
@@ -118,8 +120,8 @@ export function CompaniesSheetsContent({ isOpen, onClose, searchParams}: ModalPr
                                         px-4 py-2 pl-6 rounded-lg border
                                         cursor-pointer transition-all
                                         text-sm font-medium 
-                                        ${isActive 
-                                            ? 'bg-blue-600 text-white border-blue-600' 
+                                        ${isActive
+                                            ? 'bg-blue-600 text-white border-blue-600'
                                             : 'bg-gray-200 border-gray-300 hover:bg-blue-400'
                                         }
                                     `}

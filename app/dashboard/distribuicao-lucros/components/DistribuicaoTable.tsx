@@ -16,11 +16,12 @@ import { hasDistributionChanges, isValidDistributionNumber, normalizeDistributio
 import styles from "./DistribuicaoTable.module.css";
 import { ProfitDistributionStatus } from "@prisma/client";
 import {
-  PROFIT_DISTRIBUTION_STATUS_CONFIG,
   PROFIT_DISTRIBUTION_STATUS_OPTIONS,
 } from "@/lib/profit-distribution-status";
 
-import { DIVIDEND_TAXATION_OPTIONS, getMajorityDividendTaxation, isDividendTaxation, type DividendTaxationValue } from "@/lib/dividend-taxation";
+import { DIVIDEND_TAXATION_OPTIONS, type DividendTaxationValue } from "@/lib/dividend-taxation";
+import { DEFAULT_COMPANY_SETTINGS, hasCompanySettingsChanges, type ProfitCompanySettings } from "@/lib/profit-company-settings";
+import { CompanySummaryRow } from "./CompanySummaryRow";
 
 const MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
@@ -34,6 +35,8 @@ type MonthlyDistribution = {
 };
 
 export type Row = {
+  visibleMonths?: number[];
+  caption?: string;
   month?: number;
   monthlyDistributions?: MonthlyDistribution[];
   companyCnpj: string;
@@ -49,6 +52,7 @@ export type Row = {
 
 type Props = {
   rows: Row[];
+  companySettings?: Record<string, ProfitCompanySettings>;
   year: number;
   years: number[];
   canCreatePartner: boolean;
@@ -98,11 +102,6 @@ function formatCurrency(value?: number | null) {
   return currencyFormatter.format(value);
 }
 
-function formatPercentage(value?: number | null) {
-  if (value == null) return "-";
-  return `${value}%`;
-}
-
 function parseCurrency(value: string) {
   return Number(
     value.replace(/\./g, "").replace(",", ".").replace(/[^\d.-]/g, "")
@@ -116,14 +115,15 @@ function formatCurrencyInput(value: string) {
   return currencyInputFormatter.format(number);
 }
 
-export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props) {
+export function DistribuicaoTable({ rows, year, years, canCreatePartner, companySettings = {} }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const [isChangingYear, startYearTransition] = useTransition();
+  const [expandedCompanies, setExpandedCompanies] = useState<Record<string, boolean>>({});
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
   const [data, setData] = useState<Row[]>(() => rows.flatMap((row) => [
     normalizeRow(row),
-    ...MONTHS.map((_, month) => normalizeRow({
+    ...MONTHS.flatMap((_, month) => row.visibleMonths && !row.visibleMonths.includes(month) ? [] : [normalizeRow({
       ...row,
       participationPercentage: null,
       dividendTaxation: null,
@@ -132,8 +132,11 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
       observation: "",
       ...row.monthlyDistributions?.find((distribution) => distribution.month === month),
       month,
-    })),
+    })]),
   ]));
+  const [savedCompanySettings, setSavedCompanySettings] = useState(companySettings);
+  const [companyDrafts, setCompanyDrafts] = useState<Record<string, ProfitCompanySettings>>({});
+  const [savingCompany, setSavingCompany] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<
@@ -156,13 +159,24 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
   const filteredData = useMemo(() => {
     const term = normalizeDistributionSearch(search);
     const cnpjTerm = search.replace(/\D/g, "");
-    return summaries.filter((row) => {
+    // Filter whole companies: their totals always include every partner.
+    const grouped = new Map<string, { companyCnpj: string; companyName: string; partners: Row[]; totalInCents: number }>();
+    for (const row of summaries) {
+      let company = grouped.get(row.companyCnpj);
+      if (!company) {
+        company = { companyCnpj: row.companyCnpj, companyName: row.companyName, partners: [], totalInCents: 0 };
+        grouped.set(row.companyCnpj, company);
+      }
+      company.partners.push(row);
+      company.totalInCents += totalsInCents.get(groupKey(row)) ?? 0;
+    }
+    return [...grouped.values()].filter((company) => company.partners.some((row) => {
       const matchSearch = normalizeDistributionSearch(row.companyName).includes(term)
         || normalizeDistributionSearch(row.partnerName).includes(term)
         || (cnpjTerm.length > 0 && row.companyCnpj.includes(cnpjTerm));
-      return matchSearch && (!statusFilter || row.status === statusFilter);
-    });
-  }, [summaries, search, statusFilter]);
+      return matchSearch && (!statusFilter || (savedCompanySettings[row.companyCnpj] ?? DEFAULT_COMPANY_SETTINGS).status === statusFilter);
+    }));
+  }, [summaries, totalsInCents, search, statusFilter, savedCompanySettings]);
   const pageCount = Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
   const pageStart = (currentPage - 1) * PAGE_SIZE;
@@ -174,12 +188,15 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
     .map(getRowKey)), [data, originalRows, editingRows]);
   const companies = useMemo(() => Array.from(new Map(summaries.map((row) =>
     [row.companyCnpj, { cnpj: row.companyCnpj, name: row.companyName }])).values()), [summaries]);
+  const dirtyCompanyCount = Object.entries(companyDrafts).filter(([cnpj, draft]) =>
+    hasCompanySettingsChanges(draft, savedCompanySettings[cnpj] ?? DEFAULT_COMPANY_SETTINGS)).length;
+  const hasUnsavedChanges = dirtyKeys.size > 0 || dirtyCompanyCount > 0;
   useEffect(() => {
-    if (!dirtyKeys.size) return;
+    if (!hasUnsavedChanges) return;
     const onBeforeUnload = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
-  }, [dirtyKeys.size]);
+  }, [hasUnsavedChanges]);
 
   function toggleEdit(row: Row, value: boolean) {
     const key = groupKey(row);
@@ -204,18 +221,18 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
   }
 
   function updateRow(row: Row, changes: Partial<Row>) {
-    if (row.month == null && changes.participationPercentage !== undefined) {
+    // The annual partner percentage is persisted in all twelve months.
+    if (row.month == null) {
+      if (changes.participationPercentage === undefined) return;
       setData((prev) => prev.map((item) => groupKey(item) === groupKey(row)
-        ? { ...item, participationPercentage: changes.participationPercentage }
-        : item));
+        ? { ...item, participationPercentage: changes.participationPercentage } : item));
       return;
     }
-    if (row.month == null) {
-      changes = {
-        ...(changes.observation !== undefined ? { observation: changes.observation } : {}),
-        ...(changes.dividendTaxation !== undefined ? { dividendTaxation: changes.dividendTaxation } : {}),
-      };
-    }
+    changes = {
+      ...(changes.dividendTaxation !== undefined ? { dividendTaxation: changes.dividendTaxation } : {}),
+      ...(changes.amount !== undefined ? { amount: changes.amount } : {}),
+      ...(changes.observation !== undefined ? { observation: changes.observation } : {}),
+    };
     const month = row.month ?? new Date().getMonth();
     setData((prev) => prev.map((item) => {
       const samePeriod = item.month === month || (item.month == null && month === new Date().getMonth());
@@ -238,15 +255,10 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
     setLoadingRow(key);
     try {
       const summary = summaries.find((item) => groupKey(item) === key);
-      const originalSummary = originalRows[key];
-      const percentageChanged = summary && originalSummary
-        && (summary.participationPercentage ?? null) !== (originalSummary.participationPercentage ?? null);
-      const changedMonths = (monthsByGroup.get(key) ?? []).filter((item) => {
-        if (item.month == null || (!percentageChanged && row.month != null && item.month !== row.month)) return false;
-        if (percentageChanged) return dirtyKeys.has(getRowKey(item));
-        if (row.month != null) return true;
-        return dirtyKeys.has(getRowKey(item));
-      });
+      const percentageChanged = summary && originalRows[key]
+        && (summary.participationPercentage ?? null) !== (originalRows[key].participationPercentage ?? null);
+      const changedMonths = (monthsByGroup.get(key) ?? []).filter((item) =>
+        row.month != null && !percentageChanged ? item.month === row.month : dirtyKeys.has(getRowKey(item)));
       for (const month of changedMonths) {
         if (!isValidDistributionNumber(month.participationPercentage, 0, 100)
           || !isValidDistributionNumber(month.amount, -9999999999999.99, 9999999999999.99)) {
@@ -319,6 +331,41 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
     }
   }
 
+  function closeCompanyEdit(cnpj: string) {
+    setCompanyDrafts((prev) => {
+      const next = { ...prev };
+      delete next[cnpj];
+      return next;
+    });
+  }
+
+  async function saveCompany(cnpj: string) {
+    const draft = companyDrafts[cnpj];
+    if (!draft || saveLock.current) return;
+    if (!isValidDistributionNumber(draft.participationPercentage, 0, 100)) {
+      setNotice({ kind: "error", text: "Percentual deve estar entre 0 e 100, com ate duas casas decimais." });
+      return;
+    }
+    saveLock.current = true;
+    setSavingCompany(cnpj);
+    try {
+      const response = await fetch("/api/profit-distributions/company", {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyCnpj: cnpj, year, ...draft }),
+      });
+      const saved = await response.json();
+      if (!response.ok) throw new Error(saved.error || "Erro ao salvar empresa.");
+      setSavedCompanySettings((prev) => ({ ...prev, [cnpj]: saved }));
+      closeCompanyEdit(cnpj);
+      setNotice({ kind: "success", text: "Dados da empresa salvos." });
+    } catch (error) {
+      setNotice({ kind: "error", text: error instanceof Error ? error.message : "Erro ao salvar empresa." });
+    } finally {
+      saveLock.current = false;
+      setSavingCompany(null);
+    }
+  }
+
   async function handleCreatePartner() {
     if (!canCreatePartner || saveLock.current) return;
     saveLock.current = true;
@@ -342,6 +389,7 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
         ...MONTHS.map((_, month) => ({ ...parent, month, amount: null, participationPercentage: null, dividendTaxation: null, observation: "" }))]);
         setExpandedRows((prev) => ({ ...prev, [groupKey(parent)]: true }));
       }
+      setExpandedCompanies((prev) => ({ ...prev, [newPartner.companyCnpj]: true }));
       setSearch(partner.name);
       setStatusFilter("");
       setPage(1);
@@ -365,10 +413,10 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
           <select
             className="border rounded px-3 py-2"
             value={year}
-            disabled={isChangingYear || loadingRow !== null || isCreatingPartner}
+            disabled={isChangingYear || loadingRow !== null || isCreatingPartner || savingCompany !== null}
             onChange={(event) => {
               const nextYear = event.target.value;
-              if (dirtyKeys.size > 0) { setPendingYear(nextYear); return; }
+              if (hasUnsavedChanges) { setPendingYear(nextYear); return; }
               startYearTransition(() => router.push(`${pathname}?year=${nextYear}`));
             }}
           >
@@ -405,7 +453,7 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
 
           {canCreatePartner && <button
             className="px-3 py-2 text-sm border rounded-md hover:bg-muted whitespace-nowrap"
-            disabled={isCreatingPartner || loadingRow !== null}
+            disabled={isCreatingPartner || loadingRow !== null || savingCompany !== null}
             onClick={() => { setNotice(null); setIsModalOpen(true); }}
           >
             + Sócio
@@ -414,6 +462,7 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
       </div>
 
       {dirtyKeys.size > 0 && <p className="mb-3 text-sm text-amber-800" role="status">{dirtyKeys.size} mês(es) com alterações não salvas.</p>}
+      {dirtyCompanyCount > 0 && <p className="mb-3 text-sm text-amber-800" role="status">{dirtyCompanyCount} empresa(s) com dados pendentes de salvar.</p>}
       {(search || statusFilter) && <button type="button" className="mb-3 text-sm underline" onClick={() => { setSearch(""); setStatusFilter(""); setPage(1); }}>Limpar filtros</button>}
       {/* TABELA */}
       <div className={styles.container}>
@@ -421,8 +470,7 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
           <TableHeader>
             <TableRow>
               <TableHead className="w-[3%]">#</TableHead>
-              <TableHead className="w-[17%]">Empresa</TableHead>
-              <TableHead className="w-[14%]">Sócio</TableHead>
+              <TableHead colSpan={2} className="w-[31%]">Empresa / Sócio / Mês</TableHead>
               <TableHead className="w-[8%] text-center">%</TableHead>
               <TableHead className="w-[13%] text-center">Tributação de Dividendos</TableHead>
               <TableHead className="w-[12%] text-right">Valor</TableHead>
@@ -436,209 +484,152 @@ export function DistribuicaoTable({ rows, year, years, canCreatePartner }: Props
             {visibleData.length === 0 && (
               <TableRow><TableCell colSpan={9} className="text-center py-6">Nenhum resultado encontrado.</TableCell></TableRow>
             )}
-            {visibleData.flatMap((parent, index) => [
-              { row: parent, index },
-              ...(expandedRows[getRowKey(parent)] ? (monthsByGroup.get(groupKey(parent)) ?? [])
-                .map((row) => ({ row, index })) : []),
-            ]).map(({ row, index }) => {
-              const key = getRowKey(row);
-              const isEditing = editingRows[groupKey(row)];
-              const isLoading = loadingRow === groupKey(row);
-              const isMonthlyEditing = isEditing && row.month != null;
-              const displayedAmount = row.month == null
-                ? (totalsInCents.get(groupKey(row)) ?? 0) / 100
-                : row.amount;
-              const majorityTaxation = row.month == null
-                ? getMajorityDividendTaxation(monthsByGroup.get(groupKey(row)) ?? [])
-                : "";
-
-              const status =
-                PROFIT_DISTRIBUTION_STATUS_CONFIG[row.status!];
-
-              return (
-                <TableRow key={key} className={row.month != null ? styles.monthRow : styles.summaryRow} data-editing={isEditing || undefined} data-dirty={dirtyKeys.has(key) || undefined}>
-                  {row.month != null ? (
-                    <TableCell data-label="Mês" colSpan={3} className={styles.monthCell}><div className={styles.monthLabel}><span className={styles.monthNumber}>{String(row.month + 1).padStart(2, "0")}</span><span>{MONTHS[row.month]}</span>{dirtyKeys.has(key) && <span className={styles.unsaved}>Não salvo</span>}</div></TableCell>
-                  ) : (
-                    <>
-                      <TableCell data-label="#">{pageStart + index + 1}</TableCell>
-                      <TableCell data-label="Empresa">
-                        <div className="flex min-w-0 items-center gap-2">
-                          <button
-                            type="button"
-                            className={styles.expandButton}
-                            aria-expanded={!!expandedRows[key]}
-                            aria-label={`${expandedRows[key] ? "Recolher" : "Expandir"} meses de ${row.companyName}, ${row.partnerName}`}
-                            onClick={() => setExpandedRows((prev) => ({ ...prev, [key]: !prev[key] }))}
-                          >
-                            {expandedRows[key] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                          </button>
-                          <div className="min-w-0"><span className={styles.companyName} title={row.companyName}>{row.companyName}</span><span className={styles.summaryCaption}>Resumo anual · {year}</span></div>
-                        </div>
-                      </TableCell>
-                      <TableCell data-label="Sócio">{row.partnerName}</TableCell>
-                    </>
-                  )}
-
-                  <TableCell data-label={row.month == null ? "%" : undefined} data-empty={row.month != null ? "true" : undefined} className="text-center">
-                    {row.month != null ? null : isEditing ? (
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        maxLength={3}
-                        aria-label={`Porcentagem de ${row.partnerName} em ${year}`}
-                        title="Digite um numero inteiro de 0 a 100. Aplicado a todos os meses deste socio."
-                        disabled={isLoading}
-                        className={styles.percentageInput}
-                        value={row.participationPercentage ?? ""}
-                        onFocus={(event) => {
-                          const input = event.currentTarget;
-                          requestAnimationFrame(() => {
-                            if (document.activeElement === input) input.select();
-                          });
-                        }}
-                        onKeyDown={(event) => {
-                          if (event.key.length === 1 && !/^[0-9]$/.test(event.key)
-                            && !event.ctrlKey && !event.metaKey) event.preventDefault();
-                        }}
-                        onPaste={(event) => {
-                          const pasted = event.clipboardData.getData("text");
-                          if (!/^[0-9]+$/.test(pasted) || Number(pasted) > 100) {
-                            event.preventDefault();
-                          }
-                        }}
-                        onChange={(event) => {
-                          const value = event.target.value;
-                          if (!/^[0-9]*$/.test(value) || Number(value) > 100) return;
-                          updateRow(row, {
-                            participationPercentage: value === "" ? null : Number(value),
-                          });
-                        }}
-                      />
-                    ) : (
-                      formatPercentage(row.participationPercentage)
-                    )}
-                  </TableCell>
-
-                  <TableCell data-label="Tributação de Dividendos" className="text-center">
-                    {row.month == null ? (
-                      <span title="Opção mais selecionada nos meses">
-                        {DIVIDEND_TAXATION_OPTIONS.find((option) => option.value === majorityTaxation)?.label
-                          ?? (majorityTaxation === "EMPATE" ? "Empate" : "--")}
-                      </span>
-                    ) : isMonthlyEditing ? (
-                      <select
-                        disabled={isLoading}
-                        className="w-full border rounded px-2 py-1 disabled:opacity-100"
-                        aria-label={`Tributação de Dividendos de ${MONTHS[row.month]}, ${row.partnerName}`}
-                        value={row.dividendTaxation ?? ""}
-                        onChange={(event) => {
-                          const value = event.target.value;
-                          if (!isMonthlyEditing || (value !== "" && !isDividendTaxation(value))) return;
-                          updateRow(row, { dividendTaxation: value === "" ? null : value as DividendTaxationValue });
-                        }}
-                      >
-                        <option value="">--</option>
-                        {DIVIDEND_TAXATION_OPTIONS.map((option) => (
-                          <option key={option.value} value={option.value}>{option.label}</option>
-                        ))}
-                      </select>
-                    ) : (
-                      DIVIDEND_TAXATION_OPTIONS.find((option) => option.value === row.dividendTaxation)?.label ?? "--"
-                    )}
-                  </TableCell>
-
-                  <TableCell data-label="Valor" className={`text-right tabular-nums ${row.month == null ? styles.annualAmount : styles.monthAmount}`}>
-                    {isMonthlyEditing ? (
-                      <input
-                        disabled={isLoading}
-                        className="w-full border rounded px-2 py-1"
-                        value={
-                          row.amount != null
-                            ? formatCurrency(row.amount).replace("R$ ", "")
-                            : ""
-                        }
-                        onChange={(e) => {
-                          if (e.target.value === "") { updateRow(row, { amount: null }); return; }
-                          const masked = formatCurrencyInput(e.target.value);
-                          e.target.value = masked;
-
-                          updateRow(row, {
-                            amount: parseCurrency(masked),
-                          });
-                        }}
-                      />
-                    ) : (
-                      formatCurrency(displayedAmount)
-                    )}
-                  </TableCell>
-
-                  <TableCell data-label="Status" className="text-center">
-                    {isMonthlyEditing ? (
-                      <select
-                        disabled={isLoading}
-                        className="w-full border rounded px-2 py-1"
-                        value={row.status}
-                        onChange={(e) =>
-                          updateRow(row, {
-                            status: e.target.value as ProfitDistributionStatus,
-                          })
-                        }
-                      >
-                        {PROFIT_DISTRIBUTION_STATUS_OPTIONS.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.shortLabel}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <span className={styles.statusBadge} data-status={row.status}>
-                        {status.label}
-                      </span>
-                    )}
-                  </TableCell>
-
-                  <TableCell data-label="Observação">
-                    {isMonthlyEditing ? (
-                      <input
-                        disabled={isLoading}
-                        className="w-full border rounded px-2 py-1"
-                        value={row.observation ?? ""}
-                        onChange={(e) =>
-                          updateRow(row, {
-                            observation: e.target.value,
-                          })
-                        }
-                      />
-                    ) : (
-                      <span className={styles.observation}>{row.observation?.trim() || "--"}</span>
-                    )}
-                  </TableCell>
-
-                  <TableCell data-label="Ações" className="text-center">
-                    {row.month != null ? (isEditing && (
-                      <button type="button" className={styles.monthSaveButton} title={`Salvar ${MONTHS[row.month]}`} aria-label={`Salvar ${MONTHS[row.month]}`} disabled={loadingRow !== null || isCreatingPartner} onClick={() => saveRow(row)}>Salvar</button>
-                    )) : !isEditing ? (
-                      <button type="button" className={styles.actionButton} title="Editar" aria-label="Editar" onClick={() => toggleEdit(row, true)}><Pencil size={15} /></button>
-                    ) : (
-                      <div className="flex flex-wrap gap-1 justify-center">
-                        <button type="button" className={styles.saveButton} title="Salvar meses alterados" aria-label="Salvar meses alterados" disabled={loadingRow !== null || isCreatingPartner} onClick={() => saveRow(row)}>
-                          {isLoading ? <LoaderCircle size={15} className="animate-spin" /> : <Check size={15} />}
-                        </button>
-                        <button type="button" className={styles.actionButton} aria-label="Cancelar todas as alterações" disabled={isLoading} onClick={() => cancelEdit(row)}><X size={15} /></button>
-                      </div>
-                    )}
-                  </TableCell>
-                </TableRow>
+            {visibleData.flatMap((company, index) => {
+              const companyKey = `company-${company.companyCnpj}`;
+              const expanded = !!expandedCompanies[company.companyCnpj];
+              const companyRow = (
+                <CompanySummaryRow key={companyKey}
+                  name={company.companyName} cnpj={company.companyCnpj} year={year} index={pageStart + index + 1}
+                  total={formatCurrency(company.totalInCents / 100)} expanded={expanded}
+                  percentage={company.partners.reduce((sum, partner) => sum + Math.round((partner.participationPercentage ?? 0) * 100), 0) / 100}
+                  settings={companyDrafts[company.companyCnpj] ?? savedCompanySettings[company.companyCnpj] ?? DEFAULT_COMPANY_SETTINGS}
+                  editing={!!companyDrafts[company.companyCnpj]}
+                  busy={savingCompany !== null || loadingRow !== null || isCreatingPartner}
+                  saving={savingCompany === company.companyCnpj}
+                  onToggle={() => setExpandedCompanies((prev) => ({ ...prev, [company.companyCnpj]: !prev[company.companyCnpj] }))}
+                  onEdit={() => setCompanyDrafts((prev) => ({ ...prev, [company.companyCnpj]: { ...(savedCompanySettings[company.companyCnpj] ?? DEFAULT_COMPANY_SETTINGS) } }))}
+                  onChange={(changes) => setCompanyDrafts((prev) => ({ ...prev, [company.companyCnpj]: { ...prev[company.companyCnpj], ...changes } }))}
+                  onSave={() => void saveCompany(company.companyCnpj)}
+                  onCancel={() => closeCompanyEdit(company.companyCnpj)}
+                />
               );
+              if (!expanded) return [companyRow];
+              return [companyRow, ...company.partners.flatMap((parent) => [
+                parent,
+                ...(expandedRows[getRowKey(parent)] ? (monthsByGroup.get(groupKey(parent)) ?? []) : []),
+              ]).map((row) => {
+                const key = getRowKey(row);
+                const isEditing = editingRows[groupKey(row)];
+                const isLoading = loadingRow === groupKey(row);
+                const isMonthlyEditing = isEditing && row.month != null;
+                const displayedAmount = row.month == null
+                  ? (totalsInCents.get(groupKey(row)) ?? 0) / 100
+                  : row.amount;
+                return (
+                  <TableRow key={key} className={row.month != null ? styles.monthRow : styles.summaryRow} data-editing={isEditing || undefined} data-dirty={dirtyKeys.has(key) || undefined}>
+                    {row.month != null ? (
+                      <TableCell data-label="Mês" colSpan={3} className={styles.monthCell}><div className={styles.monthLabel}><span className={styles.monthNumber}>{String(row.month + 1).padStart(2, "0")}</span><span>{MONTHS[row.month]}</span>{dirtyKeys.has(key) && <span className={styles.unsaved}>Não salvo</span>}</div></TableCell>
+                    ) : (
+                      <>
+                        <TableCell data-empty="true" />
+                        <TableCell data-label="Sócio" colSpan={2}>
+                          <div className="flex min-w-0 items-center gap-2 pl-6">
+                            <button
+                              type="button"
+                              className={styles.expandButton}
+                              aria-expanded={!!expandedRows[key]}
+                              aria-label={`${expandedRows[key] ? "Recolher" : "Expandir"} meses de ${row.companyName}, ${row.partnerName}`}
+                              onClick={() => setExpandedRows((prev) => ({ ...prev, [key]: !prev[key] }))}
+                            >
+                              {expandedRows[key] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                            </button>
+                            <div className="min-w-0"><span className={styles.companyName} title={row.partnerName}>{row.partnerName}</span><span className={styles.summaryCaption}>{row.caption ?? `Resumo anual · ${year}`}</span></div>
+                          </div>
+                        </TableCell>
+                      </>
+                    )}
+
+                    <TableCell data-label={row.month == null ? "%" : undefined} data-empty={row.month != null ? "true" : undefined} className="text-center">
+                      {row.month == null && (isEditing ? (
+                        <input type="number" min={0} max={100} step="0.01" className={styles.percentageInput}
+                          aria-label={`Porcentagem de ${row.partnerName}`} disabled={isLoading}
+                          title="Percentual anual do socio, aplicado aos doze meses."
+                          value={row.participationPercentage ?? ""}
+                          onChange={(e) => updateRow(row, { participationPercentage: e.target.value === "" ? null : Number(e.target.value) })} />
+                      ) : row.participationPercentage == null ? "--" : `${row.participationPercentage}%`)}
+                    </TableCell>
+                    <TableCell data-label={row.month != null ? "Tributa\u00e7\u00e3o de Dividendos" : undefined} data-empty={row.month == null ? "true" : undefined} className="text-center">
+                      {row.month != null && (isMonthlyEditing ? (
+                        <select className="w-full border rounded px-2 py-1" disabled={isLoading}
+                          aria-label={`Tributa\u00e7\u00e3o de ${MONTHS[row.month]}, ${row.partnerName}`}
+                          value={row.dividendTaxation ?? ""}
+                          onChange={(e) => updateRow(row, { dividendTaxation: e.target.value === "" ? null : e.target.value as DividendTaxationValue })}>
+                          <option value="">--</option>
+                          {DIVIDEND_TAXATION_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                        </select>
+                      ) : DIVIDEND_TAXATION_OPTIONS.find((option) => option.value === row.dividendTaxation)?.label ?? "--")}
+                    </TableCell>
+
+                    <TableCell data-label="Valor" className={`text-right tabular-nums ${row.month == null ? styles.annualAmount : styles.monthAmount}`}>
+                      {isMonthlyEditing ? (
+                        <input
+                          aria-label={`Valor de ${MONTHS[row.month!]}, ${row.partnerName}`}
+                          disabled={isLoading}
+                          className="w-full border rounded px-2 py-1"
+                          value={
+                            row.amount != null
+                              ? formatCurrency(row.amount).replace("R$ ", "")
+                              : ""
+                          }
+                          onChange={(e) => {
+                            if (e.target.value === "") { updateRow(row, { amount: null }); return; }
+                            const masked = formatCurrencyInput(e.target.value);
+                            e.target.value = masked;
+
+                            updateRow(row, {
+                              amount: parseCurrency(masked),
+                            });
+                          }}
+                        />
+                      ) : (
+                        formatCurrency(displayedAmount)
+                      )}
+                    </TableCell>
+
+                    <TableCell data-empty="true" />
+
+                    <TableCell data-label="Observação">
+                      {isMonthlyEditing ? (
+                        <input
+                          aria-label={`Observação de ${MONTHS[row.month!]}, ${row.partnerName}`}
+                          disabled={isLoading}
+                          className="w-full border rounded px-2 py-1"
+                          value={row.observation ?? ""}
+                          onChange={(e) =>
+                            updateRow(row, {
+                              observation: e.target.value,
+                            })
+                          }
+                        />
+                      ) : (
+                        <span className={styles.observation}>{row.observation?.trim() || "--"}</span>
+                      )}
+                    </TableCell>
+
+                    <TableCell data-label="Ações" className="text-center">
+                      {row.month != null ? (isEditing && (
+                        <button type="button" className={styles.monthSaveButton} title={`Salvar ${MONTHS[row.month]}`} aria-label={`Salvar ${MONTHS[row.month]}`} disabled={loadingRow !== null || isCreatingPartner || savingCompany !== null} onClick={() => saveRow(row)}>Salvar</button>
+                      )) : !isEditing ? (
+                        <button type="button" className={styles.actionButton} title="Editar percentual, tributacao, valores e observações" aria-label={`Editar valores e observações de ${row.partnerName}`} disabled={loadingRow !== null || isCreatingPartner || savingCompany !== null} onClick={() => toggleEdit(row, true)}><Pencil size={15} /></button>
+                      ) : (
+                        <div className="flex flex-wrap gap-1 justify-center">
+                          <button type="button" className={styles.saveButton} title="Salvar meses alterados" aria-label="Salvar meses alterados" disabled={loadingRow !== null || isCreatingPartner || savingCompany !== null} onClick={() => saveRow(row)}>
+                            {isLoading ? <LoaderCircle size={15} className="animate-spin" /> : <Check size={15} />}
+                          </button>
+                          <button type="button" className={styles.actionButton} aria-label="Cancelar todas as alterações" disabled={isLoading} onClick={() => cancelEdit(row)}><X size={15} /></button>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })];
             })}
           </TableBody>
         </Table>
       </div>
 
       <nav aria-label="Paginas da tabela" className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
-        <span>{filteredData.length === 0 ? 0 : pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filteredData.length)} de {filteredData.length} registros</span>
+        <span>{filteredData.length === 0 ? 0 : pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filteredData.length)} de {filteredData.length} empresas</span>
         <div className="flex items-center gap-3">
           <button type="button" className="border rounded px-3 py-1 disabled:opacity-40" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>Anterior</button>
           <span>{currentPage} / {pageCount}</span>

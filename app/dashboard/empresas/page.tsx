@@ -79,15 +79,18 @@ export default async function Company({ searchParams }: Props) {
     JSON.stringify(baseOrder).replace(/"asc"/g, `"${dir}"`)
   );
 
-  const where: Prisma.CompanyWhereInput = params.group
-    ? {
+  const where: Prisma.CompanyWhereInput = {
+    deletedAt: null,
+    ...(params.group
+      ? {
         profile: {
           is: {
             group: params.group,
           },
         },
       }
-    : {};
+      : {}),
+  };
 
   const [companiesRaw, total, totalSimples, totalNaoSimples, totalPagantes, totalThirteenth] = await Promise.all([
     prisma.company.findMany({
@@ -110,14 +113,17 @@ export default async function Company({ searchParams }: Props) {
       },
     }),
 
-    prisma.company.count(),
+    prisma.company.count({
+      where: { deletedAt: null },
+    }),
 
     prisma.company.count({
-      where: { profile: { is: { taxRegime: { key: "SIMPLES" } } } },
+      where: { deletedAt: null, profile: { is: { taxRegime: { key: "SIMPLES" } } } },
     }),
 
     prisma.company.count({
       where: {
+        deletedAt: null,
         OR: [
           { profile: null },
           { profile: { is: { taxRegime: null } } },
@@ -128,6 +134,7 @@ export default async function Company({ searchParams }: Props) {
 
     prisma.company.count({
       where: {
+        deletedAt: null,
         profile: {
           is: {
             paysFees: true,
@@ -138,6 +145,7 @@ export default async function Company({ searchParams }: Props) {
 
     prisma.company.count({
       where: {
+        deletedAt: null,
         profile: {
           is: {
             thirteenth: true,

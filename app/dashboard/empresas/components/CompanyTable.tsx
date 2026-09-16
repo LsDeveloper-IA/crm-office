@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 import {
@@ -105,11 +106,11 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
   return (
     <>
       <div className="flex justify-end">
-        <button 
+        <button
           className="p-2 mb-2 mr-2 border rounded-md hover:bg-gray-200 cursor-pointer"
-          onClick={() => setIsOpen(true)} 
+          onClick={() => setIsOpen(true)}
         >
-          <img src={"/icons/excel.svg"} width={28} height={28} alt="sheets"/>
+          <Image src="/icons/excel.svg" width={28} height={28} alt="sheets" />
         </button>
 
         <CompaniesSheetsContent
@@ -118,13 +119,13 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
           searchParams={searchParams}
         />
 
-        <select 
+        <select
           value={selectedGroup}
           onChange={(e) => handleChangeGroup(e.target.value)}
           className="p-2 mb-2 border rounded-md hover:bg-gray-200 cursor-pointer"
-          >
+        >
           <option value="" disabled>Selecione um Grupo</option>
-          
+
           {GROUPS_OPTIONS.map((group) => (
             <option key={group.label} value={group.value}>
               {group.label}
@@ -137,7 +138,7 @@ export function CompanyTable({ companies, page, totalPages }: Props) {
           <TableRow>
             <TableHead>#</TableHead>
             <SortableHead label="Razão Social" sortKey="name" />
-            <SortableHead label="13°" sortKey="thirteenth"/>
+            <SortableHead label="13°" sortKey="thirteenth" />
             <SortableHead label="Honorários" sortKey="paysFees" />
             <SortableHead label="CNPJ" sortKey="cnpj" />
             <TableHead>Regime</TableHead>
