@@ -31,9 +31,38 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
+.env
+.env.*
+!.env.example
 
+# local credentials / tokens / secrets
+.local/
+**/.local/
+**/gmail-token.json
+**/token*.json
+**/credentials*.json
+**/service-account*.json
+**/client_secret*.json
+**/*.pem
+**/*.key
+**/*.crt
+**/*.p12
+**/*.pfx
+**/*.sqlite
+**/*.sqlite3
+**/*.db
+**/*.db-journal
+**/*.log
+**/*.bak
+**/*.backup
 
+# runtime / local virtualenvs
+.venv/
+**/.venv/
+venv/
+**/venv/
+**/__pycache__/
+**/*.pyc
 
 # vercel
 .vercel
