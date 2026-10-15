@@ -6,6 +6,7 @@ export type ProfitCompanySettings = {
   dividendTaxation: DividendTaxationValue | null;
   status: ProfitDistributionStatus;
   observation: string;
+  caseAside: boolean;
 };
 
 export const DEFAULT_COMPANY_SETTINGS: ProfitCompanySettings = {
@@ -13,10 +14,11 @@ export const DEFAULT_COMPANY_SETTINGS: ProfitCompanySettings = {
   dividendTaxation: null,
   status: "NAO_ENCERRADO",
   observation: "",
+  caseAside: false,
 };
 
 export function hasCompanySettingsChanges(a: ProfitCompanySettings, b: ProfitCompanySettings) {
   return a.participationPercentage !== b.participationPercentage
     || a.dividendTaxation !== b.dividendTaxation
-    || a.status !== b.status || a.observation !== b.observation;
+    || a.status !== b.status || a.observation !== b.observation || a.caseAside !== b.caseAside;
 }

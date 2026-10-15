@@ -19,6 +19,11 @@ import {
 } from "@/components/ui/command";
 
 type CompanySearchItem = {
+    kind: "company" | "partner";
+    partnerId?: number;
+    cpf?: string | null;
+    companyName?: string | null;
+    year?: number;
     cnpj: string;
     name: string | null;
 };
@@ -34,6 +39,7 @@ export function HeaderSearchCommand({ open, onOpenChange }: Props) {
     const [query, setQuery] = useState("");
     const [items, setItems] = useState<CompanySearchItem[]>([]);
     const [loading, setLoading] = useState(false);
+    const [searchError, setSearchError] = useState<string | null>(null);
 
     const abortRef = useRef<AbortController | null>(null);
 
@@ -71,24 +77,26 @@ export function HeaderSearchCommand({ open, onOpenChange }: Props) {
         if (!open) return;
 
         const q = query.trim();
+        setSearchError(null);
 
         // se vazio, limpa
-        if (!q) {
+        if (q.length < 2) {
             setItems([]);
             setLoading(false);
             abortRef.current?.abort();
             return;
         }
 
+        abortRef.current?.abort();
+        const controller = new AbortController();
+        abortRef.current = controller;
+        setItems([]);
         setLoading(true);
 
         const t = setTimeout(async () => {
-            abortRef.current?.abort();
-            const controller = new AbortController();
-            abortRef.current = controller;
 
             try {
-                const res = await fetch(`/api/companies?q=${encodeURIComponent(q)}&limit=12`, {
+                const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=12`, {
                     signal: controller.signal,
                     cache: "no-store",
                 });
@@ -96,18 +104,30 @@ export function HeaderSearchCommand({ open, onOpenChange }: Props) {
                 if (!res.ok) throw new Error("Falha ao buscar empresas");
                 const data = (await res.json()) as { items: CompanySearchItem[] };
 
-                setItems(data.items ?? []);
+                if (!controller.signal.aborted) setItems(data.items ?? []);
             } catch (err: unknown) {
+                if (controller.signal.aborted) return;
                 if (err instanceof DOMException && err.name === "AbortError") return;
                 setItems([]);
+                setSearchError("Não foi possível pesquisar. Tente novamente.");
             }
             finally {
-                setLoading(false);
+                if (!controller.signal.aborted) setLoading(false);
             }
         }, 200); // debounce 200ms
 
-        return () => clearTimeout(t);
+        return () => { clearTimeout(t); controller.abort(); };
     }, [query, open]);
+
+    function openResult(item: CompanySearchItem) {
+        if (item.kind === "partner") {
+            const params = new URLSearchParams({ company: item.cnpj, partner: String(item.partnerId) });
+            params.set("focus", String(Date.now()));
+            if (item.year) params.set("year", String(item.year));
+            router.push(`/dashboard/distribuicao-lucros?${params}`);
+            onOpenChange(false);
+        } else void openCompany(item.cnpj);
+    }
 
     async function openCompany(cnpj: string) {
         try {
@@ -139,31 +159,32 @@ export function HeaderSearchCommand({ open, onOpenChange }: Props) {
             <DialogOverlay className="bg-black/50 backdrop-blur-sm" />
 
             <DialogContent className="p-0 overflow-hidden max-w-2xl">
-                <Command className="w-full">
+                <Command className="w-full" shouldFilter={false}>
                     <CommandInput
                         value={query}
                         onValueChange={setQuery}
-                        placeholder="Pesquisar empresa por nome ou CNPJ..."
+                        placeholder="Pesquisar empresa ou sócio por nome, CNPJ ou CPF..."
                     />
                     <CommandList className="max-h-[360px]">
                         <CommandEmpty>
-                            {loading ? "Buscando..." : "Nenhuma empresa encontrada."}
+                            {loading ? "Buscando..." : searchError ?? (query.trim().length < 2
+                                ? "Digite pelo menos dois caracteres." : "Nenhum resultado encontrado.")}
                         </CommandEmpty>
 
-                        <CommandGroup heading="Empresas">
+                        <CommandGroup heading="Empresas e sócios">
                             {items.map((c) => (
                                 <CommandItem
-                                    key={c.cnpj}
-                                    value={`${c.name ?? ""} ${c.cnpj}`}
-                                    onSelect={() => openCompany(c.cnpj)}
+                                    key={`${c.kind}-${c.cnpj}-${c.partnerId ?? ""}`}
+                                    value={`${c.kind}-${c.cnpj}-${c.partnerId ?? ""}`}
+                                    onSelect={() => openResult(c)}
                                     className="flex items-center justify-between"
                                 >
                                     <span className="truncate">
-                                        {c.name ?? "-"}
+                                        {c.name ?? "-"}{c.kind === "partner" && <span className="block text-xs text-muted-foreground">{c.companyName ?? c.cnpj}</span>}
                                     </span>
 
                                     <span className="font-mono text-xs text-muted-foreground">
-                                        {c.cnpj}
+                                        {c.cpf ?? c.cnpj}
                                     </span>
                                 </CommandItem>
                             ))}

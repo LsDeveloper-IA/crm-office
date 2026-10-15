@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
   try {
     const [qsas, partnersDb] = await Promise.all([
       prisma.companyQsa.findMany({
-        where: { companyCnpj },
+        where: { companyCnpj, deletedAt: null },
         select: { nome: true },
         orderBy: { nome: "asc" },
       }),

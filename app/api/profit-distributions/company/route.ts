@@ -17,6 +17,7 @@ export async function PUT(request: Request) {
     || !isValidDistributionNumber(body.participationPercentage, 0, 100)
     || (body.dividendTaxation !== null && !isDividendTaxation(body.dividendTaxation))
     || !isProfitDistributionStatus(body.status)
+    || typeof body.caseAside !== "boolean"
     || typeof body.observation !== "string" || body.observation.length > 5000) {
     return NextResponse.json({ error: "Confira os campos da empresa. Percentual deve estar entre 0 e 100, com até duas casas decimais." }, { status: 400 });
   }
@@ -31,6 +32,7 @@ export async function PUT(request: Request) {
       dividendTaxation: body.dividendTaxation,
       status: body.status,
       observation: body.observation.trim(),
+      caseAside: body.caseAside,
     };
     const saved = await prisma.profitCompanySettings.upsert({
       where: { companyCnpj_referenceYear: { companyCnpj: body.companyCnpj, referenceYear: body.year } },

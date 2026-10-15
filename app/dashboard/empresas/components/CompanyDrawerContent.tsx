@@ -151,7 +151,7 @@ export function CompanyDrawerContent({
             />
           )}
 
-          {activeTab === "QSA" && <QsaTab qsas={company.qsas} />}
+          {activeTab === "QSA" && <QsaTab qsas={company.qsas} partners={company.partners ?? []} />}
 
           {activeTab === "atividades" && (
             <ActivitiesTab activities={company.activities} />

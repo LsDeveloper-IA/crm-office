@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { FeesType } from "@prisma/client";
 import prisma from "@/lib/prisma";
+import { safeOwnershipForYear } from "@/lib/ownership";
 
 type Params = {
   params: Promise<{
@@ -99,6 +100,11 @@ export async function GET(_: Request, { params }: Params) {
         },
       },
 
+      profitPartners: {
+        select: { name: true, cpf: true, partnerCnpj: true, isCorporate: true,
+          birthDate: true, ownershipHistory: true },
+      },
+
       activities: {
         select: {
           cnaeCode: true,
@@ -159,6 +165,13 @@ export async function GET(_: Request, { params }: Params) {
     },
 
     qsas: company.qsas,
+    partners: company.profitPartners.map(partner => {
+      const ownership = safeOwnershipForYear(partner.ownershipHistory, new Date().getFullYear());
+      return { name: partner.name, cpf: partner.cpf, cnpj: partner.partnerCnpj,
+        isCorporate: partner.isCorporate, birthDate: partner.birthDate,
+        percentage: ownership.ownershipPercentage, valueCents: ownership.ownershipValueCents,
+        quotas: ownership.quotas };
+    }),
     activities: company.activities,
 
     companySectors: company.companySectors.map((cs) => ({

@@ -23,6 +23,12 @@ test('page reload restores all saved monthly fields and the annual total', async
   }));
   const jsx = (type, props) => ({ type, props });
   const mocks = {
+    '@/lib/ownership-money': { sumCapital: values => values.some(value => value == null)
+      ? null : values.reduce((sum, value) => sum + BigInt(value), 0n).toString() },
+    '@/lib/ownership': {
+      ownershipForYear: () => ({ ownershipPercentage: 25, ownershipValueCents: '2500000', months: [] }),
+      safeOwnershipForYear: () => ({ ownershipPercentage: 25, ownershipValueCents: '2500000', quotas: null, months: [], valid: true, issue: null }),
+    },
     '@/lib/partner-periods.mjs': { partnerVisibility: () => ({ visibleMonths: Array.from({ length: 12 }, (_, i) => i), caption: 'Resumo anual' }) },
     '@/lib/profit-distribution-input': { normalizeDistributionSearch: (value) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase() },
     'react/jsx-runtime': { jsx, jsxs: jsx },
@@ -38,7 +44,7 @@ test('page reload restores all saved monthly fields and the annual total', async
       assert.equal(selection.where.referenceYear, year);
       assert.equal(selection.where.referenceDate, undefined, 'Modification date must not filter the accounting year');
       assert.equal(query.select.profitSettings.where.referenceYear, year);
-      return [{ cnpj: '12345678000199', name: 'Company', qsas: [{ nome: 'Partner' }, { nome: 'Second partner' }],
+      return [{ cnpj: '12345678000199', name: 'Company', qsas: [{ id: 11, nome: 'Partner' }, { id: 12, nome: 'Second partner' }],
         profitSettings: [{ participationPercentage: '25.50', dividendTaxation: 'ISENTO', status: 'NAO_ENCERRADO', observation: `Company ${year}` }],
         profitPartners: [{ id: 7, name: 'Partner', distributions: [...savedMonths, { ...savedMonths[0], id: 0, amount: "999.00" }] }] }];
     } } } },
@@ -53,7 +59,8 @@ test('page reload restores all saved monthly fields and the annual total', async
   } }).outputText, context);
 
   for (const requestedYear of [undefined, '2025', '2026', '2099']) {
-    year = requestedYear === '2026' ? 2026 : 2025;
+    const defaultYear = [2025, 2026].includes(new Date().getFullYear()) ? new Date().getFullYear() : 2026;
+    year = requestedYear === '2025' ? 2025 : requestedYear === '2026' ? 2026 : defaultYear;
     const page = await context.exports.default({ searchParams: Promise.resolve({ year: requestedYear }) });
     const props = page.props.children.props.children.find((child) => child.type === 'MonthlyTable').props;
     assert.equal(props.year, year);
@@ -62,7 +69,11 @@ test('page reload restores all saved monthly fields and the annual total', async
     assert.equal(props.companySettings['12345678000199'].observation, `Company ${year}`);
     assert.equal(props.canCreatePartner, year === new Date().getFullYear(), 'Partner button is only available in the current year');
     assert.equal(props.rows.length, 2, 'Unregistered QSA partners remain visible, without duplicating the registered partner');
+    assert.equal(props.rows[0].ownershipPercentage, 25);
+    assert.equal(props.rows[0].ownershipValueCents, '2500000');
+    assert.equal(props.rows[0].companyCapitalCents, null, 'A pending QSA partner prevents a misleading partial capital total');
     assert.equal(props.rows[1].partnerName, 'Second partner');
+    assert.equal(props.rows[1].qsaId, 12, 'Pending QSA partners retain their source ID for removal');
     const row = props.rows[0];
     assert.equal(row.partnerId, 7);
     assert.equal(row.companyCnpj, '12345678000199');

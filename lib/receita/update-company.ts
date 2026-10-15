@@ -164,7 +164,7 @@ async function fetchReceita(cnpj: string): Promise<ReceitaResponse> {
       await sleep(3000);
     }
   }
-  
+
   throw new Error(`Falha ao consultar a Receita para o CNPJ ${cnpj}.`);
 }
 
@@ -178,68 +178,68 @@ export async function updateCompanyFromReceita(rawCnpj: string) {
   catch { throw new ReceitaUpdateError("Falha ao consultar ReceitaWS. Tente novamente mais tarde.", 502); }
   if (!data.nome?.trim()) throw new ReceitaUpdateError("Resposta incompleta da ReceitaWS.", 502);
   await prisma.$transaction(async (tx) => {
-      await tx.company.update({
-        where: { cnpj: rawCnpj },
-        data: {
-          name: data.nome,
-          publicSpace: data.logradouro,
-          number: data.numero,
-          district: data.bairro,
-          city: data.municipio,
-          state: data.uf,
-        },
+    await tx.company.update({
+      where: { cnpj: rawCnpj },
+      data: {
+        name: data.nome,
+        publicSpace: data.logradouro,
+        number: data.numero,
+        district: data.bairro,
+        city: data.municipio,
+        state: data.uf,
+      },
+    });
+
+    if (data.qsa !== undefined) {
+      await tx.companyQsa.deleteMany({
+        where: { companyCnpj: rawCnpj },
       });
 
-      if (data.qsa !== undefined) {
-        await tx.companyQsa.deleteMany({
-          where: { companyCnpj: rawCnpj },
-        });
-
-        const qsaData: Prisma.CompanyQsaCreateManyInput[] = data.qsa.map(
-          (partner) => ({
-            companyCnpj: rawCnpj,
-            nome: partner.nome,
-            qualificacao: partner.qual,
-          })
-        );
-
-        if (qsaData.length > 0) {
-          await tx.companyQsa.createMany({
-            data: qsaData,
-          });
-        }
-      }
-
-      const activities: Prisma.CompanyActivityCreateManyInput[] = [
-        ...(data.atividade_principal ?? []).map((activity) => ({
+      const qsaData: Prisma.CompanyQsaCreateManyInput[] = data.qsa.map(
+        (partner) => ({
           companyCnpj: rawCnpj,
-          cnaeCode: activity.code,
-          description: activity.text,
-          kind: ActivityKind.PRIMARY,
-        })),
-        ...(data.atividades_secundarias ?? []).map((activity) => ({
-          companyCnpj: rawCnpj,
-          cnaeCode: activity.code,
-          description: activity.text,
-          kind: ActivityKind.SECONDARY,
-        })),
-      ];
+          nome: partner.nome,
+          qualificacao: partner.qual,
+        })
+      );
 
-      const hasActivitiesPayload =
-        data.atividade_principal !== undefined ||
-        data.atividades_secundarias !== undefined;
-
-      if (hasActivitiesPayload) {
-        await tx.companyActivity.deleteMany({
-          where: { companyCnpj: rawCnpj },
+      if (qsaData.length > 0) {
+        await tx.companyQsa.createMany({
+          data: qsaData,
         });
-
-        if (activities.length > 0) {
-          await tx.companyActivity.createMany({
-            data: activities,
-          });
-        }
       }
+    }
+
+    const activities: Prisma.CompanyActivityCreateManyInput[] = [
+      ...(data.atividade_principal ?? []).map((activity) => ({
+        companyCnpj: rawCnpj,
+        cnaeCode: activity.code,
+        description: activity.text,
+        kind: ActivityKind.PRIMARY,
+      })),
+      ...(data.atividades_secundarias ?? []).map((activity) => ({
+        companyCnpj: rawCnpj,
+        cnaeCode: activity.code,
+        description: activity.text,
+        kind: ActivityKind.SECONDARY,
+      })),
+    ];
+
+    const hasActivitiesPayload =
+      data.atividade_principal !== undefined ||
+      data.atividades_secundarias !== undefined;
+
+    if (hasActivitiesPayload) {
+      await tx.companyActivity.deleteMany({
+        where: { companyCnpj: rawCnpj },
+      });
+
+      if (activities.length > 0) {
+        await tx.companyActivity.createMany({
+          data: activities,
+        });
+      }
+    }
 
   });
   return { cnpj: rawCnpj };

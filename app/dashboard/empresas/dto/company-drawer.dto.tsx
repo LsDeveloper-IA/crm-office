@@ -39,6 +39,17 @@ export type CompanyDrawerDTO = {
     qualificacao: string;
   }[];
 
+  partners?: {
+    name: string;
+    cpf: string | null;
+    cnpj: string | null;
+    isCorporate: boolean;
+    birthDate: string | null;
+    percentage: number | null;
+    valueCents: string | null;
+    quotas: string | null;
+  }[];
+
   activities: {
     cnaeCode: string;
     description: string;

@@ -103,7 +103,7 @@ test('inclusive month boundaries, past/future years, historical exits and re-ent
   assert.deepEqual(visibleMonths([{ enteredAt: '2027-01-01', exitedAt: null }]), []);
   const result = projectPartner([event('entry', '2026-08-01'), event('exit', '2026-02-01')]);
   assert.deepEqual(result.visibleMonths, [0, 1, 7, 8, 9, 10, 11]);
-  assert.equal(result.caption, 'Resumo anual · 2026');
+  assert.equal(result.caption, 'Sócio ativo · 2026');
   assert.equal(projectPartner([event('exit', '2026-08-10')]).caption, 'Ex sócios · 10/08/2026');
   assert.throws(() => projectPartner([event('entry', '2026-01-01'), event('entry', '2026-02-01')]));
 });

@@ -31,6 +31,65 @@ test('percentage validation rejects invalid values and preserves blank versus ze
   assert.equal(input.normalizeDistributionSearch('  SÓCIO São José '), 'socio sao jose');
 });
 
+test('no-partner placeholder companies appear only in the case-aside filter', () => {
+  const placeholder = { partnerId: 12, partnerName: 'Sem sócios' };
+  const singularPlaceholder = { partnerId: 14, partnerName: 'Sem sócio' };
+  const placeholderId = { partnerId: -999999, partnerName: 'Sem parceiros' };
+  const realPartner = { partnerId: 13, partnerName: 'Maria da Silva' };
+
+  assert.equal(input.hasOnlyNoPartnersPlaceholder([placeholder]), true);
+  assert.equal(input.hasOnlyNoPartnersPlaceholder([singularPlaceholder]), true);
+  assert.equal(input.hasOnlyNoPartnersPlaceholder([placeholderId]), true);
+  assert.equal(input.hasOnlyNoPartnersPlaceholder([placeholder, realPartner]), false);
+  assert.equal(input.hasOnlyNoPartnersPlaceholder([]), false);
+  assert.equal(input.hasNoPartnersPlaceholder([placeholder]), true);
+  assert.equal(input.hasNoPartnersPlaceholder([placeholder, realPartner]), true);
+  assert.equal(input.hasNoPartnersPlaceholder([realPartner]), false);
+  assert.equal(input.hasMixedNoPartnersPlaceholder([placeholder, realPartner]), true);
+  assert.equal(input.hasMixedNoPartnersPlaceholder([singularPlaceholder, realPartner]), true);
+  assert.equal(input.hasMixedNoPartnersPlaceholder([placeholder]), false);
+  assert.equal(input.hasMixedNoPartnersPlaceholder([realPartner]), false);
+
+  assert.equal(input.matchesPartnerFilter([placeholder], 'all', false), false);
+  assert.equal(input.matchesPartnerFilter([placeholder], 'case-aside', false), true);
+  assert.equal(input.matchesPartnerFilter([placeholder], 'without-documents', false, true), false);
+  assert.equal(input.matchesPartnerFilter([placeholder], 'without-drive-folder', false, false, true), false);
+  assert.equal(input.matchesPartnerFilter([realPartner], 'all', false), true);
+  assert.equal(input.matchesPartnerFilter([placeholder, realPartner], 'all', false), false);
+  assert.equal(input.matchesPartnerFilter([placeholder, realPartner], 'case-aside', false), true);
+  assert.equal(input.matchesPartnerFilter([realPartner], 'all', true), false);
+  assert.equal(input.matchesPartnerFilter([realPartner], 'without-documents', false, false), false);
+  assert.equal(input.matchesPartnerFilter([placeholder], 'all', false, true), false);
+  assert.equal(input.matchesPartnerFilter([realPartner], 'without-drive-folder', false, false, true), true);
+  assert.equal(input.matchesPartnerFilter([placeholder, realPartner], 'case-aside', false, false, true), true);
+  assert.equal(input.matchesPartnerFilter([realPartner], 'without-documents', false, true, true), false);
+  assert.equal(input.matchesPartnerFilter([realPartner], 'without-drive-folder', false), false);
+});
+
+test('each company matches at most one distribution filter when classifications overlap', () => {
+  const partner = { partnerId: 13, partnerName: 'Maria da Silva' };
+  const noPartners = { partnerId: -999999, partnerName: 'Sem sócios' };
+  const filters = ['all', 'case-aside', 'without-documents', 'without-drive-folder'];
+  const cases = [
+    { partners: [partner], caseAside: false, withoutDocuments: false, withoutDriveFolder: false, expected: 'all' },
+    { partners: [partner], caseAside: true, withoutDocuments: false, withoutDriveFolder: false, expected: 'case-aside' },
+    { partners: [partner], caseAside: true, withoutDocuments: true, withoutDriveFolder: false, expected: 'without-documents' },
+    { partners: [partner], caseAside: true, withoutDocuments: true, withoutDriveFolder: true, expected: 'without-drive-folder' },
+    { partners: [noPartners], caseAside: false, withoutDocuments: true, withoutDriveFolder: true, expected: 'case-aside' },
+  ];
+
+  for (const entry of cases) {
+    const matches = filters.filter(filter => input.matchesPartnerFilter(
+      entry.partners,
+      filter,
+      entry.caseAside,
+      entry.withoutDocuments,
+      entry.withoutDriveFolder,
+    ));
+    assert.deepEqual(matches, [entry.expected]);
+  }
+});
+
 test('save API preserves blanks, rejects invalid percentages and checks partner company', async () => {
   let writes = 0;
   let matchingPartner = true;
@@ -141,7 +200,7 @@ test('company settings are isolated by company and year and never overwrite part
     'next/cache': { revalidatePath: () => {} },
   });
   const save = changes => api.PUT({ json: async () => ({ companyCnpj: '12345678000199', year: 2025,
-    participationPercentage: null, dividendTaxation: null, status: 'NAO_ENCERRADO', observation: '', ...changes }) });
+    participationPercentage: null, dividendTaxation: null, status: 'NAO_ENCERRADO', observation: '', caseAside: false, ...changes }) });
   assert.equal((await save({ participationPercentage: 0 })).body.participationPercentage, 0);
   assert.equal((await save({ participationPercentage: 25.5, dividendTaxation: 'ISENTO', status: 'ENCERRADO_COM_LUCRO', observation: ' Annual ' })).body.observation, 'Annual');
   assert.equal((await save({ year: 2026 })).status, 200);

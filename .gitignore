@@ -36,6 +36,7 @@ yarn-error.log*
 !.env.example
 
 # local credentials / tokens / secrets
+/credentials/
 .local/
 **/.local/
 **/gmail-token.json
@@ -58,6 +59,7 @@ yarn-error.log*
 
 # runtime / local virtualenvs
 .venv/
+.venv-ocr/
 **/.venv/
 venv/
 **/venv/

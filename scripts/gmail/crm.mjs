@@ -41,7 +41,7 @@ export function projectPartner(events, year = 2026, knownBefore = false) {
   const exit = last?.exitedAt && last.exitedAt <= yearEnd ? last.exitedAt : null;
   return {
     name: ordered.at(-1)?.name, periods, visibleMonths: months,
-    caption: exit ? `Ex sócios · ${exit.split('-').reverse().join('/')}` : `Resumo anual · ${year}`,
+    caption: exit ? `Ex sócios · ${exit.split('-').reverse().join('/')}` : `Sócio ativo · ${year}`,
   };
 }
 

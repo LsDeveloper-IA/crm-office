@@ -11,6 +11,47 @@ export function normalizeDistributionSearch(value: string): string {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
 }
 
+type PartnerFilterRow = {
+  partnerId: number;
+  partnerName: string;
+};
+
+function isNoPartnersPlaceholder(partner: PartnerFilterRow): boolean {
+  const normalizedName = normalizeDistributionSearch(partner.partnerName);
+  return partner.partnerId === -999999
+    || normalizedName === "sem socio"
+    || normalizedName === "sem socios";
+}
+
+export function hasOnlyNoPartnersPlaceholder(partners: PartnerFilterRow[]): boolean {
+  return partners.length > 0 && partners.every(isNoPartnersPlaceholder);
+}
+
+export function hasNoPartnersPlaceholder(partners: PartnerFilterRow[]): boolean {
+  return partners.some(isNoPartnersPlaceholder);
+}
+
+export function hasMixedNoPartnersPlaceholder(partners: PartnerFilterRow[]): boolean {
+  return hasNoPartnersPlaceholder(partners)
+    && partners.some(partner => !isNoPartnersPlaceholder(partner));
+}
+
+export function matchesPartnerFilter(
+  partners: PartnerFilterRow[],
+  filter: "all" | "case-aside" | "without-documents" | "without-drive-folder",
+  caseAside: boolean,
+  withoutDocuments = false,
+  withoutDriveFolder = false,
+): boolean {
+  if (hasNoPartnersPlaceholder(partners)) return filter === "case-aside";
+  if (withoutDriveFolder) return filter === "without-drive-folder";
+  if (filter === "without-drive-folder") return false;
+  if (filter === "without-documents") return withoutDocuments;
+  if (withoutDocuments) return false;
+  if (filter === "case-aside") return caseAside;
+  return !caseAside;
+}
+
 type EditableMonth = {
   participationPercentage?: number | null;
   amount?: number | null;

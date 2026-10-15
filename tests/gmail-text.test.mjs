@@ -38,6 +38,12 @@ test('Gmail bold markers, list bullets and contact footer do not become partner 
   assert.equal(result.companyName, 'SOARES-FERREIRA CONSULTORIA AMBIENTAL LTDA');
 });
 
+test('same-line exit ignores the following current-QSA roster and archive footer', () => {
+  const message = `qui., 27 de fev., 15:49\nEmpresa da empresa Exemplo Ltda., inscrita no CNPJ sob Nº 28.133.640/0001-99\nALTERAÇÃO DE QSA:\nSAI: ANA SOUZA\n\n- BRUNO LIMA - SÓC\n- CARLA SILVA - SÓC\nA documentação está arquivada na respectiva pasta.`;
+  const result = parseTextAlteration(message, { referenceYear: 2025 });
+  assert.deepEqual(result.changes, [{ name: 'ANA SOUZA', action: 'exit' }]);
+});
+
 test('unknown year is never guessed; Date header takes precedence; invalid calendar dates fail', () => {
   assert.throws(() => parseTextAlteration(text), /referenceYear/);
   assert.equal(parseTextAlteration(text, { referenceYear: 2026, dateHeader: 'Wed, 27 Aug 2025 15:49:00 -0300' }).date.year, 2025);

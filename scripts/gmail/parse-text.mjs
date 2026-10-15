@@ -64,6 +64,7 @@ export function parseTextAlteration(text, options = {}) {
   };
   for (const line of normalized.split('\n')) {
     let content = clean(line);
+    let closeAfterLine = false;
     if (!content) continue;
     const flag = content.match(/^(SAI|SAEM|ENTRA|ENTRAM|FICA\s+SOMENTE)\s*:\s*(.*)$/i);
     if (flag) {
@@ -71,9 +72,11 @@ export function parseTextAlteration(text, options = {}) {
       action = /^SA/i.test(flag[1]) ? 'exit' : /^FICA/i.test(flag[1]) ? 'remain' : 'entry';
       content = flag[2];
       if (!content) continue;
+      // An explicit action with a same-line name ends before the current-roster list.
+      closeAfterLine = true;
     }
     if (!action) continue;
-    if (/^(?:\.{3,}|…|\[image:|CONTATO\s*:|PR[ÓO][ -]LABORE\s*:|QSA\s*:|Segue\b|Seguem\b|J[áa] atualizado\b|Desde j[áa]\b|Cordialmente\b|Atenciosamente\b)/i.test(content)) {
+    if (/^(?:\.{3,}|…|\[image:|CONTATO\s*:|PR[ÓO][ -]LABORE\s*:|QSA\s*:|A\s+documenta(?:\u00e7|c)[\u00e3a]o\b|Segue\b|Seguem\b|J[áa] atualizado\b|Desde j[áa]\b|Cordialmente\b|Atenciosamente\b)/i.test(content)) {
       close();
       continue;
     }
@@ -92,6 +95,7 @@ export function parseTextAlteration(text, options = {}) {
       changes.set(key, { name, action });
       sectionCount++;
     }
+    if (closeAfterLine) close();
   }
   close();
   if (!changes.size) throw new Error('Nenhuma seção SAI, ENTRA ou FICA SOMENTE encontrada.');

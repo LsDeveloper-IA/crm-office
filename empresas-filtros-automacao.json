@@ -1,0 +1,986 @@
+[
+  {
+    "cnpj": "36470216000168",
+    "name": "AMANDA MARTINS BATISTA 09419992624",
+    "filter": "skip-instructed",
+    "reason": "Pular conforme revisão cadastral"
+  },
+  {
+    "cnpj": "03910605000108",
+    "name": "ANTONIO TELES CAVALCANTE MERCADINHO",
+    "filter": "skip-instructed",
+    "reason": "Pular conforme revisão cadastral"
+  },
+  {
+    "cnpj": "04907927000160",
+    "name": "ASSOCIACAO AMIGOS DO BRASIL",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "30275386000105",
+    "name": "ASSOCIACAO BEM COMUM",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "23406503000167",
+    "name": "ASSOCIACAO DAS EMPRESAS DO COMPLEXO INDUSTRIAL E PORTUARIO DO PECEM - AECIPP",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "09642669000151",
+    "name": "ASSOCIACAO DOS DELEGADOS DE POLICIA CIVI",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "56421088000170",
+    "name": "ASSOCIACAO DOS GESTORES E LOCATARIOS",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "35065192000107",
+    "name": "ASSOCIACAO DOS JOVENS EMPRESARIOS",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "16514802000150",
+    "name": "ASSOCIACAO DOS LOJISTAS DO CENTRO",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "00000204000122",
+    "name": "ASSOCIACAO DOS MORADORES DA VL CHALOT CJ AUGUA BRANCA",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "12283107000173",
+    "name": "ASSOCIACAO DOS SERVIDORES DA SECRETARIA DE DESENVOLVIMENTO AGRARIO",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "46571812000198",
+    "name": "ASSOCIACAO OUTRA CASA COLETIVA",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "57256006000141",
+    "name": "ASSOCIACAO PROJETO OLIMPIA DE ESPORTE E DESENVOLVIMENTO",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "40216021000163",
+    "name": "ASSOCIACAO VARANDAS TERRA BRASILIS",
+    "filter": "needs-review-policy",
+    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+  },
+  {
+    "cnpj": "30599448000134",
+    "name": "2WV CONSTRUCOES E REFORMAS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ATLANTA SERVICOS E CONSTRUCOES LTDA (0%) | J V ENGENHARIA E CONSTRUÇÕES LTDA (0%) | AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%)"
+  },
+  {
+    "cnpj": "40596187000152",
+    "name": "40.596.187 VALTECIRA SENA MOTA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "42654308000109",
+    "name": "A M GONDIM DE AQUINO TORRES",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: A M P DA SILVA (33%) | J A DISTRIBUIDORA DE GÁS EIRELI (0%) | J M DE O NEGRAO TREINAMENTO LTDA (0%)"
+  },
+  {
+    "cnpj": "11175219000229",
+    "name": "A2PRO COMERCIO DE TECNOLOGIA ELETRONICA AUTOMOTIVA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: A2PRO (17%) | AMP COMERCIO DE COMBUSTIVEIS LTDA (0%) | ATACADAO CENTRO COMERCIO DE INSTRUMENTOS MUSICAIS LTDA (0%)"
+  },
+  {
+    "cnpj": "11504335000163",
+    "name": "ALCANCE ASSESSORIA CONTABIL UNIPESSOAL LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ASSESSORIA CONTABIL OFFICE (0%) | AC ASSESSORIA (0%) | CELERE TECNOLOGIA E ASSESSORIA EM SAUDE PUBLICA E PRIVADA LTDA (0%)"
+  },
+  {
+    "cnpj": "01514155000109",
+    "name": "ANA VIRGINIA BARBOSA MELO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ANA CAROLINE ALBANO MARTINS (0%) | ANA CRISTINA MENDES.ART LTDA (0%) | 1 - EMPRESAS BAIXADAS (0%)"
+  },
+  {
+    "cnpj": "27008122000180",
+    "name": "ANDRADE DISTRIBUIDORA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CLINICA DE PSICOLOGIA INARA ANDRADE GOMES LTDA (0%) | J A DISTRIBUIDORA DE GÁS EIRELI (0%) | JBM DISTRIBUIDORA DE MATERIAL HOSPITALAR LTDA EPP (0%)"
+  },
+  {
+    "cnpj": "27008122000261",
+    "name": "ANDRADE DISTRIBUIDORA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CLINICA DE PSICOLOGIA INARA ANDRADE GOMES LTDA (0%) | J A DISTRIBUIDORA DE GÁS EIRELI (0%) | JBM DISTRIBUIDORA DE MATERIAL HOSPITALAR LTDA EPP (0%)"
+  },
+  {
+    "cnpj": "27008122000342",
+    "name": "ANDRADE DISTRIBUIDORA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CLINICA DE PSICOLOGIA INARA ANDRADE GOMES LTDA (0%) | J A DISTRIBUIDORA DE GÁS EIRELI (0%) | JBM DISTRIBUIDORA DE MATERIAL HOSPITALAR LTDA EPP (0%)"
+  },
+  {
+    "cnpj": "32127100000170",
+    "name": "ANTONIO CAVALCANTE PINTO NETO LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ANTONIO TELES (0%) | ANTONIO TELES FROTA JR (0%) | FF DUARTE CAVALCANTE & MANIPULADOS LTDA (0%)"
+  },
+  {
+    "cnpj": "48712232000107",
+    "name": "ARM PARTICIPACOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ARBORA NEGOCIOS E PARTICIPACOES LTDA (0%) | B3 CAPITAL PARTICIPAÇÕES LTDA (0%) | CMP PARTICIPACOES LTDA (0%)"
+  },
+  {
+    "cnpj": "06068436000107",
+    "name": "ASSIS SCAP COMERCIO DE PECAS E SERVICOS",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: SERILOS COMERCIO E SERVICOS DE PLACAS LTDA (0%) | AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "41865769000230",
+    "name": "ATIVIDADE IMOB RET PMCMV",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "00000210000180",
+    "name": "ATIVIDADE IMOBILIARIA RET",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ESRA PARTICIPACAO IMOBILIARIA LTDA (0%) | FIALHO - CONSTRUCAO E IMOBILIARIA LTDA (0%) | IMOBILIÁRIA CEARENSE LTDA (0%)"
+  },
+  {
+    "cnpj": "41865768000377",
+    "name": "ATIVIDADE IMOBILIARIA RET",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ESRA PARTICIPACAO IMOBILIARIA LTDA (0%) | FIALHO - CONSTRUCAO E IMOBILIARIA LTDA (0%) | IMOBILIÁRIA CEARENSE LTDA (0%)"
+  },
+  {
+    "cnpj": "02932921000118",
+    "name": "BARRACA SORRISO DO SOL LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ASSOCIAÇÃO AMIGOS DO BRASIL (0%) | COSTA DO BRASIL PARTICIPACOES LTDA (0%) | DUARTE MEDICINA E SEGURANCA DO TRABALHO LTDA (0%)"
+  },
+  {
+    "cnpj": "10676662000130",
+    "name": "BASTOS & OLIVEIRA COMERCIO E SERVICOS LT",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | LABORATORIAL COMERCIO E SERVICOS LTDA (0%) | M & P COMERCIO E SERVICOS LIMITADA (0%)"
+  },
+  {
+    "cnpj": "59882972000108",
+    "name": "BEA SERVICOS DE TREINAMENTO EM DESENVOLVIMENTO PROFISSIONAL E GERENCIAL LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: FIX TECNOLOGIA E DESENVOLVIMENTO DE SOFTWARES LTDA (0%) | JCM SERVICOS DE GESTAO E ADMINISTRACAO DE PESSOAL LTDA (0%) | RESERVAFOR SERVICOS DE RESERVAS DE CASAS E HOTEIS LTDA (0%)"
+  },
+  {
+    "cnpj": "02668300000500",
+    "name": "BIOSAUDE PRODUTOS HOSPITALARES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: BIOSAUDE (33%) | NEW CARDIO MEDICAL COMERCIO DE PRODUTOS MEDICOS LTDA (0%) | TOTAL SPORTS COMERCIO DE PRODUTOS ESPORTIVOS LTDA (0%)"
+  },
+  {
+    "cnpj": "42361582000181",
+    "name": "BRENA AMANDA BIZERRA BATISTA GUI BEBIDAS",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AMANDA MARTINS (0%) | ANDERSON BATISTA (0%) | D P W COMERCIO DE BEBIDAS LTDA (0%)"
+  },
+  {
+    "cnpj": "28489162000154",
+    "name": "CAMILA DE SOUSA SANTANA MELO 01270537431",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: GABRIELLE ALBUQUERQUE DE SOUSA (0%) | GEOVANE P DE SOUSA TRANSPORTES (0%) | JOAO LUCAS SERAFIM DE SOUSA (0%)"
+  },
+  {
+    "cnpj": "37867482000191",
+    "name": "CARLA VILLAS BOAS BARBOSA 10104907703",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "05524900000151",
+    "name": "COMFEL ARMAZENAMENTO DE SUCATAS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: COMFEL (25%) | ABIDIAS DE MORAES PEREIRA RADIO LTDA (0%) | ACADEMY SERVICOS DE TREINAMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "11768017000100",
+    "name": "CONDOMINIO EDIFICIO OLIVEIRA FERNANDES",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: COND OLIVEIRA FERNANDES (0%) | CARNEIRO OLIVEIRA (0%) | CARTORIO OLIVEIRA & OLIVEIRA - SEGUNDO OFICIO (0%)"
+  },
+  {
+    "cnpj": "01927381000111",
+    "name": "CONSELHO ESCOLAR DA ESCOLA MUNICIPAL DE ENSINO FUNDAMENTAL ANTONIO RONNA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CENTRO DE ENSINO INSTITUTO DE VENDAS (0%) | POSTO DE COMBUSTIVEIS E LUBRIFICANTES SANTO ANTONIO LTDA (0%) | A M P DA SILVA (0%)"
+  },
+  {
+    "cnpj": "00000103000151",
+    "name": "CTB REMA ASSESSORIA CONTABIL LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ASSESSORIA CONTABIL OFFICE (0%) | AC ASSESSORIA (0%) | CELERE TECNOLOGIA E ASSESSORIA EM SAUDE PUBLICA E PRIVADA LTDA (0%)"
+  },
+  {
+    "cnpj": "05092558000168",
+    "name": "CTI - CENTRO DE TERAPIAS INTEGRADAS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CTI-CENTRO TERAPIAS (60%) | ASSOCIACAO NACIONAL DE TERAPIAS CANABICAS (0%) | ATACADAO CENTRO COMERCIO DE INSTRUMENTOS MUSICAIS LTDA (0%)"
+  },
+  {
+    "cnpj": "14787566000110",
+    "name": "D & E COMERCIO DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "19247452000109",
+    "name": "D & R COMERCIO DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: D P W COMERCIO DE BEBIDAS LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "17143338000103",
+    "name": "D R B M CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: B M COSTA SERVICOS EDUCACIONAIS LTDA (0%) | M & M FREITAS INDUSTRIA DE CONFECCOES LTDA (0%) | R M TREINAMENTOS (0%)"
+  },
+  {
+    "cnpj": "21818643000117",
+    "name": "D&B COMERCIO DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: D P W COMERCIO DE BEBIDAS LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "21164411000192",
+    "name": "D&M COMERCIO DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: D P W COMERCIO DE BEBIDAS LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "43082596000200",
+    "name": "DIGITAL COLLEGE FORTALEZA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CE CERTIFICACAO DIGITAL LTDA (0%) | ERIKA DANTAS DIGITAL MARKETING LTDA (0%) | ORGAO DE GESTAO DE MAO DE O DO TP DO P ORG DE FORTALEZA (0%)"
+  },
+  {
+    "cnpj": "43082596000129",
+    "name": "DIGITAL COLLEGE FORTALEZA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CE CERTIFICACAO DIGITAL LTDA (0%) | ERIKA DANTAS DIGITAL MARKETING LTDA (0%) | ORGAO DE GESTAO DE MAO DE O DO TP DO P ORG DE FORTALEZA (0%)"
+  },
+  {
+    "cnpj": "43082596000390",
+    "name": "DIGITAL COLLEGE FORTALEZA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CE CERTIFICACAO DIGITAL LTDA (0%) | ERIKA DANTAS DIGITAL MARKETING LTDA (0%) | ORGAO DE GESTAO DE MAO DE O DO TP DO P ORG DE FORTALEZA (0%)"
+  },
+  {
+    "cnpj": "12975412000126",
+    "name": "DISTRIBUIDORA DE ALIMENTOS VITALICIO LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: F P N SERVICOS DE ALIMENTOS LTDA (0%) | J A DISTRIBUIDORA DE GÁS EIRELI (0%) | JBM DISTRIBUIDORA DE MATERIAL HOSPITALAR LTDA EPP (0%)"
+  },
+  {
+    "cnpj": "59812591000144",
+    "name": "DM AI TECH SERVICOS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: A.K.F.G SERVIÇOS EDUCACIONAIS (0%) | AB SERVICOS MEDICOS LTDA (0%) | ACADEMY SERVICOS DE TREINAMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "24408993000101",
+    "name": "DR E B COMERCIO DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "26095185000159",
+    "name": "DR E M COMERCIO DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "27796696000160",
+    "name": "DROGARIA MAIS SAUDE SOCIEDADE EMPRESARIA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ACTO SOLUCOES EM SAUDE LTDA (0%) | CELERE TECNOLOGIA E ASSESSORIA EM SAUDE PUBLICA E PRIVADA LTDA (0%) | FABIO TAVARES - SOCIEDADE INDIVIDUAL DE ADVOCACIA (0%)"
+  },
+  {
+    "cnpj": "41977217000133",
+    "name": "EMPRESA SIMPLES - COMERCIO E IND",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%) | DBO INDUSTRIA E COMÉRCIO LTDA (0%)"
+  },
+  {
+    "cnpj": "23167223000143",
+    "name": "EMPRESA SIMPLES - COMERCIO E SERVIÇO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%) | DBO INDUSTRIA E COMÉRCIO LTDA (0%)"
+  },
+  {
+    "cnpj": "17792181000139",
+    "name": "EMPRESA SIMPLES - COMERCIO, SERV E IND",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%) | DBO INDUSTRIA E COMÉRCIO LTDA (0%)"
+  },
+  {
+    "cnpj": "91181339000197",
+    "name": "EMPRESA SIMPLES - INDUSTRIA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 3D INDÚSTRIA (0%) | DBO INDUSTRIA E COMÉRCIO LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "85693410000118",
+    "name": "EMPRESA SIMPLES - SERVIÇO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: E S SILVA SERVIÇO ADMINISTRATIVO LTDA (0%) | EMPRESA JR DA FEAACS (0%) | TAX SIMPLES CONTABILIDADE SS (0%)"
+  },
+  {
+    "cnpj": "19093773000279",
+    "name": "ENGAJA COMUNICACAO LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: G O TREINAMENTO E COMUNICACAO LTDA (0%) | 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%)"
+  },
+  {
+    "cnpj": "19093773000198",
+    "name": "ENGAJA COMUNICACAO LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: G O TREINAMENTO E COMUNICACAO LTDA (0%) | 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%)"
+  },
+  {
+    "cnpj": "55479491000197",
+    "name": "ESPETARIA MOSSORO LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "19498729000168",
+    "name": "EUSEBIO AUTOS COMERCIO DE PECAS E SERVIC",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%) | DIMEDICAL COMERCIO E REPRESENTACAO DE MATERIAL MEDICO E HOSPITALAR LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "44995186000131",
+    "name": "F F DE OLIVEIRA SANTOS",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: F S DE OLIVEIRA (0%) | F P N SERVICOS DE ALIMENTOS LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "26545367000184",
+    "name": "FARMAVET PRODUTOS VETERINARIOS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: NEW CARDIO MEDICAL COMERCIO DE PRODUTOS MEDICOS LTDA (0%) | TOTAL SPORTS COMERCIO DE PRODUTOS ESPORTIVOS LTDA (0%) | 1 - EMPRESAS BAIXADAS (0%)"
+  },
+  {
+    "cnpj": "59676571000193",
+    "name": "FERREIRA GUEDES SOLUCOES EMPRESARIAIS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: INOV SOLUÇOES EMPRESARIAIS, ASSESSORIA LTDA (0%) | ACTO SOLUCOES EM SAUDE LTDA (0%) | AMPLA SOLUCOES (0%)"
+  },
+  {
+    "cnpj": "18977348000280",
+    "name": "FILIAL PRESUMIDO - COM, SERV E IND",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | ARBORA NEGOCIOS E PARTICIPACOES LTDA (0%) | ASP ARQUIVOLOGIA, CONSULTORIA E DIGITALIZACAO LTDA (0%)"
+  },
+  {
+    "cnpj": "28823444000146",
+    "name": "FITPRIME ESCOLA DE EMPREENDEDORISMO FITN",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ABIDIAS DE MORAES PEREIRA RADIO LTDA (0%) | ACADEMY SERVICOS DE TREINAMENTOS LTDA (0%) | AGUIAS MIDIA SERVICOS DE MARKETING LTDA (0%)"
+  },
+  {
+    "cnpj": "89612934000198",
+    "name": "FOLHA PROFESSOR",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "37592366000107",
+    "name": "FRANCISCO DE ASSIS AZEVEDO CARIOCA 07278",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CENTRO DE MEDICINA INTEGRADA SÃO FRANCISCO (0%) | E L DE AZEVEDO (0%) | EN DE AZEVEDO (0%)"
+  },
+  {
+    "cnpj": "15410690000124",
+    "name": "FRUT FLOR INDUSTRIA E COMERCIO DE CONFEC",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | RAMIRA INDUSTRIA E COMERCIO DE MODA LTDA (0%)"
+  },
+  {
+    "cnpj": "42568110000102",
+    "name": "FTI COMERCIO E SERVICOS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | LABORATORIAL COMERCIO E SERVICOS LTDA (0%) | M & P COMERCIO E SERVICOS LIMITADA (0%)"
+  },
+  {
+    "cnpj": "04704007000145",
+    "name": "FUNDACAO VALE DO JAGUARIBE",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: HOTEL DO VALE LTDA (0%) | LUCAS DO VALE FARIAS FALCÃO (0%) | ASSOCIAÇÃO AMIGOS DO BRASIL (0%)"
+  },
+  {
+    "cnpj": "49545422000131",
+    "name": "G. L. F. ROCHA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: A.K.F.G SERVIÇOS EDUCACIONAIS (0%) | F. G. GUILHERME NET LTDA (0%) | L G GALVAO JUSTEN SERVICOS GRAFICOS LTDA (0%)"
+  },
+  {
+    "cnpj": "31188343000155",
+    "name": "GEOTEKNIK TREINAMENTOS E CONSULTORIA LTD",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: D. VIEGAS CONSULTORIA EDUCACIONAL E TREINAMENTOS LTDA (0%) | SOCORRO OLIVEIRA CONSULTORIA E TREINAMENTOS LTDA (0%) | ASP ARQUIVOLOGIA, CONSULTORIA E DIGITALIZACAO LTDA (0%)"
+  },
+  {
+    "cnpj": "58647059000156",
+    "name": "GRANJA SERTAO POTIGUAR LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "31227423000172",
+    "name": "GRUPO AFETO DE APOIO A ADOCAO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: J A DISTRIBUIDORA DE GÁS EIRELI (0%) | LUME SERVICOS DE APOIO ADMINISTRATIVO LTDA (0%) | A C IMAGEM (0%)"
+  },
+  {
+    "cnpj": "47305819000120",
+    "name": "GVPTECH SERVICOS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: A.K.F.G SERVIÇOS EDUCACIONAIS (0%) | AB SERVICOS MEDICOS LTDA (0%) | ACADEMY SERVICOS DE TREINAMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "24450328000178",
+    "name": "HOLANDA&FIRMINO PET HOSTEL BONS AMIGOS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: BONS AMIGOS CLUBE LTDA (0%) | ASSOCIAÇÃO AMIGOS DO BRASIL (0%) | 1 - EMPRESAS BAIXADAS (0%)"
+  },
+  {
+    "cnpj": "18315393000198",
+    "name": "IANA LARA FERRAZ OLEGARIO 06330162336",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "16799075000114",
+    "name": "IARA SAMARA FERRAZ OLEGARIO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "44829652000109",
+    "name": "INSTITUTO PABLO SANTIAGO DE SAUDE INTEGRADA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CENTRO DE ENSINO INSTITUTO DE VENDAS (0%) | CENTRO DE MEDICINA INTEGRADA SALUS LTDA (0%) | CENTRO DE MEDICINA INTEGRADA SÃO FRANCISCO (0%)"
+  },
+  {
+    "cnpj": "19794018000130",
+    "name": "J B M DISTRIBUIDORA DE MATERIAL HOSPITALAR LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: JBM DISTRIBUIDORA DE MATERIAL HOSPITALAR LTDA EPP (0%) | DIMEDICAL COMERCIO E REPRESENTACAO DE MATERIAL MEDICO E HOSPITALAR LTDA (0%) | J A DISTRIBUIDORA DE GÁS EIRELI (0%)"
+  },
+  {
+    "cnpj": "23950295000162",
+    "name": "JACQUELINE MARIA RIOS NOBREGA 5250226035",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: MARIA DA CONCEICAO FREITAS ALMEIDA (0%) | MARIA DO SOCORRO (0%) | MARIA JOSETE (0%)"
+  },
+  {
+    "cnpj": "52666471000137",
+    "name": "JL SERVICOS DE DEPILACAO LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ACADEMY SERVICOS DE TREINAMENTOS LTDA (0%) | AGUIAS MIDIA SERVICOS DE MARKETING LTDA (0%) | DBS PRESTACAO DE SERVICOS LTDA (0%)"
+  },
+  {
+    "cnpj": "27963378000147",
+    "name": "JOAO DE SOUSA OLIVEIRA NETO 53182685368",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: JOAO LUCAS SERAFIM DE SOUSA (0%) | F S DE OLIVEIRA (0%) | GABRIELLE ALBUQUERQUE DE SOUSA (0%)"
+  },
+  {
+    "cnpj": "09129812000106",
+    "name": "JOICE APARECIDA DA SILVA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: A M P DA SILVA (0%) | ROMENILDO MANOEL DA SILVA BATISTA (0%) | ALTO DA MANGABEIRA INCORPORAÇÕES SPE LTDA (0%)"
+  },
+  {
+    "cnpj": "27542847000154",
+    "name": "JOSE DONIZETI DO COUTO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ASSOCIAÇÃO AMIGOS DO BRASIL (0%) | COSTA DO BRASIL PARTICIPACOES LTDA (0%) | DUARTE MEDICINA E SEGURANCA DO TRABALHO LTDA (0%)"
+  },
+  {
+    "cnpj": "28551795000145",
+    "name": "JOSE EUCLIDES AQUINO DA SILVA JUNIOR",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: A M P DA SILVA (0%) | EMPRESA JR DA FEAACS (0%) | ROMENILDO MANOEL DA SILVA BATISTA (0%)"
+  },
+  {
+    "cnpj": "06323147000107",
+    "name": "JOTAGE COMERCIO LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: JOTAGE (50%) | AMP COMERCIO DE COMBUSTIVEIS LTDA (0%) | AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%)"
+  },
+  {
+    "cnpj": "28507422000177",
+    "name": "JS INSTITUTO DE PROFISSOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CENTRO DE ENSINO INSTITUTO DE VENDAS (0%) | ABIDIAS DE MORAES PEREIRA RADIO LTDA (0%) | ACADEMY SERVICOS DE TREINAMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "14068512000102",
+    "name": "K C C CABRAL PUBLICIDADE",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: A C IMAGEM (0%) | C L C SERVICOS ADMINISTRATIVOS LTDA (0%) | C P GESTÃO DE RECEBIVEIS LTDA (0%)"
+  },
+  {
+    "cnpj": "50978255000100",
+    "name": "LARISSA ARRUDA AGUIAR ALVERNE",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "00661349000174",
+    "name": "LONDON COMERCIO DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | MARILIPE COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "43476240000170",
+    "name": "LUCAS ALENCAR DE BRITO - SOCIEDADE INDIVIDUAL DE ADVOCACIA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: LUCAS ALENCAR OAB (25%) | FABIO TAVARES - SOCIEDADE INDIVIDUAL DE ADVOCACIA (0%) | LIECIO NOGUEIRA SOCIEDADE INDIVIDUAL DE ADVOCACIA (0%)"
+  },
+  {
+    "cnpj": "10231820000148",
+    "name": "LUCRO PRESUMIDO - COM, SERV E IND",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | ARBORA NEGOCIOS E PARTICIPACOES LTDA (0%) | ASP ARQUIVOLOGIA, CONSULTORIA E DIGITALIZACAO LTDA (0%)"
+  },
+  {
+    "cnpj": "90894321000170",
+    "name": "LUCRO PRESUMIDO - COMERCIO E INDUSTRIA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: DBO INDUSTRIA E COMÉRCIO LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "21478962000120",
+    "name": "LUCRO PRESUMIDO - COMERCIO E SERVIÇO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%) | DBO INDUSTRIA E COMÉRCIO LTDA (0%)"
+  },
+  {
+    "cnpj": "83299333000190",
+    "name": "LUCRO PRESUMIDO - INDUSTRIA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 3D INDÚSTRIA (0%) | DBO INDUSTRIA E COMÉRCIO LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "64847127000123",
+    "name": "LUCRO REAL - TRANSPORTADORA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "14346585000100",
+    "name": "M & E COMERCIO DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "33120099000114",
+    "name": "M M R PEREIRA RADIO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: M M MEDICAMENTOS LTDA (40%) | M & M FREITAS INDUSTRIA DE CONFECCOES LTDA (33%) | R M TREINAMENTOS (0%)"
+  },
+  {
+    "cnpj": "22863409000174",
+    "name": "M VERONICA S DE QUEIROZ",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: F S DE OLIVEIRA (0%) | J M DE O NEGRAO TREINAMENTO LTDA (0%) | M & M FREITAS INDUSTRIA DE CONFECCOES LTDA (0%)"
+  },
+  {
+    "cnpj": "46878838000183",
+    "name": "MACHADO AGUIAR ESCRITORIOS COMPARTILHADOS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "02179944000101",
+    "name": "MADRYCA CORRETORA DE SEGUROS LTDA.",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ABIDIAS DE MORAES PEREIRA RADIO LTDA (0%) | ACADEMY SERVICOS DE TREINAMENTOS LTDA (0%) | AGUIAS MIDIA SERVICOS DE MARKETING LTDA (0%)"
+  },
+  {
+    "cnpj": "47712063000134",
+    "name": "MAIS SAUDE DROGARIA SOCIEDADE EMPRESARIA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ACTO SOLUCOES EM SAUDE LTDA (0%) | CELERE TECNOLOGIA E ASSESSORIA EM SAUDE PUBLICA E PRIVADA LTDA (0%) | FABIO TAVARES - SOCIEDADE INDIVIDUAL DE ADVOCACIA (0%)"
+  },
+  {
+    "cnpj": "47712063000215",
+    "name": "MAIS SAUDE DROGARIA SOCIEDADE EMPRESARIA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ACTO SOLUCOES EM SAUDE LTDA (0%) | CELERE TECNOLOGIA E ASSESSORIA EM SAUDE PUBLICA E PRIVADA LTDA (0%) | FABIO TAVARES - SOCIEDADE INDIVIDUAL DE ADVOCACIA (0%)"
+  },
+  {
+    "cnpj": "03915936000130",
+    "name": "MARCONE COSTA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: B M COSTA SERVICOS EDUCACIONAIS LTDA (0%) | COSTA DO BRASIL PARTICIPACOES LTDA (0%) | COSTA ENGENHARIA 2 SPE LTDA (0%)"
+  },
+  {
+    "cnpj": "23806499000124",
+    "name": "MARCOS ANDRETT MOURA FERNANDES SERVICOS",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: N G C FERNANDES SERVICOS MEDICOS (0%) | A.K.F.G SERVIÇOS EDUCACIONAIS (0%) | AB SERVICOS MEDICOS LTDA (0%)"
+  },
+  {
+    "cnpj": "37022164300102",
+    "name": "MARIA CARMEM NOGUEIRA DE AZEVEDO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: E L DE AZEVEDO (0%) | EN DE AZEVEDO (0%) | J N DE AZEVEDO EIRELI EPP (0%)"
+  },
+  {
+    "cnpj": "10236806000137",
+    "name": "MARIA ELBA BARBOSA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: MARIA DA CONCEICAO FREITAS ALMEIDA (0%) | MARIA DO SOCORRO (0%) | MARIA JOSETE (0%)"
+  },
+  {
+    "cnpj": "19704421000121",
+    "name": "MATHEUS BARBOSA SANTIAGO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "18977348000107",
+    "name": "MATRIZ PRESUMIDO - COM, SERV E IND",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | ARBORA NEGOCIOS E PARTICIPACOES LTDA (0%) | ASP ARQUIVOLOGIA, CONSULTORIA E DIGITALIZACAO LTDA (0%)"
+  },
+  {
+    "cnpj": "22148821000102",
+    "name": "MEB COMERCIO DE EMBALAGENS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AMP COMERCIO DE COMBUSTIVEIS LTDA (0%) | ATACADAO CENTRO COMERCIO DE INSTRUMENTOS MUSICAIS LTDA (0%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "08950624000181",
+    "name": "METALCOUROS COMERCIO DE METAIS E COUROS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: METALCOUROS (17%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%) | DIMEDICAL COMERCIO E REPRESENTACAO DE MATERIAL MEDICO E HOSPITALAR LTDA (0%)"
+  },
+  {
+    "cnpj": "00000202000133",
+    "name": "MODELO LUCRO PRESUMIDO - SERVIÇO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: E S SILVA SERVIÇO ADMINISTRATIVO LTDA (0%) | GERAÇÃO SOLAR MODELO 1 LTDA (0%) | GERAÇÃO SOLAR MODELO 2 LTDA (0%)"
+  },
+  {
+    "cnpj": "00000106000195",
+    "name": "MODELO SIMPLES NACIONAL - COM SERV IND",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ASSOCIACAO NACIONAL DE TERAPIAS CANABICAS (0%) | GERAÇÃO SOLAR MODELO 1 LTDA (0%) | GERAÇÃO SOLAR MODELO 2 LTDA (0%)"
+  },
+  {
+    "cnpj": "00000100000118",
+    "name": "MODELO SIMPLES NACIONAL - COMERCIO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AMP COMERCIO DE COMBUSTIVEIS LTDA (0%) | AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | ASSOCIACAO NACIONAL DE TERAPIAS CANABICAS (0%)"
+  },
+  {
+    "cnpj": "00000101000162",
+    "name": "MODELO SIMPLES NACIONAL - SERVIÇO",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ASSOCIACAO NACIONAL DE TERAPIAS CANABICAS (0%) | E S SILVA SERVIÇO ADMINISTRATIVO LTDA (0%) | GERAÇÃO SOLAR MODELO 1 LTDA (0%)"
+  },
+  {
+    "cnpj": "45365874000180",
+    "name": "MVMM SUPORTE INFORMATICA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "58586771000192",
+    "name": "NATHALIA BESSA ATIVIDADE MEDICA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CLINICA MEDICA THAMIDI LA LTDA (0%) | GT CLINICA MEDICA LTDA (0%) | 1 - EMPRESAS BAIXADAS (0%)"
+  },
+  {
+    "cnpj": "21271720000161",
+    "name": "NAYARA NATYLA PIO PIMENTEL - LANCHONETE",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "34126604000109",
+    "name": "OPINIAO POSITIVA COMUNICACOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "34128162000121",
+    "name": "OUROCERT SERVICO DE AUTORIDADE DE REGISTRO LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ABIDIAS DE MORAES PEREIRA RADIO LTDA (0%) | ACADEMY SERVICOS DE TREINAMENTOS LTDA (0%) | AGUIAS MIDIA SERVICOS DE MARKETING LTDA (0%)"
+  },
+  {
+    "cnpj": "20639133000110",
+    "name": "POMUR CURSOS TECNICOS PROFISSIONALIZANTE",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "29255408000196",
+    "name": "PORTO SOLUCOES IMOBILIARIAS E CONSULTORI",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: GUADALUPE SERVICOS E SOLUCOES INTEGRADAS LTDA (0%) | NAWA SONDAGEM E SOLUCOES GEOAMBIENTAIS LTDA (0%) | QUANTRIX SOLUÇÕES E TECNOLOGIA LTDA (0%)"
+  },
+  {
+    "cnpj": "35816844000190",
+    "name": "POSTO VIA OESTE PRIME 9 COMERCIO VAREJISTA DE COMBUSTIVEIS E LUBRIFICANTES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: POSTO DE COMBUSTIVEIS E LUBRIFICANTES SANTO ANTONIO LTDA (0%) | AMP COMERCIO DE COMBUSTIVEIS LTDA (0%) | B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "17447150000140",
+    "name": "POUSADA PEPONE LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: POSTO E POUSADA MOREIRA & PINHEIRO LTDA (0%) | POUSADA HORIZONTE LTDA (0%) | 1 - EMPRESAS BAIXADAS (0%)"
+  },
+  {
+    "cnpj": "11868194000168",
+    "name": "PRISCILA PEREIRA MOREIRA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: PRISCILA (33%) | ABIDIAS DE MORAES PEREIRA RADIO LTDA (0%) | JORGE LUCAS DE SOUSA MOREIRA LTDA (0%)"
+  },
+  {
+    "cnpj": "02653810000172",
+    "name": "PROLEITE COMERCIO DE PRODUTOS AGROPECUARIOS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: NEW CARDIO MEDICAL COMERCIO DE PRODUTOS MEDICOS LTDA (0%) | TOTAL SPORTS COMERCIO DE PRODUTOS ESPORTIVOS LTDA (0%) | AMP COMERCIO DE COMBUSTIVEIS LTDA (0%)"
+  },
+  {
+    "cnpj": "42600370000100",
+    "name": "R M FIALHO LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: R M TREINAMENTOS (67%) | S M R F FEITOSA (0%) | A M P DA SILVA (0%)"
+  },
+  {
+    "cnpj": "07429664000110",
+    "name": "R NONATO FERNANDES",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: COND OLIVEIRA FERNANDES (0%) | N G C FERNANDES SERVICOS MEDICOS (0%) | R M TREINAMENTOS (0%)"
+  },
+  {
+    "cnpj": "54836438000133",
+    "name": "REAL - COMERCIO E INDUSTRIA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: DBO INDUSTRIA E COMÉRCIO LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "40684068000151",
+    "name": "REAL - POSTO DE COMBUSTIVEL",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: POSTO DE COMBUSTIVEIS E LUBRIFICANTES SANTO ANTONIO LTDA (0%) | ABIDIAS DE MORAES PEREIRA RADIO LTDA (0%) | ACADEMY SERVICOS DE TREINAMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "21953750000158",
+    "name": "REALIZA FESTAS E EVENTOS PERSONALIZADOS",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | ARBORA NEGOCIOS E PARTICIPACOES LTDA (0%) | ASP ARQUIVOLOGIA, CONSULTORIA E DIGITALIZACAO LTDA (0%)"
+  },
+  {
+    "cnpj": "34177866000194",
+    "name": "RH SOLUTION EM INFORMATICA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: RH CONSULTORIA EM TECNOLOGIA LTDA (0%) | ACTO SOLUCOES EM SAUDE LTDA (0%) | CELERE TECNOLOGIA E ASSESSORIA EM SAUDE PUBLICA E PRIVADA LTDA (0%)"
+  },
+  {
+    "cnpj": "17220091000173",
+    "name": "ROBERTO CESAR PEREIRA COSTA - INFORMATICA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ABIDIAS DE MORAES PEREIRA RADIO LTDA (0%) | B M COSTA SERVICOS EDUCACIONAIS LTDA (0%) | COSTA DO BRASIL PARTICIPACOES LTDA (0%)"
+  },
+  {
+    "cnpj": "29338306000134",
+    "name": "S C ENGENHARIA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: M.S ENGENHARIA SPE LTDA (0%) | A C IMAGEM (0%) | C L C SERVICOS ADMINISTRATIVOS LTDA (0%)"
+  },
+  {
+    "cnpj": "29487108000132",
+    "name": "SABRINA LIMA FERREIRA MUNIZ 65123298304",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ANDERSON SOUSA LIMA (0%) | SOARES-FERREIRA CONSULTORIA AMBIENTAL LTDA (0%) | T S R LIMA TREINAMENTOS LTDA (0%)"
+  },
+  {
+    "cnpj": "18083210000156",
+    "name": "SANTONIO COMERCIAL DE MOVEIS E EQUIPAMENTOS LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: B2YOU COMERCIO DE COSMETICOS E SUPLEMENTOS LTDA (0%) | CEBRITA BRITAGEM E LOCACAO DE MAQUINAS LTDA (0%) | CLINICA DE ODONTOLOGIA E ESTETICA PREVENTIVA DR. RODRIGO FROTA LTDA (0%)"
+  },
+  {
+    "cnpj": "47951740000177",
+    "name": "SANTOS E EVANGELISTA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | ARBORA NEGOCIOS E PARTICIPACOES LTDA (0%) | ASP ARQUIVOLOGIA, CONSULTORIA E DIGITALIZACAO LTDA (0%)"
+  },
+  {
+    "cnpj": "07497216000153",
+    "name": "SEGSERCOP - SEGURANCA ELETRONICA REPRESSIVA PREDIAL, OPERACIONAL. COMERCIO E INSTALACOES ELETRO ELETRONICA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: BIG ELETRONICA COMERCIO LTDA (0%) | ELETRONICA COMERCIO LTDA (0%) | TOP ELETRONICA COMERCIO LTDA (0%)"
+  },
+  {
+    "cnpj": "08284053000193",
+    "name": "SOUZA ALMEIDA ALUMINIO IND E C",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: D & C CONSULTORIA EDUCACIONAL E TREINAMENTO LTDA (0%) | F. ALMEIDA TREINAMENTOS E AGROPECUARIA LTDA (0%) | PH COMERCIO E DISTRIBUICAO DE VIDRO, ALUMINIO, FERRAGEM, E ACESSORIOS LTDA (0%)"
+  },
+  {
+    "cnpj": "12301891000103",
+    "name": "SOUZACUCAR",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: 1 - EMPRESAS BAIXADAS (0%) | 2 - EMPRESAS NÃO CLIENTES - INATIVAS (0%) | 3D INDÚSTRIA (0%)"
+  },
+  {
+    "cnpj": "10856460000501",
+    "name": "TECNO FOODS ALIMENTOS DO BRASIL LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ASSOCIAÇÃO AMIGOS DO BRASIL (0%) | COSTA DO BRASIL PARTICIPACOES LTDA (0%) | FAST DADOS E TECNOLOGIA DO BRASIL LTDA (0%)"
+  },
+  {
+    "cnpj": "01103427000340",
+    "name": "TORQUATO IND & COM DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: TORQUATO INDUSTRIA & COMERCIO DE CONFECCOES LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "01103427000269",
+    "name": "TORQUATO IND & COM DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: TORQUATO INDUSTRIA & COMERCIO DE CONFECCOES LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "01103427000501",
+    "name": "TORQUATO IND & COM DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: TORQUATO INDUSTRIA & COMERCIO DE CONFECCOES LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "01103427000420",
+    "name": "TORQUATO IND & COM DE CONFECCOES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: TORQUATO INDUSTRIA & COMERCIO DE CONFECCOES LTDA (0%) | DINART INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%) | F. DINARTE INDUSTRIA E COMÉRCIO DE CONFECÇÕES LTDA (0%)"
+  },
+  {
+    "cnpj": "66902581000165",
+    "name": "TORRES E GONDIM CONSTRUCAO E PROJETOS LT",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: FIALHO - CONSTRUCAO E IMOBILIARIA LTDA (0%) | AR FRIO REFRIGERACAO COMERCIO E SERVICOS LTDA ME (0%) | ARBORA NEGOCIOS E PARTICIPACOES LTDA (0%)"
+  },
+  {
+    "cnpj": "07360366000110",
+    "name": "TROPICNOR CONSULTORIA IMOBILIARIA LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: MP CONSULTORIA IMOBILIÁRIA LTDA (0%) | ARPA CONSULTORIA ESTRATEGICA LTDA (0%) | ASP ARQUIVOLOGIA, CONSULTORIA E DIGITALIZACAO LTDA (0%)"
+  },
+  {
+    "cnpj": "02943170000135",
+    "name": "UNIASP UNIAO DE ASSISTENCIA AOS SERVIDORES PUBLICOS",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: ABIDIAS DE MORAES PEREIRA RADIO LTDA (0%) | ACADEMY SERVICOS DE TREINAMENTOS LTDA (0%) | AGUIAS MIDIA SERVICOS DE MARKETING LTDA (0%)"
+  },
+  {
+    "cnpj": "46655432000131",
+    "name": "VOX SERVICOS DE APOIO ADMINISTRATIVOS LT",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: LUME SERVICOS DE APOIO ADMINISTRATIVO LTDA (0%) | ACADEMY SERVICOS DE TREINAMENTOS LTDA (0%) | AGUIAS MIDIA SERVICOS DE MARKETING LTDA (0%)"
+  },
+  {
+    "cnpj": "36668478000131",
+    "name": "XCONTROL CONSULTORIA EM TECNOLOGIA DA INFORMACAO E CONTROLES LTDA",
+    "filter": "without-drive-folder",
+    "reason": "nenhuma pasta atingiu confiança suficiente; candidatos: CELERE TECNOLOGIA E ASSESSORIA EM SAUDE PUBLICA E PRIVADA LTDA (0%) | RH CONSULTORIA EM TECNOLOGIA LTDA (0%) | ASP ARQUIVOLOGIA, CONSULTORIA E DIGITALIZACAO LTDA (0%)"
+  },
+  {
+    "cnpj": "44194660002412",
+    "name": "CASA PUBLICADORA BRASILEIRA",
+    "filter": "skip-no-importable-ownership-history",
+    "reason": "Sync interrupted (code 1). No success was confirmed. {\"timestamp\": \"2026-10-15T15:08:28.711603-03:00\", \"event\": \"gemini.started\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"pages\": 1}\r\n{\"timestamp\": \"2026-10-15T15:08:33.823447-03:00\", \"event\": \"gemini.completed\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"pages\": 1, \"characters\": 623}\r\n{\"timestamp\": \"2026-10-15T15:08:33.823447-03:00\", \"event\": \"document.extracted\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"mimeType\": \"application/pdf\", \"sizeBytes\": 78382, \"pages\": 1, \"sha256\": \"5817d62b374e8807460b882eac22eae52cc489627f73278e38eb1a558d700be5\", \"textSource\": \"gemini-inline\", \"classificationScore\": 20}\r\n{\"timestamp\": \"2026-10-15T15:08:38.264162-03:00\", \"event\": \"gemini.recovery_completed\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"reason\": \"parser\", \"classificationScore\": 20}\r\nNenhum histórico societário importável encontrado. QSA RECEITA.pdf: CNPJ de filial diferente; vÃ­nculo confirmado pelo nome empresarial exato e pasta correspondente; quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado; recuperaÃ§Ã£o assistida tambÃ©m nÃ£o validou: quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado\r\nSync interrupted (code 1). No success was confirmed. {\"timestamp\": \"2026-10-15T15:08:28.711603-03:00\", \"event\": \"gemini.started\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"pages\": 1}\r\n{\"timestamp\": \"2026-10-15T15:08:33.823447-03:00\", \"event\": \"gemini.completed\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"pages\": 1, \"characters\": 623}\r\n{\"timestamp\": \"2026-10-15T15:08:33.823447-03:00\", \"event\": \"document.extracted\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"mimeType\": \"application/pdf\", \"sizeBytes\": 78382, \"pages\": 1, \"sha256\": \"5817d62b374e8807460b882eac22eae52cc489627f73278e38eb1a558d700be5\", \"textSource\": \"gemini-inline\", \"classificationScore\": 20}\r\n{\"timestamp\": \"2026-10-15T15:08:38.264162-03:00\", \"event\": \"gemini.recovery_completed\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"reason\": \"parser\", \"classificationScore\": 20}\r\nNenhum histórico societário importável encontrado. QSA RECEITA.pdf: CNPJ de filial diferente; vÃ­nculo confirmado pelo nome empresarial exato e pasta correspondente; quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado; recuperaÃ§Ã£o assistida tambÃ©m nÃ£o validou: quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado"
+  },
+  {
+    "cnpj": "06203885000102",
+    "name": "COMERCIO VAREJISTA MARQUES AVIAMENTOS LTDA.",
+    "filter": "needs-review-ambiguous-partner-link",
+    "reason": "Sync interrupted (code 1). No success was confirmed. {\"timestamp\": \"2026-10-15T15:08:46.715957-03:00\", \"event\": \"document.native_text_accepted\", \"correlationId\": \"a771edb8-46a1-4595-84b4-30de55edba4c\", \"sourceFileId\": \"1c1t09QrIZLShCr1QaV9Twj02G8mhtSXU\", \"pages\": 12, \"characters\": 33254}\r\n{\"timestamp\": \"2026-10-15T15:08:46.719166-03:00\", \"event\": \"document.extracted\", \"correlationId\": \"a771edb8-46a1-4595-84b4-30de55edba4c\", \"sourceFileId\": \"1c1t09QrIZLShCr1QaV9Twj02G8mhtSXU\", \"mimeType\": \"application/pdf\", \"sizeBytes\": 2039308, \"pages\": 12, \"sha256\": \"51c36aee2f416564fef50498067a7ca0d5da045949477730d4ff323f3da5cc6e\", \"textSource\": \"pypdf-native\", \"classificationScore\": 27}\r\nVínculo ambíguo por nome e sem CPF/CNPJ único; revise o cadastro antes de importar\nSync interrupted (code 1). No success was confirmed. Vínculo ambíguo por nome e sem CPF/CNPJ único; revise o cadastro antes de importar"
+  },
+  {
+    "cnpj": "06095564000131",
+    "name": "EMPRESA JUNIOR DA FEAACS",
+    "filter": "skip-no-importable-ownership-history",
+    "reason": "Sync interrupted (code 1). No success was confirmed. {\"timestamp\": \"2026-10-15T15:08:54.986563-03:00\", \"event\": \"gemini.started\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"1M3YrjiYi-Z8h0NoLv_wT7FQ_oY2M_USt\", \"pages\": 6}\r\n{\"timestamp\": \"2026-10-15T15:09:11.041274-03:00\", \"event\": \"gemini.completed\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"1M3YrjiYi-Z8h0NoLv_wT7FQ_oY2M_USt\", \"pages\": 6, \"characters\": 9091}\r\n{\"timestamp\": \"2026-10-15T15:09:11.068607-03:00\", \"event\": \"document.extracted\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"1M3YrjiYi-Z8h0NoLv_wT7FQ_oY2M_USt\", \"mimeType\": \"application/pdf\", \"sizeBytes\": 860531, \"pages\": 6, \"sha256\": \"1f106dcac6fa7484af6e2076390bb0c1a9a2137326ba1ef0b367da525d1b7b50\", \"textSource\": \"gemini-inline\", \"classificationScore\": 8}\r\n{\"timestamp\": \"2026-10-15T15:09:14.469429-03:00\", \"event\": \"gemini.started\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"15ieWtN29GwAKODiBvteIJfuHiIRi3QU0\", \"pages\": 10}\r\n{\"timestamp\": \"2026-10-15T15:09:39.251720-03:00\", \"event\": \"gemini.completed\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"15ieWtN29GwAKODiBvteIJfuHiIRi3QU0\", \"pages\": 10, \"characters\": 24415}\r\n{\"timestamp\": \"2026-10-15T15:09:39.286339-03:00\", \"event\": \"document.extracted\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"15ieWtN29GwAKODiBvteIJfuHiIRi3QU0\", \"mimeType\": \"application/pdf\", \"sizeBytes\": 2776392, \"pages\": 10, \"sha256\": \"b230caeb1af45fd506db14daec0d36461b6ac8c351d49ac69af8503ee669a8f4\", \"textSource\": \"gemini-inline\", \"classificationScore\": 8}\r\n{\"timestamp\": \"2026-10-15T15:09:57.267064-03:00\", \"event\": \"gemini.recovery_completed\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"1M3YrjiYi-Z8h0NoLv_wT7FQ_oY2M_USt\", \"reason\": \"parser\", \"classificationScore\": 8}\r\n{\"timestamp\": \"2026-10-15T15:10:27.137727-03:00\", \"event\": \"gemini.recovery_completed\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"15ieWtN29GwAKODiBvteIJfuHiIRi3QU0\", \"reason\": \"parser\", \"classificationScore\": 8}\r\nNenhum histórico societário importável encontrado. NOVA ATA ALTERAÇÃO DO RESPONSAVEL.pdf: quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado; recuperaÃ§Ã£o assistida tambÃ©m nÃ£o validou: quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado | 3º ADITIVO AO ESTATUTO INOVA.pdf: vÃ­nculo comprovado pelo contexto da pasta da empresa; documento sem CNPJ/nome explÃ­cito; quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado; recuperaÃ§Ã£o assistida tambÃ©m nÃ£o validou: quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado\r\nSync interrupted (code 1). No success was confirmed. {\"timestamp\": \"2026-10-15T15:08:54.986563-03:00\", \"event\": \"gemini.started\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"1M3YrjiYi-Z8h0NoLv_wT7FQ_oY2M_USt\", \"pages\": 6}\r\n{\"timestamp\": \"2026-10-15T15:09:11.041274-03:00\", \"event\": \"gemini.completed\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"1M3YrjiYi-Z8h0NoLv_wT7FQ_oY2M_USt\", \"pages\": 6, \"characters\": 9091}\r\n{\"timestamp\": \"2026-10-15T15:09:11.068607-03:00\", \"event\": \"document.extracted\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"1M3YrjiYi-Z8h0NoLv_wT7FQ_oY2M_USt\", \"mimeType\": \"application/pdf\", \"sizeBytes\": 860531, \"pages\": 6, \"sha256\": \"1f106dcac6fa7484af6e2076390bb0c1a9a2137326ba1ef0b367da525d1b7b50\", \"textSource\": \"gemini-inline\", \"classificationScore\": 8}\r\n{\"timestamp\": \"2026-10-15T15:09:14.469429-03:00\", \"event\": \"gemini.started\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"15ieWtN29GwAKODiBvteIJfuHiIRi3QU0\", \"pages\": 10}\r\n{\"timestamp\": \"2026-10-15T15:09:39.251720-03:00\", \"event\": \"gemini.completed\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"15ieWtN29GwAKODiBvteIJfuHiIRi3QU0\", \"pages\": 10, \"characters\": 24415}\r\n{\"timestamp\": \"2026-10-15T15:09:39.286339-03:00\", \"event\": \"document.extracted\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"15ieWtN29GwAKODiBvteIJfuHiIRi3QU0\", \"mimeType\": \"application/pdf\", \"sizeBytes\": 2776392, \"pages\": 10, \"sha256\": \"b230caeb1af45fd506db14daec0d36461b6ac8c351d49ac69af8503ee669a8f4\", \"textSource\": \"gemini-inline\", \"classificationScore\": 8}\r\n{\"timestamp\": \"2026-10-15T15:09:57.267064-03:00\", \"event\": \"gemini.recovery_completed\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"1M3YrjiYi-Z8h0NoLv_wT7FQ_oY2M_USt\", \"reason\": \"parser\", \"classificationScore\": 8}\r\n{\"timestamp\": \"2026-10-15T15:10:27.137727-03:00\", \"event\": \"gemini.recovery_completed\", \"correlationId\": \"f475b61d-e4f3-4446-bbf4-f3c698900e6c\", \"sourceFileId\": \"15ieWtN29GwAKODiBvteIJfuHiIRi3QU0\", \"reason\": \"parser\", \"classificationScore\": 8}\r\nNenhum histórico societário importável encontrado. NOVA ATA ALTERAÇÃO DO RESPONSAVEL.pdf: quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado; recuperaÃ§Ã£o assistida tambÃ©m nÃ£o validou: quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado | 3º ADITIVO AO ESTATUTO INOVA.pdf: vÃ­nculo comprovado pelo contexto da pasta da empresa; documento sem CNPJ/nome explÃ­cito; quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado; recuperaÃ§Ã£o assistida tambÃ©m nÃ£o validou: quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado"
+  },
+  {
+    "cnpj": "35561114000195",
+    "name": "F V B RIBEIRO",
+    "filter": "without-documents",
+    "reason": "Sync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas\r\nSync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas"
+  },
+  {
+    "cnpj": "31449429000194",
+    "name": "FRANCISCO NATANAEL LOPES NOGUEIRA",
+    "filter": "without-documents",
+    "reason": "Sync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas\r\nSync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas"
+  },
+  {
+    "cnpj": "31578226000106",
+    "name": "GERARDO MAGELLA BRAZ LOPES",
+    "filter": "without-documents",
+    "reason": "Sync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas\r\nSync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas"
+  },
+  {
+    "cnpj": "34456110000184",
+    "name": "HELDER BRANCO MOITA 02083849280",
+    "filter": "without-documents",
+    "reason": "Sync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas\r\nSync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas"
+  },
+  {
+    "cnpj": "10488345000190",
+    "name": "MARIA LINDOMAR GALDINO DE OLIVEIRA",
+    "filter": "without-documents",
+    "reason": "Sync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas\r\nSync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas"
+  },
+  {
+    "cnpj": "01208014000168",
+    "name": "ORGAO DE GESTAO DE MAO DE O DO TP DO P ORG DE FORTALEZA",
+    "filter": "without-documents",
+    "reason": "Sync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas\r\nSync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas"
+  },
+  {
+    "cnpj": "60529451000142",
+    "name": "PETALAS PATRIMONIAL LTDA",
+    "filter": "skip-no-importable-ownership-history",
+    "reason": "Sync interrupted (code 1). No success was confirmed. {\"timestamp\": \"2026-10-15T15:15:15.865944-03:00\", \"event\": \"gemini.started\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"sourceFileId\": \"13f3X07S9KHLjAxKxIvzG9Mnz3GMOWboQ\", \"pages\": 8}\r\n{\"timestamp\": \"2026-10-15T15:15:37.150817-03:00\", \"event\": \"gemini.retry\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"attempt\": 1, \"maxAttempts\": 2, \"reason\": \"empty-response\", \"delaySeconds\": 1.0}\r\n{\"timestamp\": \"2026-10-15T15:15:56.931829-03:00\", \"event\": \"gemini.page_fallback_started\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"sourceFileId\": \"13f3X07S9KHLjAxKxIvzG9Mnz3GMOWboQ\", \"pages\": 8, \"chunkPages\": 2}\r\n{\"timestamp\": \"2026-10-15T15:16:07.785198-03:00\", \"event\": \"gemini.page_fallback_completed\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"sourceFileId\": \"13f3X07S9KHLjAxKxIvzG9Mnz3GMOWboQ\", \"pageRange\": \"1-2\", \"characters\": 3443}\r\n{\"timestamp\": \"2026-10-15T15:16:16.618005-03:00\", \"event\": \"gemini.retry\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"attempt\": 1, \"maxAttempts\": 2, \"reason\": \"empty-response\", \"delaySeconds\": 1.0}\r\n{\"timestamp\": \"2026-10-15T15:16:21.033296-03:00\", \"event\": \"document.quarantined\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"sourceFileId\": \"13f3X07S9KHLjAxKxIvzG9Mnz3GMOWboQ\", \"error\": \"Gemini retornou texto vazio após 2 tentativas (FinishReason.RECITATION); fallback por paginas 3-4 falhou: Gemini retornou texto vazio após 2 tentativas (FinishReason.PROHIBITED_CONTENT)\"}\r\nNenhum histórico societário importável encontrado. CONTRATO SOCIAL - PETALAS PATRIMONIAL LTDA.pdf: Gemini retornou texto vazio após 2 tentativas (FinishReason.RECITATION); fallback por paginas 3-4 falhou: Gemini retornou texto vazio após 2 tentativas (FinishReason.PROHIBITED_CONTENT)\r\nSync interrupted (code 1). No success was confirmed. {\"timestamp\": \"2026-10-15T15:15:15.865944-03:00\", \"event\": \"gemini.started\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"sourceFileId\": \"13f3X07S9KHLjAxKxIvzG9Mnz3GMOWboQ\", \"pages\": 8}\r\n{\"timestamp\": \"2026-10-15T15:15:37.150817-03:00\", \"event\": \"gemini.retry\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"attempt\": 1, \"maxAttempts\": 2, \"reason\": \"empty-response\", \"delaySeconds\": 1.0}\r\n{\"timestamp\": \"2026-10-15T15:15:56.931829-03:00\", \"event\": \"gemini.page_fallback_started\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"sourceFileId\": \"13f3X07S9KHLjAxKxIvzG9Mnz3GMOWboQ\", \"pages\": 8, \"chunkPages\": 2}\r\n{\"timestamp\": \"2026-10-15T15:16:07.785198-03:00\", \"event\": \"gemini.page_fallback_completed\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"sourceFileId\": \"13f3X07S9KHLjAxKxIvzG9Mnz3GMOWboQ\", \"pageRange\": \"1-2\", \"characters\": 3443}\r\n{\"timestamp\": \"2026-10-15T15:16:16.618005-03:00\", \"event\": \"gemini.retry\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"attempt\": 1, \"maxAttempts\": 2, \"reason\": \"empty-response\", \"delaySeconds\": 1.0}\r\n{\"timestamp\": \"2026-10-15T15:16:21.033296-03:00\", \"event\": \"document.quarantined\", \"correlationId\": \"bc479392-7897-4a4e-bb61-fffa6eb028c7\", \"sourceFileId\": \"13f3X07S9KHLjAxKxIvzG9Mnz3GMOWboQ\", \"error\": \"Gemini retornou texto vazio após 2 tentativas (FinishReason.RECITATION); fallback por paginas 3-4 falhou: Gemini retornou texto vazio após 2 tentativas (FinishReason.PROHIBITED_CONTENT)\"}\r\nNenhum histórico societário importável encontrado. CONTRATO SOCIAL - PETALAS PATRIMONIAL LTDA.pdf: Gemini retornou texto vazio após 2 tentativas (FinishReason.RECITATION); fallback por paginas 3-4 falhou: Gemini retornou texto vazio após 2 tentativas (FinishReason.PROHIBITED_CONTENT)"
+  }
+]
