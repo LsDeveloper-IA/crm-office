@@ -211,6 +211,7 @@ export function DistribuicaoTable({
 
   const headerFailureFilters = visibleFailureFilters.filter(reason =>
     reason !== "__partners__"
+    && reason !== "case-aside"
     && reason !== "without-documents"
     && reason !== "without-drive-folder",
   );
@@ -273,19 +274,31 @@ export function DistribuicaoTable({
         || (savedCompanySettings[row.companyCnpj] ?? DEFAULT_COMPANY_SETTINGS).status === statusFilter;
       const settings = savedCompanySettings[company.companyCnpj] ?? DEFAULT_COMPANY_SETTINGS;
       const companyFailureReason = failureOverrides[company.companyCnpj] ?? companyFailureReasons[company.companyCnpj];
-      const isAutomationFailureFilter = partnerFilter === "case-aside"
-        || partnerFilter === "without-documents"
+      const isAutomationFailureFilter = partnerFilter === "without-documents"
         || partnerFilter === "without-drive-folder"
         || partnerFilter === "needs-review-policy"
         || partnerFilter === "skip-instructed"
         || automationFailureFilterOptions.includes(partnerFilter);
+      // "Caso à parte" pode vir do flag salvo (settings) ou da seleção manual do filtro na linha.
+      const effectiveCaseAside = settings.caseAside || companyFailureReason === "case-aside";
       let matchPartnerFilter = false;
       if (companyFailureReason === "__partners__") {
         matchPartnerFilter = partnerFilter === "all";
+      } else if (partnerFilter === "case-aside") {
+        const hasExclusiveFailure = Boolean (companyFailureReason)
+          && companyFailureReason !== "__partners__"
+          && companyFailureReason !== "case-aside";
+        const hasDriveOrDocsIssue =
+          companiesWithoutDriveFolder.includes(company.companyCnpj)
+          || companiesWithoutDocuments.includes(company.companyCnpj);
+        const keepInCaseAside = hasNoPartnersPlaceholder(company.partners)
+          ? true
+          : !(hasExclusiveFailure || hasDriveOrDocsIssue);
+        matchPartnerFilter = (effectiveCaseAside || hasNoPartnersPlaceholder(company.partners)) && keepInCaseAside;
       } else if (isAutomationFailureFilter) {
         matchPartnerFilter = companyFailureReason === partnerFilter;
       } else {
-        matchPartnerFilter = matchesPartnerFilter(company.partners, partnerFilter as "all" | "case-aside" | "without-documents" | "without-drive-folder", settings.caseAside,
+        matchPartnerFilter = matchesPartnerFilter(company.partners, partnerFilter as "all" | "case-aside" | "without-documents" | "without-drive-folder", effectiveCaseAside,
           companiesWithoutDocuments.includes(company.companyCnpj),
           companiesWithoutDriveFolder.includes(company.companyCnpj));
       }

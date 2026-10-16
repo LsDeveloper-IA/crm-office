@@ -32,14 +32,14 @@
   {
     "cnpj": "09642669000151",
     "name": "ASSOCIACAO DOS DELEGADOS DE POLICIA CIVI",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-drive-folder",
+    "reason": "Pasta correspondente nao encontrada no Drive; verificar cadastro manualmente"
   },
   {
     "cnpj": "56421088000170",
     "name": "ASSOCIACAO DOS GESTORES E LOCATARIOS",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-drive-folder",
+    "reason": "Pasta correspondente nao encontrada no Drive; verificar cadastro manualmente"
   },
   {
     "cnpj": "35065192000107",
@@ -50,26 +50,26 @@
   {
     "cnpj": "16514802000150",
     "name": "ASSOCIACAO DOS LOJISTAS DO CENTRO",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-drive-folder",
+    "reason": "Pasta correspondente nao encontrada no Drive; verificar cadastro manualmente"
   },
   {
     "cnpj": "00000204000122",
     "name": "ASSOCIACAO DOS MORADORES DA VL CHALOT CJ AUGUA BRANCA",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-drive-folder",
+    "reason": "Pasta correspondente nao encontrada no Drive; verificar cadastro manualmente"
   },
   {
     "cnpj": "12283107000173",
     "name": "ASSOCIACAO DOS SERVIDORES DA SECRETARIA DE DESENVOLVIMENTO AGRARIO",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-drive-folder",
+    "reason": "Pasta correspondente nao encontrada no Drive; verificar cadastro manualmente"
   },
   {
     "cnpj": "46571812000198",
     "name": "ASSOCIACAO OUTRA CASA COLETIVA",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-drive-folder",
+    "reason": "Pasta correspondente nao encontrada no Drive; verificar cadastro manualmente"
   },
   {
     "cnpj": "57256006000141",
@@ -80,8 +80,8 @@
   {
     "cnpj": "40216021000163",
     "name": "ASSOCIACAO VARANDAS TERRA BRASILIS",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-drive-folder",
+    "reason": "Pasta correspondente nao encontrada no Drive; verificar cadastro manualmente"
   },
   {
     "cnpj": "30599448000134",
