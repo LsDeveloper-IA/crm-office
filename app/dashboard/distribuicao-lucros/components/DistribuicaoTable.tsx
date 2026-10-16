@@ -291,9 +291,7 @@ export function DistribuicaoTable({
         const hasDriveOrDocsIssue =
           companiesWithoutDriveFolder.includes(company.companyCnpj)
           || companiesWithoutDocuments.includes(company.companyCnpj);
-        const keepInCaseAside = hasNoPartnersPlaceholder(company.partners)
-          ? true
-          : !(hasExclusiveFailure || hasDriveOrDocsIssue);
+        const keepInCaseAside = !(hasExclusiveFailure || hasDriveOrDocsIssue);
         matchPartnerFilter = (effectiveCaseAside || hasNoPartnersPlaceholder(company.partners)) && keepInCaseAside;
       } else if (isAutomationFailureFilter) {
         matchPartnerFilter = companyFailureReason === partnerFilter;
