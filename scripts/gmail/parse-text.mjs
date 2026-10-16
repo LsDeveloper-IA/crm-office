@@ -49,8 +49,19 @@ export function parseTextAlteration(text, options = {}) {
   if (typeof text !== 'string' || !text.trim()) throw new Error('Corpo textual vazio.');
   // Gmail representa negrito como *texto* na alternativa text/plain.
   const normalized = text.replace(/\r\n?/g, '\n').replace(/[\u00a0\u202f]/g, ' ').replace(/\*/g, '');
-  const companies = new Set([...clean(normalized).matchAll(/\bda\s+empresa\s*:?\s*(.+?)\s*,?\s*inscrit[ao]\s+n[oa]\s+CNPJ\b/gi)]
-    .map(match => clean(match[1]).replace(/[,;:\s]+$/, '')));
+  const primaryCompanyMatches = [...clean(normalized).matchAll(/\bda\s+empresa\s*:?\s*(.+?)\s*,?\s*inscrit[ao]\s+n[oa]\s+CNPJ\b/gi)];
+let companies = new Set(primaryCompanyMatches.map(match => clean(match[1]).replace(/[,;:\s]+$/, '')));
+if (companies.size !== 1) {
+  const fallbackMatches = [
+    ...clean(normalized).matchAll(/\b(?:da|de)\s+empresa\s*:?\s*(.+?)\s*,?\s*CNPJ\b/gi),
+    ...clean(normalized).matchAll(/\bempresa\s*:?\s*(.+?)\s*,?\s*CNPJ\b/gi),
+  ];
+  const fallbackCompanies = new Set(fallbackMatches.map(match => clean(match[1]).replace(/[,;:\s]+$/, '')
+    .replace(/^.*\b(?:da|de)\s+empresa\s*:?\s*/i, '')
+    .replace(/^empresa\s*:?\s*/i, '')));
+  if (fallbackCompanies.size === 1) companies = fallbackCompanies;
+}
+
   if (companies.size !== 1) throw new Error('Nome da empresa ausente ou ambíguo.');
   const cnpjs = new Set((normalized.match(/\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g) ?? []).map(value => value.replace(/\D/g, '')));
   if (cnpjs.size !== 1 || !validCnpj([...cnpjs][0])) throw new Error('CNPJ ausente, inválido ou múltiplo.');
