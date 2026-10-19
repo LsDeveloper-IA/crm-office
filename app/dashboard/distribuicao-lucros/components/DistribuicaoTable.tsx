@@ -303,7 +303,8 @@ export function DistribuicaoTable({
       return matchSearch && matchStatus && matchPartnerFilter;
     }));
   }, [summaries, totalsInCents, search, statusFilter, partnerFilter, savedCompanySettings,
-    companiesWithoutDocuments, companiesWithoutDriveFolder, companyFailureReasons, automationFailureFilterOptions]);
+    companiesWithoutDocuments, companiesWithoutDriveFolder, companyFailureReasons, automationFailureFilterOptions,
+    failureOverrides]);
   const pageCount = Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
   const pageStart = (currentPage - 1) * PAGE_SIZE;

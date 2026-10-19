@@ -36,6 +36,8 @@ test('page reload restores all saved monthly fields and the annual total', async
     '@/lib/auth': { getCurrentUser: async () => ({ id: 1 }) },
     '@prisma/client': { ProfitDistributionStatus: { NAO_ENCERRADO: 'NAO_ENCERRADO' } },
     './components/DistribuicaoTable': { DistribuicaoTable: 'MonthlyTable' },
+    '../../../empresas-sem-socios-sem-pasta-drive.json': { default: [] },
+    '../../../empresas-filtros-automacao.json': { default: [] },
     '@/lib/prisma': { __esModule: true, default: {
       referenceYear: { findMany: async () => [{ year: 2025 }, { year: 2026 }] },
       company: { findMany: async (query) => {
