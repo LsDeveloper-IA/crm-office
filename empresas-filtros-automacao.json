@@ -14,20 +14,20 @@
   {
     "cnpj": "04907927000160",
     "name": "ASSOCIACAO AMIGOS DO BRASIL",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-documents",
+    "reason": "Pasta encontrada, mas sem documento societario com informacoes suficientes"
   },
   {
     "cnpj": "30275386000105",
     "name": "ASSOCIACAO BEM COMUM",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-documents",
+    "reason": "Pasta encontrada, mas sem documento societario com informacoes suficientes"
   },
   {
     "cnpj": "23406503000167",
     "name": "ASSOCIACAO DAS EMPRESAS DO COMPLEXO INDUSTRIAL E PORTUARIO DO PECEM - AECIPP",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-documents",
+    "reason": "Pasta encontrada, mas sem documento societario com informacoes suficientes"
   },
   {
     "cnpj": "09642669000151",
@@ -44,8 +44,8 @@
   {
     "cnpj": "35065192000107",
     "name": "ASSOCIACAO DOS JOVENS EMPRESARIOS",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-documents",
+    "reason": "Pasta encontrada, mas sem documento societario com informacoes suficientes"
   },
   {
     "cnpj": "16514802000150",
@@ -74,8 +74,8 @@
   {
     "cnpj": "57256006000141",
     "name": "ASSOCIACAO PROJETO OLIMPIA DE ESPORTE E DESENVOLVIMENTO",
-    "filter": "needs-review-policy",
-    "reason": "Associação sem quadro de capital/quotas; verificar dirigentes e forma de cadastro manualmente"
+    "filter": "without-documents",
+    "reason": "Pasta encontrada, mas sem documento societario com informacoes suficientes"
   },
   {
     "cnpj": "40216021000163",
