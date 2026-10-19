@@ -932,8 +932,8 @@
   {
     "cnpj": "06203885000102",
     "name": "COMERCIO VAREJISTA MARQUES AVIAMENTOS LTDA.",
-    "filter": "needs-review-ambiguous-partner-link",
-    "reason": "Sync interrupted (code 1). No success was confirmed. {\"timestamp\": \"2026-10-15T15:08:46.715957-03:00\", \"event\": \"document.native_text_accepted\", \"correlationId\": \"a771edb8-46a1-4595-84b4-30de55edba4c\", \"sourceFileId\": \"1c1t09QrIZLShCr1QaV9Twj02G8mhtSXU\", \"pages\": 12, \"characters\": 33254}\r\n{\"timestamp\": \"2026-10-15T15:08:46.719166-03:00\", \"event\": \"document.extracted\", \"correlationId\": \"a771edb8-46a1-4595-84b4-30de55edba4c\", \"sourceFileId\": \"1c1t09QrIZLShCr1QaV9Twj02G8mhtSXU\", \"mimeType\": \"application/pdf\", \"sizeBytes\": 2039308, \"pages\": 12, \"sha256\": \"51c36aee2f416564fef50498067a7ca0d5da045949477730d4ff323f3da5cc6e\", \"textSource\": \"pypdf-native\", \"classificationScore\": 27}\r\nVínculo ambíguo por nome e sem CPF/CNPJ único; revise o cadastro antes de importar\nSync interrupted (code 1). No success was confirmed. Vínculo ambíguo por nome e sem CPF/CNPJ único; revise o cadastro antes de importar"
+    "filter": "__partners__",
+    "reason": "Socio eudes removido (representante legal); empresa com socios"
   },
   {
     "cnpj": "06095564000131",
