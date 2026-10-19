@@ -13,7 +13,13 @@
     "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
     "odbc:sync": "tsx scripts/companies/syncCompaniesFromOdbc.ts",
     "odbc:sync:watch": "tsx scripts/companies/syncCompaniesFromOdbc.ts --watch",
+    "odbc:sync:ownership": "tsx scripts/companies/syncOwnershipFromOdbc.ts",
     "gmail:sync": "node scripts/gmail/sync.mjs --apply",
+    "ownership:sync": "tsx scripts/ownership/sync.ts",
+    "ownership:verify": "tsx scripts/ownership/verify.ts",
+    "ownership:status": "tsx scripts/ownership/status.ts",
+    "ownership:check": "python scripts/ownership/extract.py --check-access",
+    "ownership:sections": "python scripts/ownership/corporate_sections_pipeline.py",
     "gmail:sync:preview": "node scripts/gmail/sync.mjs",
     "gmail:sync:watch": "node scripts/gmail/sync.mjs --apply --watch --every-days=7"
   },

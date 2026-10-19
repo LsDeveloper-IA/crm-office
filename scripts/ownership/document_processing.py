@@ -1,4 +1,4 @@
-"""In-memory corporate-document reading and structured extraction.
+﻿"""In-memory corporate-document reading and structured extraction.
 
 Boundaries:
 DriveService -> DocumentReader (strategies) -> DocumentParser (multimodal AI)
@@ -205,17 +205,38 @@ def _payload_from_text(text: str) -> dict[str, Any]:
     document_date = next((_parse_date(value) for value in reversed(dates) if _parse_date(value)), None)
 
     socios: list[dict[str, Any]] = []
-    # Receita QSA layout: repeated name/qualification blocks, without participation.
+    # Receita QSA layout: repeated name/qualification blocks.
+    # Tenta extrair CPF/CNPJ e data de nascimento via qualification() do corpus.
     qsa_pattern = re.compile(
         r"Nome/Nome\s+Empresarial\s*:?\s*[\r\n]+\s*([^\r\n]+).*?"
-        r"Qualifica(?:ção|cao|��o)\s*:?\s*[\r\n]+\s*([^\r\n]+)",
+        r"Qualifica(?:ção|cao)\s*:?\s*[\r\n]+\s*([^\r\n]+)",
         re.I | re.S,
     )
-    for name, qualification in qsa_pattern.findall(text):
-        socios.append({
-            "nome": name.strip(), "cpf_cnpj": None,
-            "qualificacao": qualification.strip(), "percentual": None,
-        })
+    qsa_matches = qsa_pattern.findall(text)
+    if qsa_matches:
+        try:
+            from scripts.ownership.corpus import qualification
+            from scripts.ownership.extract import valid_cpf
+        except ModuleNotFoundError:
+            from corpus import qualification
+            from extract import valid_cpf
+        for name, qual in qsa_matches:
+            name = name.strip()
+            qual = qual.strip()
+            # Tenta extrair CPF/CNPJ via qualification() (layout Junta/contrato).
+            cpf_cnpj = None
+            try:
+                ids_birth = qualification(text, name, valid_cpf)
+                if ids_birth:
+                    ident = ids_birth[0].get("cpf") or ids_birth[0].get("partnerCnpj")
+                    if ident:
+                        cpf_cnpj = ident
+            except Exception:
+                pass
+            socios.append({
+                "nome": name, "cpf_cnpj": cpf_cnpj,
+                "qualificacao": qual, "percentual": None,
+            })
 
     # For contracts/aditivos, reuse the tolerant table reader already exercised by
     # the ownership corpus. Identity is accepted only when bound to the same name.
@@ -234,6 +255,9 @@ def _payload_from_text(text: str) -> dict[str, Any]:
                     item.get("cpf") or item.get("partnerCnpj")
                     for item in identities if item.get("cpf") or item.get("partnerCnpj")
                 }
+                birth_date = None
+                if identities:
+                    birth_date = identities[0].get("birthDate")
                 socios.append({
                     "nome": row["name"],
                     "cpf_cnpj": next(iter(identifiers)) if len(identifiers) == 1 else None,

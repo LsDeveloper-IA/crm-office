@@ -342,6 +342,7 @@ model ProfitCompanySettings {
   dividendTaxation         DividendTaxation?
   status                  ProfitDistributionStatus @default(NAO_ENCERRADO)
   observation             String?
+  caseAside               Boolean                  @default(false)
   company                 Company                  @relation(fields: [companyCnpj], references: [cnpj])
   year                    ReferenceYear            @relation(fields: [referenceYear], references: [year])
 
@@ -358,11 +359,48 @@ model ProfitPartner {
   companyCnpj   String               @db.VarChar(14)
   name          String
   qsaPeriods    Json?
+  cpf           String?              @db.VarChar(11)
+  partnerCnpj   String?              @db.VarChar(14)
+  isCorporate   Boolean              @default(false)
+  birthDate     String?              @db.VarChar(10)
+  ownershipHistory Json?
   knownBeforeGmail Boolean @default(true)
   distributions ProfitDistribution[]
   company       Company              @relation(fields: [companyCnpj], references: [cnpj])
 
   @@index([companyCnpj])
+  @@unique([companyCnpj, cpf])
+  @@unique([companyCnpj, partnerCnpj])
+}
+
+enum OwnershipProcessingStatus {
+  RECEIVED
+  EXTRACTING
+  VALIDATING
+  VALIDATED
+  PERSISTING
+  PERSISTED
+  NEEDS_REVIEW
+  FAILED_RETRYABLE
+  FAILED_PERMANENT
+}
+
+model OwnershipProcessingRun {
+  id            String                    @id @default(uuid())
+  correlationId String                    @unique @db.VarChar(36)
+  companyCnpj   String                    @db.VarChar(14)
+  status        OwnershipProcessingStatus @default(RECEIVED)
+  stage         String                    @db.VarChar(40)
+  attempt       Int                       @default(1)
+  audit         Json?
+  errorCode     String?                   @db.VarChar(80)
+  errorMessage  String?
+  startedAt     DateTime                  @default(now())
+  finishedAt    DateTime?
+  updatedAt     DateTime                  @updatedAt
+
+  @@index([companyCnpj, startedAt])
+  @@index([status, updatedAt])
 }
 
 model GmailQsaImport {
