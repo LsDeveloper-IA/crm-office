@@ -1110,38 +1110,44 @@ export function DistribuicaoTable({
 
       {/* EXPORT DIALOG */}
       <Dialog open={isExportOpen} onOpenChange={(open) => { if (!open) setIsExportOpen(false); }}>
-        <DialogPopup>
-          <DialogTitle>Exportar planilha</DialogTitle>
-          <DialogDescription>Escolha a empresa (ou todas) para exportar a distribuição de lucros.</DialogDescription>
-          <div className="flex flex-col gap-3 mt-3">
-            <label className="flex flex-col gap-1 text-sm">
-              Pesquisar empresa
+        <DialogPopup className="max-w-2xl">
+          <DialogTitle className="text-lg font-semibold text-slate-800">Exportar planilha de distribuição</DialogTitle>
+          <DialogDescription className="text-sm text-slate-500">
+            Filtre as empresas e exporte os dados de distribuição de lucros em Excel.
+          </DialogDescription>
+
+          <div className="mt-4 space-y-4">
+            {/* Search */}
+            <div className="relative">
               <input
                 type="text"
-                className="border rounded px-3 py-2"
-                placeholder="Nome ou CNPJ..."
+                className="w-full border border-slate-300 rounded-lg px-4 py-2.5 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                placeholder="Pesquisar por nome ou CNPJ..."
                 value={exportSearch}
                 onChange={(e) => { setExportSearch(e.target.value); setExportCompany("all"); }}
               />
-            </label>
-            <div className="flex gap-2">
-              <label className="flex flex-col gap-1 text-sm flex-1">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+            </div>
+
+            {/* Filters row */}
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
                 Status
                 <select
-                  className="border rounded px-3 py-2"
+                  className="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition"
                   value={exportStatusFilter}
                   onChange={(e) => setExportStatusFilter(e.target.value)}
                 >
-                  <option value="">Todos</option>
+                  <option value="">Todos os status</option>
                   {PROFIT_DISTRIBUTION_STATUS_OPTIONS.map((s) => (
                     <option key={s.value} value={s.value}>{s.shortLabel}</option>
                   ))}
                 </select>
               </label>
-              <label className="flex flex-col gap-1 text-sm flex-1">
+              <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
                 Filtro de sócios
                 <select
-                  className="border rounded px-3 py-2"
+                  className="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition"
                   value={exportPartnerFilter}
                   onChange={(e) => setExportPartnerFilter(e.target.value)}
                 >
@@ -1152,36 +1158,96 @@ export function DistribuicaoTable({
                 </select>
               </label>
             </div>
-            <label className="flex flex-col gap-1 text-sm">
+
+            {/* Company selector */}
+            <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
               Empresa
               <select
-                className="border rounded px-3 py-2"
+                className="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition"
                 value={exportCompany}
                 onChange={(e) => setExportCompany(e.target.value)}
               >
-                <option value="all">Todas as empresas (filtradas)</option>
+                <option value="all">
+                  Todas as empresas filtradas ({companies.filter((c) => {
+                    const term = normalizeDistributionSearch(exportSearch);
+                    const cnpjTerm = exportSearch.replace(/\D/g, "");
+                    const matchSearch = !term || normalizeDistributionSearch(c.name).includes(term) || (cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm));
+                    const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
+                    const matchStatus = !exportStatusFilter || settings.status === exportStatusFilter;
+                    const hasNoPartners = hasNoPartnersPlaceholder(data.filter((r) => r.companyCnpj === c.cnpj));
+                    const caseAside = settings.caseAside || hasNoPartners;
+                    const matchPartner = exportPartnerFilter === "all"
+                      || (exportPartnerFilter === "case-aside" && caseAside)
+                      || (exportPartnerFilter === "without-documents" && companiesWithoutDocuments.includes(c.cnpj))
+                      || (exportPartnerFilter === "without-drive-folder" && companiesWithoutDriveFolder.includes(c.cnpj));
+                    return matchSearch && matchStatus && matchPartner;
+                  }).length})
+                </option>
                 {companies
                   .filter((c) => {
                     const term = normalizeDistributionSearch(exportSearch);
-                    const cnpjTerm = exportSearch.replace(/\\D/g, "");
-                    const matchSearch = !term
-                      || normalizeDistributionSearch(c.name).includes(term)
-                      || (cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm));
+                    const cnpjTerm = exportSearch.replace(/\D/g, "");
+                    const matchSearch = !term || normalizeDistributionSearch(c.name).includes(term) || (cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm));
                     const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
                     const matchStatus = !exportStatusFilter || settings.status === exportStatusFilter;
-                    return matchSearch && matchStatus;
+                    const hasNoPartners = hasNoPartnersPlaceholder(data.filter((r) => r.companyCnpj === c.cnpj));
+                    const caseAside = settings.caseAside || hasNoPartners;
+                    const matchPartner = exportPartnerFilter === "all"
+                      || (exportPartnerFilter === "case-aside" && caseAside)
+                      || (exportPartnerFilter === "without-documents" && companiesWithoutDocuments.includes(c.cnpj))
+                      || (exportPartnerFilter === "without-drive-folder" && companiesWithoutDriveFolder.includes(c.cnpj));
+                    return matchSearch && matchStatus && matchPartner;
                   })
                   .map((c) => (
                     <option key={c.cnpj} value={c.cnpj}>{c.name} ({c.cnpj})</option>
                   ))}
               </select>
             </label>
-            <div className="flex justify-end gap-2">
-              <button type="button" className="px-3 py-2 text-sm border rounded-md hover:bg-muted" onClick={() => setIsExportOpen(false)}>
+
+            {/* Summary badge */}
+            <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 rounded-lg px-3 py-2">
+              <span className="font-medium">Empresas encontradas:</span>
+              <span className="font-bold text-blue-600">
+                {companies.filter((c) => {
+                  const term = normalizeDistributionSearch(exportSearch);
+                  const cnpjTerm = exportSearch.replace(/\D/g, "");
+                  const matchSearch = !term || normalizeDistributionSearch(c.name).includes(term) || (cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm));
+                  const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
+                  const matchStatus = !exportStatusFilter || settings.status === exportStatusFilter;
+                  const hasNoPartners = hasNoPartnersPlaceholder(data.filter((r) => r.companyCnpj === c.cnpj));
+                  const caseAside = settings.caseAside || hasNoPartners;
+                  const matchPartner = exportPartnerFilter === "all"
+                    || (exportPartnerFilter === "case-aside" && caseAside)
+                    || (exportPartnerFilter === "without-documents" && companiesWithoutDocuments.includes(c.cnpj))
+                    || (exportPartnerFilter === "without-drive-folder" && companiesWithoutDriveFolder.includes(c.cnpj));
+                  return matchSearch && matchStatus && matchPartner;
+                }).length}
+              </span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                className="px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 transition"
+                onClick={() => { setIsExportOpen(false); setExportSearch(""); setExportStatusFilter(""); setExportPartnerFilter("all"); }}
+              >
+                Limpar filtros
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 transition"
+                onClick={() => setIsExportOpen(false)}
+              >
                 Cancelar
               </button>
-              <button type="button" className="px-3 py-2 text-sm border rounded-md bg-blue-600 text-white hover:bg-blue-700" onClick={exportToExcel} disabled={isExporting}>
-                {isExporting ? "Exportando..." : "Exportar"}
+              <button
+                type="button"
+                className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium disabled:opacity-50"
+                onClick={exportToExcel}
+                disabled={isExporting}
+              >
+                {isExporting ? "Exportando..." : "Exportar Excel"}
               </button>
             </div>
           </div>
