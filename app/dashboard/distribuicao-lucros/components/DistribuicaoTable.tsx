@@ -240,6 +240,9 @@ export function DistribuicaoTable({
   const [isCreatingPartner, setIsCreatingPartner] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPartner, setNewPartner] = useState({ companyCnpj: "", partnerName: "" });
+  const [isExportOpen, setIsExportOpen] = useState(false);
+  const [exportCompany, setExportCompany] = useState<string>("all");
+  const [isExporting, setIsExporting] = useState(false);
 
   // Server refresh/HMR can deliver new OCR data without remounting this year's table.
   // Update read-only ownership fields while preserving unsaved distribution edits.
@@ -580,6 +583,111 @@ export function DistribuicaoTable({
     }
   }
 
+  async function exportToExcel() {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const ExcelJS = (await import("exceljs")).default;
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "CRM Office";
+      workbook.created = new Date();
+
+      const selectedCompanies = exportCompany === "all"
+        ? companies
+        : companies.filter((c) => c.cnpj === exportCompany);
+
+      const MONTH_NAMES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+      for (const company of selectedCompanies) {
+        const companyRows = data.filter((r) => r.companyCnpj === company.cnpj);
+        if (!companyRows.length) continue;
+
+        const sheetName = (company.name || company.cnpj).slice(0, 31).replace(/[\\/*?\\[\\]]/g, "");
+        const ws = workbook.addWorksheet(sheetName);
+
+        // Title
+        ws.addRow([`Distribuição de Lucros — ${company.name} (${company.cnpj}) — Ano ${year}`]);
+        ws.getRow(1).font = { bold: true, size: 14 };
+        ws.addRow([]);
+
+        // Company settings
+        const settings = savedCompanySettings[company.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
+        ws.addRow(["Capital Social", formatCurrency(Number(companyRows[0]?.companyCapitalCents ?? 0) / 100)]);
+        ws.addRow(["Status", settings.status]);
+        ws.addRow(["Observação", settings.observation || "--"]);
+        ws.addRow(["Caso à parte", settings.caseAside ? "Sim" : "Não"]);
+        ws.addRow([]);
+
+        // Header for monthly data
+        const headerRow = ws.addRow(["Sócio", "Mês", "% Participação", "Tributação", "Valor (R$)", "Status", "Observação"]);
+        headerRow.font = { bold: true };
+        headerRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFD9E2F3" } };
+
+        const partners = [...new Set(companyRows.map((r) => r.partnerName))];
+        for (const partnerName of partners) {
+          const partnerRows = companyRows.filter((r) => r.partnerName === partnerName && r.month != null);
+          for (const row of partnerRows.sort((a, b) => (a.month ?? 0) - (b.month ?? 0))) {
+            ws.addRow([
+              partnerName,
+              MONTHS[row.month ?? 0],
+              row.participationPercentage ?? "",
+              row.dividendTaxation ?? "",
+              row.amount ?? "",
+              row.status,
+              row.observation ?? "",
+            ]);
+          }
+          // Summary row
+          const summary = companyRows.find((r) => r.partnerName === partnerName && r.month == null);
+          if (summary) {
+            const sRow = ws.addRow([
+              `${partnerName} (Resumo)`,
+              "Total",
+              summary.participationPercentage ?? "",
+              "",
+              "",
+              summary.status,
+              summary.observation ?? "",
+            ]);
+            sRow.font = { italic: true };
+          }
+        }
+
+        // Auto-width columns
+        ws.columns.forEach((col: any) => {
+          if (!col) return;
+          let maxLen = 10;
+          col.eachCell({ includeEmpty: false }, (cell: any) => {
+            const len = String(cell.value ?? "").length;
+            if (len > maxLen) maxLen = Math.min(len, 40);
+          });
+          col.width = maxLen + 2;
+        });
+      }
+
+      if (workbook.worksheets.length === 0) {
+        alert("Nenhuma empresa encontrada para exportar.");
+        return;
+      }
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `distribuicao-lucros-${year}${exportCompany !== "all" ? "-" + exportCompany : ""}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setIsExportOpen(false);
+      setNotice({ kind: "success", text: "Planilha exportada com sucesso." });
+    } catch (err) {
+      console.error(err);
+      setNotice({ kind: "error", text: err instanceof Error ? err.message : "Erro ao exportar planilha." });
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   async function deletePartner(row: Row) {
     if ((row.partnerId < 1 && !row.qsaId) || saveLock.current) return;
     const isPendingQsa = !!row.qsaId;
@@ -695,6 +803,13 @@ export function DistribuicaoTable({
           >
             + Sócio
           </button>}
+          <button
+            className="px-3 py-2 text-sm border rounded-md hover:bg-muted whitespace-nowrap"
+            disabled={isExporting}
+            onClick={() => { setNotice(null); setIsExportOpen(true); }}
+          >
+            {isExporting ? "Exportando..." : "Exportar"}
+          </button>
         </div>
       </div>
 
@@ -935,6 +1050,37 @@ export function DistribuicaoTable({
               setPendingYear(null);
               startYearTransition(() => router.push(`${pathname}?year=${nextYear}`));
             }}>Descartar e trocar</button>
+          </div>
+        </DialogPopup>
+      </Dialog>
+
+      {/* EXPORT DIALOG */}
+      <Dialog open={isExportOpen} onOpenChange={(open) => { if (!open) setIsExportOpen(false); }}>
+        <DialogPopup>
+          <DialogTitle>Exportar planilha</DialogTitle>
+          <DialogDescription>Escolha a empresa (ou todas) para exportar a distribuição de lucros.</DialogDescription>
+          <div className="flex flex-col gap-3 mt-3">
+            <label className="flex flex-col gap-1 text-sm">
+              Empresa
+              <select
+                className="border rounded px-3 py-2"
+                value={exportCompany}
+                onChange={(e) => setExportCompany(e.target.value)}
+              >
+                <option value="all">Todas as empresas</option>
+                {companies.map((c) => (
+                  <option key={c.cnpj} value={c.cnpj}>{c.name} ({c.cnpj})</option>
+                ))}
+              </select>
+            </label>
+            <div className="flex justify-end gap-2">
+              <button type="button" className="px-3 py-2 text-sm border rounded-md hover:bg-muted" onClick={() => setIsExportOpen(false)}>
+                Cancelar
+              </button>
+              <button type="button" className="px-3 py-2 text-sm border rounded-md bg-blue-600 text-white hover:bg-blue-700" onClick={exportToExcel} disabled={isExporting}>
+                {isExporting ? "Exportando..." : "Exportar"}
+              </button>
+            </div>
           </div>
         </DialogPopup>
       </Dialog>
