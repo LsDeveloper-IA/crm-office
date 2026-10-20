@@ -189,7 +189,6 @@ export function DistribuicaoTable({
   });
 
   const allFailureReasonOptions = Array.from(new Set([
-    "__partners__",
     "without-documents",
     "without-drive-folder",
     ...(automationFailureFilterOptions ?? []),
@@ -210,13 +209,12 @@ export function DistribuicaoTable({
   );
 
   const headerFailureFilters = visibleFailureFilters.filter(reason =>
-    reason !== "__partners__"
-    && reason !== "case-aside"
+    reason !== "case-aside"
     && reason !== "without-documents"
     && reason !== "without-drive-folder",
   );
 
-  const rowFailureReasonOptions = Array.from(new Set(["__partners__", "case-aside", ...visibleFailureFilters]));
+  const rowFailureReasonOptions = Array.from(new Set(["case-aside", ...visibleFailureFilters]));
 
   function changeFailureReason(cnpj: string, reason: string) {
     setFailureOverrides(previous => {
@@ -282,11 +280,8 @@ export function DistribuicaoTable({
       // "Caso à parte" pode vir do flag salvo (settings) ou da seleção manual do filtro na linha.
       const effectiveCaseAside = settings.caseAside || companyFailureReason === "case-aside";
       let matchPartnerFilter = false;
-      if (companyFailureReason === "__partners__") {
-        matchPartnerFilter = partnerFilter === "all";
-      } else if (partnerFilter === "case-aside") {
+      if (partnerFilter === "case-aside") {
         const hasExclusiveFailure = Boolean (companyFailureReason)
-          && companyFailureReason !== "__partners__"
           && companyFailureReason !== "case-aside";
         const hasDriveOrDocsIssue =
           companiesWithoutDriveFolder.includes(company.companyCnpj)

@@ -21,7 +21,6 @@ type Props = {
 
 const FAILURE_REASON_LABELS: Record<string, string> = {
   "case-aside": "Casos a parte",
-  "__partners__": "Com sócios",
   "without-documents": "Sem docs",
   "without-drive-folder": "Sem Drive",
   "skip-no-importable-ownership-history": "Sem histórico",
