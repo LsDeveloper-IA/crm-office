@@ -243,6 +243,9 @@ export function DistribuicaoTable({
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [exportCompany, setExportCompany] = useState<string>("all");
   const [isExporting, setIsExporting] = useState(false);
+  const [exportSearch, setExportSearch] = useState("");
+  const [exportStatusFilter, setExportStatusFilter] = useState<string>("");
+  const [exportPartnerFilter, setExportPartnerFilter] = useState<string>("all");
 
   // Server refresh/HMR can deliver new OCR data without remounting this year's table.
   // Update read-only ownership fields while preserving unsaved distribution edits.
@@ -592,9 +595,28 @@ export function DistribuicaoTable({
       workbook.creator = "CRM Office";
       workbook.created = new Date();
 
+      // Apply search + status + partner filters to determine which companies to export
+      const term = normalizeDistributionSearch(exportSearch);
+      const cnpjTerm = exportSearch.replace(/\\D/g, "");
+      const filteredExportCompanies = companies.filter((c) => {
+        const matchSearch = !term
+          || normalizeDistributionSearch(c.name).includes(term)
+          || (cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm));
+        const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
+        const matchStatus = !exportStatusFilter || settings.status === exportStatusFilter;
+        // Partner filter: check if company has caseAside or specific issues
+        const hasNoPartners = hasNoPartnersPlaceholder(data.filter((r) => r.companyCnpj === c.cnpj));
+        const caseAside = settings.caseAside || hasNoPartners;
+        const matchPartner = exportPartnerFilter === "all"
+          || (exportPartnerFilter === "case-aside" && caseAside)
+          || (exportPartnerFilter === "without-documents" && companiesWithoutDocuments.includes(c.cnpj))
+          || (exportPartnerFilter === "without-drive-folder" && companiesWithoutDriveFolder.includes(c.cnpj));
+        return matchSearch && matchStatus && matchPartner;
+      });
+
       const selectedCompanies = exportCompany === "all"
-        ? companies
-        : companies.filter((c) => c.cnpj === exportCompany);
+        ? filteredExportCompanies
+        : filteredExportCompanies.filter((c) => c.cnpj === exportCompany);
 
       const MONTH_NAMES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
@@ -605,29 +627,53 @@ export function DistribuicaoTable({
         const sheetName = (company.name || company.cnpj).slice(0, 31).replace(/[\\/*?\\[\\]]/g, "");
         const ws = workbook.addWorksheet(sheetName);
 
+        const thinBorder: any = { style: "thin", color: { argb: "FFBFBFBF" } };
+        const allBorders = { top: thinBorder, left: thinBorder, bottom: thinBorder, right: thinBorder };
+
         // Title
-        ws.addRow([`Distribuição de Lucros — ${company.name} (${company.cnpj}) — Ano ${year}`]);
-        ws.getRow(1).font = { bold: true, size: 14 };
+        const titleRow = ws.addRow([`Distribuição de Lucros — ${company.name}`]);
+        titleRow.font = { bold: true, size: 14, color: { argb: "FF1F3864" } };
+        ws.mergeCells(1, 1, 1, 7);
+        titleRow.alignment = { horizontal: "center" };
+        const subRow = ws.addRow([`CNPJ: ${company.cnpj}  |  Ano de referência: ${year}`]);
+        subRow.font = { italic: true, size: 10, color: { argb: "FF595959" } };
+        ws.mergeCells(2, 1, 2, 7);
+        subRow.alignment = { horizontal: "center" };
         ws.addRow([]);
 
-        // Company settings
+        // Company settings block
         const settings = savedCompanySettings[company.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
-        ws.addRow(["Capital Social", formatCurrency(Number(companyRows[0]?.companyCapitalCents ?? 0) / 100)]);
-        ws.addRow(["Status", settings.status]);
-        ws.addRow(["Observação", settings.observation || "--"]);
-        ws.addRow(["Caso à parte", settings.caseAside ? "Sim" : "Não"]);
+        const infoRows = [
+          ["Capital Social", formatCurrency(Number(companyRows[0]?.companyCapitalCents ?? 0) / 100)],
+          ["Status", settings.status],
+          ["Observação", settings.observation || "--"],
+          ["Caso à parte", settings.caseAside ? "Sim" : "Não"],
+        ];
+        for (const [label, value] of infoRows) {
+          const r = ws.addRow([label, value]);
+          r.getCell(1).font = { bold: true, size: 10 };
+          r.getCell(2).font = { size: 10 };
+          ws.mergeCells(r.number, 2, r.number, 7);
+        }
         ws.addRow([]);
 
         // Header for monthly data
         const headerRow = ws.addRow(["Sócio", "Mês", "% Participação", "Tributação", "Valor (R$)", "Status", "Observação"]);
-        headerRow.font = { bold: true };
-        headerRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFD9E2F3" } };
+        headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+        headerRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF2E5496" } };
+        headerRow.alignment = { horizontal: "center", vertical: "middle" };
+        headerRow.height = 20;
+        for (let c = 1; c <= 7; c++) {
+          headerRow.getCell(c).border = allBorders;
+        }
 
         const partners = [...new Set(companyRows.map((r) => r.partnerName))];
+        let rowIndex = headerRow.number + 1;
         for (const partnerName of partners) {
-          const partnerRows = companyRows.filter((r) => r.partnerName === partnerName && r.month != null);
-          for (const row of partnerRows.sort((a, b) => (a.month ?? 0) - (b.month ?? 0))) {
-            ws.addRow([
+          const partnerRows = companyRows.filter((r) => r.partnerName === partnerName && r.month != null)
+            .sort((a, b) => (a.month ?? 0) - (b.month ?? 0));
+          for (const row of partnerRows) {
+            const r = ws.addRow([
               partnerName,
               MONTHS[row.month ?? 0],
               row.participationPercentage ?? "",
@@ -636,6 +682,13 @@ export function DistribuicaoTable({
               row.status,
               row.observation ?? "",
             ]);
+            for (let c = 1; c <= 7; c++) r.getCell(c).border = allBorders;
+            if (rowIndex % 2 === 0) {
+              for (let c = 1; c <= 7; c++) {
+                r.getCell(c).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF2F2F2" } };
+              }
+            }
+            rowIndex++;
           }
           // Summary row
           const summary = companyRows.find((r) => r.partnerName === partnerName && r.month == null);
@@ -649,19 +702,20 @@ export function DistribuicaoTable({
               summary.status,
               summary.observation ?? "",
             ]);
-            sRow.font = { italic: true };
+            sRow.font = { italic: true, bold: true };
+            for (let c = 1; c <= 7; c++) {
+              sRow.getCell(c).border = allBorders;
+              sRow.getCell(c).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFDDEBF7" } };
+            }
+            rowIndex++;
           }
         }
 
         // Auto-width columns
-        ws.columns.forEach((col: any) => {
+        const colWidths = [30, 12, 14, 14, 14, 16, 30];
+        ws.columns.forEach((col: any, idx: number) => {
           if (!col) return;
-          let maxLen = 10;
-          col.eachCell({ includeEmpty: false }, (cell: any) => {
-            const len = String(cell.value ?? "").length;
-            if (len > maxLen) maxLen = Math.min(len, 40);
-          });
-          col.width = maxLen + 2;
+          col.width = colWidths[idx] ?? 12;
         });
       }
 
@@ -1061,16 +1115,65 @@ export function DistribuicaoTable({
           <DialogDescription>Escolha a empresa (ou todas) para exportar a distribuição de lucros.</DialogDescription>
           <div className="flex flex-col gap-3 mt-3">
             <label className="flex flex-col gap-1 text-sm">
+              Pesquisar empresa
+              <input
+                type="text"
+                className="border rounded px-3 py-2"
+                placeholder="Nome ou CNPJ..."
+                value={exportSearch}
+                onChange={(e) => { setExportSearch(e.target.value); setExportCompany("all"); }}
+              />
+            </label>
+            <div className="flex gap-2">
+              <label className="flex flex-col gap-1 text-sm flex-1">
+                Status
+                <select
+                  className="border rounded px-3 py-2"
+                  value={exportStatusFilter}
+                  onChange={(e) => setExportStatusFilter(e.target.value)}
+                >
+                  <option value="">Todos</option>
+                  {PROFIT_DISTRIBUTION_STATUS_OPTIONS.map((s) => (
+                    <option key={s.value} value={s.value}>{s.shortLabel}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="flex flex-col gap-1 text-sm flex-1">
+                Filtro de sócios
+                <select
+                  className="border rounded px-3 py-2"
+                  value={exportPartnerFilter}
+                  onChange={(e) => setExportPartnerFilter(e.target.value)}
+                >
+                  <option value="all">Todos</option>
+                  <option value="case-aside">Somente casos à parte</option>
+                  <option value="without-documents">Sem documentos</option>
+                  <option value="without-drive-folder">Sem pasta no Drive</option>
+                </select>
+              </label>
+            </div>
+            <label className="flex flex-col gap-1 text-sm">
               Empresa
               <select
                 className="border rounded px-3 py-2"
                 value={exportCompany}
                 onChange={(e) => setExportCompany(e.target.value)}
               >
-                <option value="all">Todas as empresas</option>
-                {companies.map((c) => (
-                  <option key={c.cnpj} value={c.cnpj}>{c.name} ({c.cnpj})</option>
-                ))}
+                <option value="all">Todas as empresas (filtradas)</option>
+                {companies
+                  .filter((c) => {
+                    const term = normalizeDistributionSearch(exportSearch);
+                    const cnpjTerm = exportSearch.replace(/\\D/g, "");
+                    const matchSearch = !term
+                      || normalizeDistributionSearch(c.name).includes(term)
+                      || (cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm));
+                    const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
+                    const matchStatus = !exportStatusFilter || settings.status === exportStatusFilter;
+                    return matchSearch && matchStatus;
+                  })
+                  .map((c) => (
+                    <option key={c.cnpj} value={c.cnpj}>{c.name} ({c.cnpj})</option>
+                  ))}
               </select>
             </label>
             <div className="flex justify-end gap-2">
