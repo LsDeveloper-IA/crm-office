@@ -699,6 +699,32 @@ export function DistribuicaoTable({
 
     [row.companyCnpj, { cnpj: row.companyCnpj, name: row.companyName }])).values()), [summaries]);
 
+  const exportFilteredCompanies = useMemo(() => {
+    const term = normalizeDistributionSearch(exportSearch);
+    const cnpjTerm = exportSearch.replace(/\D/g, "");
+    const result = [];
+    for (const c of companies) {
+      if (term && !normalizeDistributionSearch(c.name).includes(term) && !(cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm))) {
+        continue;
+      }
+      if (exportStatusFilter) {
+        const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
+        if (settings.status !== exportStatusFilter) continue;
+      }
+      if (exportPartnerFilter !== "all") {
+        const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
+        const hasNoPartners = hasNoPartnersPlaceholder(data.filter((r) => r.companyCnpj === c.cnpj));
+        const caseAside = settings.caseAside || hasNoPartners;
+        const matchPartner = (exportPartnerFilter === "case-aside" && caseAside)
+          || (exportPartnerFilter === "without-documents" && companiesWithoutDocuments.includes(c.cnpj))
+          || (exportPartnerFilter === "without-drive-folder" && companiesWithoutDriveFolder.includes(c.cnpj));
+        if (!matchPartner) continue;
+      }
+      result.push(c);
+    }
+    return result;
+  }, [companies, exportSearch, exportStatusFilter, exportPartnerFilter, savedCompanySettings, data, companiesWithoutDocuments, companiesWithoutDriveFolder]);
+
   const dirtyCompanyCount = Object.entries(companyDrafts).filter(([cnpj, draft]) =>
 
     hasCompanySettingsChanges(draft, savedCompanySettings[cnpj] ?? DEFAULT_COMPANY_SETTINGS)).length;
@@ -2282,38 +2308,11 @@ export function DistribuicaoTable({
               <div className="bg-slate-50 px-3 py-2 text-xs font-medium text-slate-600 flex items-center justify-between">
                 <span>Empresas encontradas</span>
                 <span className="font-bold text-blue-600">
-                  {companies.filter((c) => {
-                    const term = normalizeDistributionSearch(exportSearch);
-                    const cnpjTerm = exportSearch.replace(/\D/g, "");
-                    const matchSearch = !term || normalizeDistributionSearch(c.name).includes(term) || (cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm));
-                    const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
-                    const matchStatus = !exportStatusFilter || settings.status === exportStatusFilter;
-                    const hasNoPartners = hasNoPartnersPlaceholder(data.filter((r) => r.companyCnpj === c.cnpj));
-                    const caseAside = settings.caseAside || hasNoPartners;
-                    const matchPartner = exportPartnerFilter === "all"
-                      || (exportPartnerFilter === "case-aside" && caseAside)
-                      || (exportPartnerFilter === "without-documents" && companiesWithoutDocuments.includes(c.cnpj))
-                      || (exportPartnerFilter === "without-drive-folder" && companiesWithoutDriveFolder.includes(c.cnpj));
-                    return matchSearch && matchStatus && matchPartner;
-                  }).length}
+                  {exportFilteredCompanies.length}
                 </span>
               </div>
               <div className="max-h-48 overflow-y-auto divide-y divide-slate-100">
-                {companies
-                  .filter((c) => {
-                    const term = normalizeDistributionSearch(exportSearch);
-                    const cnpjTerm = exportSearch.replace(/\D/g, "");
-                    const matchSearch = !term || normalizeDistributionSearch(c.name).includes(term) || (cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm));
-                    const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
-                    const matchStatus = !exportStatusFilter || settings.status === exportStatusFilter;
-                    const hasNoPartners = hasNoPartnersPlaceholder(data.filter((r) => r.companyCnpj === c.cnpj));
-                    const caseAside = settings.caseAside || hasNoPartners;
-                    const matchPartner = exportPartnerFilter === "all"
-                      || (exportPartnerFilter === "case-aside" && caseAside)
-                      || (exportPartnerFilter === "without-documents" && companiesWithoutDocuments.includes(c.cnpj))
-                      || (exportPartnerFilter === "without-drive-folder" && companiesWithoutDriveFolder.includes(c.cnpj));
-                    return matchSearch && matchStatus && matchPartner;
-                  })
+                {exportFilteredCompanies
                   .slice(0, exportShowAll ? undefined : 50)
                   .map((c) => {
                     const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
@@ -2333,55 +2332,16 @@ export function DistribuicaoTable({
                       </button>
                     );
                   })}
-                {companies.filter((c) => {
-                  const term = normalizeDistributionSearch(exportSearch);
-                  const cnpjTerm = exportSearch.replace(/\D/g, "");
-                  const matchSearch = !term || normalizeDistributionSearch(c.name).includes(term) || (cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm));
-                  const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
-                  const matchStatus = !exportStatusFilter || settings.status === exportStatusFilter;
-                  const hasNoPartners = hasNoPartnersPlaceholder(data.filter((r) => r.companyCnpj === c.cnpj));
-                  const caseAside = settings.caseAside || hasNoPartners;
-                  const matchPartner = exportPartnerFilter === "all"
-                    || (exportPartnerFilter === "case-aside" && caseAside)
-                    || (exportPartnerFilter === "without-documents" && companiesWithoutDocuments.includes(c.cnpj))
-                    || (exportPartnerFilter === "without-drive-folder" && companiesWithoutDriveFolder.includes(c.cnpj));
-                  return matchSearch && matchStatus && matchPartner;
-                }).length > 50 && !exportShowAll && (
+                {exportFilteredCompanies.length > 50 && !exportShowAll && (
                   <button
                     type="button"
                     className="w-full px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 transition text-center font-medium"
                     onClick={() => setExportShowAll(true)}
                   >
-                    Mostrar mais ({companies.filter((c) => {
-                      const term = normalizeDistributionSearch(exportSearch);
-                      const cnpjTerm = exportSearch.replace(/\D/g, "");
-                      const matchSearch = !term || normalizeDistributionSearch(c.name).includes(term) || (cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm));
-                      const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
-                      const matchStatus = !exportStatusFilter || settings.status === exportStatusFilter;
-                      const hasNoPartners = hasNoPartnersPlaceholder(data.filter((r) => r.companyCnpj === c.cnpj));
-                      const caseAside = settings.caseAside || hasNoPartners;
-                      const matchPartner = exportPartnerFilter === "all"
-                        || (exportPartnerFilter === "case-aside" && caseAside)
-                        || (exportPartnerFilter === "without-documents" && companiesWithoutDocuments.includes(c.cnpj))
-                        || (exportPartnerFilter === "without-drive-folder" && companiesWithoutDriveFolder.includes(c.cnpj));
-                      return matchSearch && matchStatus && matchPartner;
-                    }).length - 50} empresas restantes)
+                    Mostrar mais ({exportFilteredCompanies.length - 50} empresas restantes)
                   </button>
                 )}
-                {companies.filter((c) => {
-                  const term = normalizeDistributionSearch(exportSearch);
-                  const cnpjTerm = exportSearch.replace(/\D/g, "");
-                  const matchSearch = !term || normalizeDistributionSearch(c.name).includes(term) || (cnpjTerm.length > 0 && c.cnpj.includes(cnpjTerm));
-                  const settings = savedCompanySettings[c.cnpj] ?? DEFAULT_COMPANY_SETTINGS;
-                  const matchStatus = !exportStatusFilter || settings.status === exportStatusFilter;
-                  const hasNoPartners = hasNoPartnersPlaceholder(data.filter((r) => r.companyCnpj === c.cnpj));
-                  const caseAside = settings.caseAside || hasNoPartners;
-                  const matchPartner = exportPartnerFilter === "all"
-                    || (exportPartnerFilter === "case-aside" && caseAside)
-                    || (exportPartnerFilter === "without-documents" && companiesWithoutDocuments.includes(c.cnpj))
-                    || (exportPartnerFilter === "without-drive-folder" && companiesWithoutDriveFolder.includes(c.cnpj));
-                  return matchSearch && matchStatus && matchPartner;
-                }).length === 0 && (
+                {exportFilteredCompanies.length === 0 && (
                   <div className="px-3 py-4 text-sm text-slate-400 text-center">
                     Nenhuma empresa encontrada.
                   </div>
