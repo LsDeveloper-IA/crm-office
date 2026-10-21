@@ -14433,41 +14433,36 @@ export function DistribuicaoTable({
 
 
       {pendingAlerts.length > 0 && (
-
-
-
         <div className="mb-3 space-y-1">
-
-
-
-          {pendingAlerts.map((alert, i) => (
-
-
-
-            <div key={i} className="flex items-center gap-2 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2" role="alert">
-
-
-
-              <span>⚠️</span>
-
-
-
-              <span>{alert}</span>
-
-
-
-            </div>
-
-
-
-          ))}
-
-
-
+          {pendingAlerts.map((alert, i) => {
+            const isCapital = alert.includes("capital social incompleto");
+            const isEmptyMonths = alert.includes("meses sem distribuicao");
+            const filterKey = isCapital ? "capital" : isEmptyMonths ? "emptyMonths" : null;
+            const isActive = pendingFilter === filterKey;
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setPendingFilter(isActive ? null : filterKey)}
+                className={`flex items-center gap-2 text-sm rounded-lg px-3 py-2 border transition w-full text-left ${isActive ? "bg-amber-200 border-amber-400 text-amber-900 font-medium" : "text-amber-800 bg-amber-50 border-amber-200 hover:bg-amber-100"}`}
+                role="alert"
+              >
+                <span>⚠️</span>
+                <span>{alert}</span>
+                {isActive && <span className="ml-auto text-xs">(clique para desativar)</span>}
+              </button>
+            );
+          })}
+          {pendingFilter && (
+            <button
+              type="button"
+              className="text-xs text-blue-600 hover:underline"
+              onClick={() => setPendingFilter(null)}
+            >
+              Limpar filtro de pendencias
+            </button>
+          )}
         </div>
-
-
-
       )}
 
 
