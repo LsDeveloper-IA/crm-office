@@ -30,8 +30,21 @@ def name_key(value):
 
 
 def document_number(text, label, length):
-    pattern = rf"\b{label}(?:\s*\(?\s*/?\s*MF\s*\)?)?[^\d]{{0,45}}((?:\d[\s./-]*){{{length-1}}}\d)(?!\d)"
-    return {re.sub(r"\D", "", v) for v in re.findall(pattern, text, re.I)}
+    # Tenta varios formatos: "LABEL: numero", "LABEL numero", numero em linha separada.
+    numbers = set()
+    # Formato 1: label seguido de ate 60 chars nao-digitos e depois o numero.
+    pattern1 = rf"\b{label}(?:\s*\(?\s*/?\s*MF\s*\)?)?[^\d]{{0,60}}((?:\d[\s./-]*){{{length-1}}}\d)(?!\d)"
+    for v in re.findall(pattern1, text, re.I):
+        numbers.add(re.sub(r"\D", "", v))
+    # Formato 2: numero em linha separada apos o label (label em uma linha, numero na proxima).
+    pattern2 = rf"\b{label}\s*[:\-]?\s*\n\s*((?:\d[\s./-]*){{{length-1}}}\d)(?!\d)"
+    for v in re.findall(pattern2, text, re.I):
+        numbers.add(re.sub(r"\D", "", v))
+    # Formato 3: label com separador "/" ou "-" antes do numero na mesma linha.
+    pattern3 = rf"\b{label}\s*[/:\-]\s*((?:\d[\s./-]*){{{length-1}}}\d)(?!\d)"
+    for v in re.findall(pattern3, text, re.I):
+        numbers.add(re.sub(r"\D", "", v))
+    return numbers
 
 
 def company_binding(text, cnpj, company_name, trusted_folder=False):
@@ -1113,7 +1126,9 @@ def qualification(text, name, valid_cpf):
     compact = normalized(text)
     # Matching the full name in a qualification avoids CPF lists of Junta signers.
     pattern = r"\b" + r"\s+".join(re.escape(t) for t in normalized(name).split())
-    pattern += r"\s*,?\s*(?:NACIONALIDADE\s*[:\-]?\s*)?(BRASILEIR[OA]|PESSOA JURIDICA)\b"
+    # Aceita tanto layout Junta (NACIONALIDADE: BRASILEIRO) quanto QSA Receita
+    # (nome seguido de Qualificacao) e layout com virgula.
+    pattern += r"\s*,?\s*(?:NACIONALIDADE\s*[:\-]?\s*)?(BRASILEIR[OA]|PESSOA JURIDICA|QUALIFICACAO|QUALIFICAÇÃO)\b"
     results = []
     for match in re.finditer(pattern, compact):
         body = compact[match.end():match.end()+1400]

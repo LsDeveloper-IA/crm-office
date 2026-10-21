@@ -403,6 +403,34 @@ model OwnershipProcessingRun {
   @@index([status, updatedAt])
 }
 
+model OwnershipCorrection {
+  id            String   @id @default(uuid())
+  companyCnpj   String   @db.VarChar(14)
+  partnerName   String
+  field         String   @db.VarChar(40)
+  oldValue      String?
+  newValue      String
+  sourceFileId  String?  @db.VarChar(80)
+  createdAt     DateTime @default(now())
+
+  @@index([companyCnpj])
+  @@index([createdAt])
+}
+
+model OwnershipDocumentPattern {
+  id            String   @id @default(uuid())
+  patternType   String   @db.VarChar(40)
+  documentType  String   @db.VarChar(40)
+  description   String
+  exampleText   String?
+  successCount  Int      @default(0)
+  failureCount  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([patternType, documentType])
+}
+
 model GmailQsaImport {
   id          Int      @id @default(autoincrement())
   mailbox     String
