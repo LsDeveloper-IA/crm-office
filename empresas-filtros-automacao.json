@@ -930,12 +930,6 @@
     "reason": "Sync interrupted (code 1). No success was confirmed. {\"timestamp\": \"2026-10-15T15:08:28.711603-03:00\", \"event\": \"gemini.started\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"pages\": 1}\r\n{\"timestamp\": \"2026-10-15T15:08:33.823447-03:00\", \"event\": \"gemini.completed\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"pages\": 1, \"characters\": 623}\r\n{\"timestamp\": \"2026-10-15T15:08:33.823447-03:00\", \"event\": \"document.extracted\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"mimeType\": \"application/pdf\", \"sizeBytes\": 78382, \"pages\": 1, \"sha256\": \"5817d62b374e8807460b882eac22eae52cc489627f73278e38eb1a558d700be5\", \"textSource\": \"gemini-inline\", \"classificationScore\": 20}\r\n{\"timestamp\": \"2026-10-15T15:08:38.264162-03:00\", \"event\": \"gemini.recovery_completed\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"reason\": \"parser\", \"classificationScore\": 20}\r\nNenhum histórico societário importável encontrado. QSA RECEITA.pdf: CNPJ de filial diferente; vÃ­nculo confirmado pelo nome empresarial exato e pasta correspondente; quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado; recuperaÃ§Ã£o assistida tambÃ©m nÃ£o validou: quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado\r\nSync interrupted (code 1). No success was confirmed. {\"timestamp\": \"2026-10-15T15:08:28.711603-03:00\", \"event\": \"gemini.started\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"pages\": 1}\r\n{\"timestamp\": \"2026-10-15T15:08:33.823447-03:00\", \"event\": \"gemini.completed\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"pages\": 1, \"characters\": 623}\r\n{\"timestamp\": \"2026-10-15T15:08:33.823447-03:00\", \"event\": \"document.extracted\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"mimeType\": \"application/pdf\", \"sizeBytes\": 78382, \"pages\": 1, \"sha256\": \"5817d62b374e8807460b882eac22eae52cc489627f73278e38eb1a558d700be5\", \"textSource\": \"gemini-inline\", \"classificationScore\": 20}\r\n{\"timestamp\": \"2026-10-15T15:08:38.264162-03:00\", \"event\": \"gemini.recovery_completed\", \"correlationId\": \"3ce7bf31-a102-4f46-9cf5-dc7dcf00289a\", \"sourceFileId\": \"1sPIsLsmsFtyJus4IY7AquGQJWDaf1IaL\", \"reason\": \"parser\", \"classificationScore\": 20}\r\nNenhum histórico societário importável encontrado. QSA RECEITA.pdf: CNPJ de filial diferente; vÃ­nculo confirmado pelo nome empresarial exato e pasta correspondente; quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado; recuperaÃ§Ã£o assistida tambÃ©m nÃ£o validou: quadro completo nÃ£o encontrado; nenhum cabeÃ§alho societÃ¡rio reconhecÃ­vel foi detectado"
   },
   {
-    "cnpj": "06203885000102",
-    "name": "COMERCIO VAREJISTA MARQUES AVIAMENTOS LTDA.",
-    "filter": "__partners__",
-    "reason": "Socio eudes removido (representante legal); empresa com socios"
-  },
-  {
     "cnpj": "06095564000131",
     "name": "EMPRESA JUNIOR DA FEAACS",
     "filter": "skip-no-importable-ownership-history",
@@ -976,11 +970,5 @@
     "name": "ORGAO DE GESTAO DE MAO DE O DO TP DO P ORG DE FORTALEZA",
     "filter": "without-documents",
     "reason": "Sync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas\r\nSync interrupted (code 1). No success was confirmed. Nenhum arquivo relacionado ao quadro societário ou às suas alterações foi identificado pelo nome na pasta ou subpastas"
-  },
-  {
-    "cnpj": "60529451000142",
-    "name": "PETALAS PATRIMONIAL LTDA",
-    "filter": "__partners__",
-    "reason": "Socia francisca marcada como ex-socia; empresa com socios"
   }
 ]
