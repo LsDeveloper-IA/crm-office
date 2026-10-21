@@ -3926,7 +3926,7 @@ export function DistribuicaoTable({
 
 
 
-  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [pendingFilter, setPendingFilter] = useState<"capital" | "emptyMonths" | null>(null);
 
 
 
@@ -3934,7 +3934,7 @@ export function DistribuicaoTable({
 
 
 
-  const [isImporting, setIsImporting] = useState(false);
+
 
 
 
@@ -4382,7 +4382,17 @@ export function DistribuicaoTable({
 
 
 
-    return [...grouped.values()].filter((company) => company.partners.some((row) => {
+    const matchesPendingFilter = (company: { companyCnpj: string; partners: Row[] }) => {
+      if (!pendingFilter) return true;
+      if (pendingFilter === "capital") return company.partners.some((p) => p.companyCapitalCents == null);
+      if (pendingFilter === "emptyMonths") {
+        const months = company.partners.flatMap((p) => p.monthlyDistributions ?? []);
+        return months.length > 0 && months.some((m) => m.amount == null && m.participationPercentage == null);
+      }
+      return true;
+    };
+
+    return [...grouped.values()].filter((company) => matchesPendingFilter(company) && company.partners.some((row) => {
 
 
 
@@ -4942,7 +4952,7 @@ export function DistribuicaoTable({
 
 
 
-    failureOverrides]);
+    failureOverrides, pendingFilter]);
 
 
 
@@ -14310,43 +14320,7 @@ export function DistribuicaoTable({
 
 
 
-          <button
-
-
-
-            className="px-3 py-2 text-sm border rounded-md hover:bg-muted whitespace-nowrap"
-
-
-
-            disabled={isImporting}
-
-
-
-            onClick={() => { setNotice(null); setIsImportOpen(true); }}
-
-
-
-          >
-
-
-
-            {isImporting ? "Importando..." : "Importar"}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          </button>
+          
 
 
 
@@ -19503,335 +19477,6 @@ export function DistribuicaoTable({
 
 
       </Dialog>
-
-
-
-
-
-      {/* IMPORT DIALOG */}
-
-
-      <Dialog open={isImportOpen} onOpenChange={(open) => { if (!open) setIsImportOpen(false); }}>
-
-
-        <DialogPopup className="max-w-2xl">
-
-
-          <DialogTitle className="text-lg font-semibold text-slate-800">Importar planilha de distribuicao</DialogTitle>
-
-
-          <DialogDescription className="text-sm text-slate-500">
-
-
-            Selecione um arquivo CSV com colunas: Empresa (CNPJ), Socio, Mes, % Participacao, Tributacao, Valor, Status, Observacao.
-
-
-          </DialogDescription>
-
-
-          <div className="mt-4 space-y-4">
-
-
-            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
-
-
-              <input
-
-
-                type="file"
-
-
-                accept=".csv"
-
-
-                className="hidden"
-
-
-                id="import-file-input"
-
-
-                onChange={async (e) => {
-
-
-                  const file = e.target.files?.[0];
-
-
-                  if (!file) return;
-
-
-                  setIsImporting(true);
-
-
-                  setNotice(null);
-
-
-                  try {
-
-
-                    const text = await file.text();
-
-
-                    const lines = text.split(/\r?\n/).filter((l) => l.trim());
-
-
-                    if (lines.length < 2) throw new Error("Arquivo vazio ou sem dados.");
-
-
-                    const header = lines[0].split(";").map((h) => h.trim().toLowerCase().replace(/"/g, ""));
-
-
-                    const cnpjIdx = header.findIndex((h) => h.includes("cnpj") || h.includes("empresa"));
-
-
-                    const partnerIdx = header.findIndex((h) => h.includes("socio") || h.includes("partner"));
-
-
-                    const monthIdx = header.findIndex((h) => h.includes("mes") || h.includes("month"));
-
-
-                    const pctIdx = header.findIndex((h) => h.includes("%") || h.includes("participacao") || h.includes("percentual"));
-
-
-                    const taxIdx = header.findIndex((h) => h.includes("tributacao") || h.includes("taxation"));
-
-
-                    const amountIdx = header.findIndex((h) => h.includes("valor") || h.includes("amount"));
-
-
-                    const statusIdx = header.findIndex((h) => h.includes("status"));
-
-
-                    const obsIdx = header.findIndex((h) => h.includes("observacao") || h.includes("obs"));
-
-
-
-
-
-                    if (cnpjIdx < 0 || partnerIdx < 0 || monthIdx < 0) {
-
-
-                      throw new Error("Colunas obrigatorias nao encontradas: Empresa (CNPJ), Socio, Mes.");
-
-
-                    }
-
-
-
-
-
-                    const MONTH_MAP: Record<string, number> = {
-
-
-                      janeiro: 0, fevereiro: 1, marco: 2, abril: 3, maio: 4, junho: 5,
-
-
-                      julho: 6, agosto: 7, setembro: 8, outubro: 9, novembro: 10, dezembro: 11,
-
-
-                      jan: 0, fev: 1, mar: 2, abr: 3, mai: 4, jun: 5, jul: 6, ago: 7, set: 8, out: 9, nov: 10, dez: 11,
-
-
-                    };
-
-
-
-
-
-                    let imported = 0;
-
-
-                    const newData = [...data];
-
-
-                    for (let i = 1; i < lines.length; i++) {
-
-
-                      const cols = lines[i].split(";").map((c) => c.trim().replace(/^"|"$/g, ""));
-
-
-                      const cnpj = cols[cnpjIdx]?.replace(/\D/g, "");
-
-
-                      const partnerName = cols[partnerIdx];
-
-
-                      const monthRaw = cols[monthIdx]?.toLowerCase();
-
-
-                      const monthNum = MONTH_MAP[monthRaw] ?? (Number(monthRaw) - 1);
-
-
-                      if (isNaN(monthNum) || monthNum < 0 || monthNum > 11) continue;
-
-
-
-
-
-                      const pct = pctIdx >= 0 ? cols[pctIdx] : "";
-
-
-                      const tax = taxIdx >= 0 ? cols[taxIdx] : "";
-
-
-                      const amount = amountIdx >= 0 ? cols[amountIdx] : "";
-
-
-                      const status = statusIdx >= 0 ? cols[statusIdx] : "NAO_ENCERRADO";
-
-
-                      const obs = obsIdx >= 0 ? cols[obsIdx] : "";
-
-
-
-
-
-                      const existingIdx = newData.findIndex(
-
-
-                        (r) => r.companyCnpj === cnpj && r.partnerName === partnerName && r.month === monthNum
-
-
-                      );
-
-
-                      if (existingIdx >= 0) {
-
-
-                        newData[existingIdx] = {
-
-
-                          ...newData[existingIdx],
-
-
-                          participationPercentage: pct ? Number(pct.replace(",", ".")) : null,
-
-
-                          dividendTaxation: (tax as any) || null,
-
-
-                          amount: amount ? Number(amount.replace(",", ".")) : null,
-
-
-                          status: status as any,
-
-
-                          observation: obs,
-
-
-                        };
-
-
-                      }
-
-
-                      imported++;
-
-
-                    }
-
-
-                    setData(newData);
-
-
-                    setNotice({ kind: "success", text: imported + " linha(s) importada(s) do CSV. Revise e salve." });
-
-
-                    setIsImportOpen(false);
-
-
-                  } catch (err) {
-
-
-                    setNotice({ kind: "error", text: err instanceof Error ? err.message : "Erro ao importar arquivo." });
-
-
-                  } finally {
-
-
-                    setIsImporting(false);
-
-
-                    e.target.value = "";
-
-
-                  }
-
-
-                }}
-
-
-              />
-
-
-              <label
-
-
-                htmlFor="import-file-input"
-
-
-                className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition font-medium"
-
-
-              >
-
-
-                Selecionar arquivo CSV
-
-
-              </label>
-
-
-              <p className="text-xs text-slate-400 mt-2">
-
-
-                Formato: CSV com separador ponto-e-virgula (;). Colunas: Empresa (CNPJ), Socio, Mes, % Participacao, Tributacao, Valor, Status, Observacao.
-
-
-              </p>
-
-
-            </div>
-
-
-
-
-
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-
-
-              <button
-
-
-                type="button"
-
-
-                className="px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 transition"
-
-
-                onClick={() => setIsImportOpen(false)}
-
-
-              >
-
-
-                Fechar
-
-
-              </button>
-
-
-            </div>
-
-
-          </div>
-
-
-        </DialogPopup>
-
-
-      </Dialog>
-
-
 
 
 
